@@ -1,0 +1,9 @@
+<resources>
+    <!-- Paleta base -->
+
+    <!-- Modo claro -->
+    <color name="background">#FFFFFF</color>
+    <color name="primary_text">#000000</color>
+
+    <!-- Modo oscuro -->
+</resources>

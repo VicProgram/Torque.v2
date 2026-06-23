@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permisos para imágenes (si usas galería) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Torque"
+        android:theme="@style/Theme.TorqueLight">
+
+        <!-- Activity Principal -->
+        <activity
+            android:name=".MenuPrincipal.MenuPrincipal"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Activities de Maintenance -->
+        <activity android:name=".maintenance.RegistroMantenimiento" />
+        <activity android:name=".maintenance.FormularioMantenimiento" />
+        <activity android:name=".maintenance.OpcionesMantenimiento" />
+        <activity android:name=".maintenance.MantenimientoHistorial" />
+        <!-- MaintenanceDetailData is a data class, not an activity -->
+
+        <!-- Activities de Garage -->
+        <activity android:name=".garage.MotoDetalle" />
+        <activity android:name=".garage.AnadirMotoActivity" />
+        <activity android:name=".garage.ListaGaraje" />
+
+        <!-- Perfil y Ajustes -->
+        <activity android:name=".perfil.PerfilActivity" />
+        <activity android:name=".ajustes.AjustesActivity" />
+
+    </application>
+</manifest>

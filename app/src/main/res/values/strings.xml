@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Torque</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="preferences_header">PREFERENCIAS</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="notifications_subtitle">Alertas de mantenimiento</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="dark_mode_subtitle">Interfaz de alto contraste</string>
+    <string name="system_header">SISTEMA</string>
+    <string name="privacy">Privacidad</string>
+    <string name="privacy_subtitle">Gestionar tus datos</string>
+    <string name="backup">Copia de Seguridad</string>
+    <string name="backup_subtitle">Copia de seguridad de la base de datos</string>
+    <string name="dashboard_title">Panel de Control</string>
+    <string name="no_notifications">No tienes notificaciones</string>
+    <string name="menu_toast">Menú lateral no implementado</string>
+    <string name="save_motorcycle">Guardar Moto</string>
+    <string name="welcome_prefix">Bienvenido,</string>
+    <string name="welcome_name">Motorista</string>
+    <string name="quick_actions_title">ACCIONES RÁPIDAS</string>
+    <string name="garage_title">Garaje</string>
+    <string name="garage_subtitle">Mis Motos</string>
+    <string name="maintenance_title">Mantenimiento</string>
+    <string name="maintenance_subtitle">Registros y Más</string>
+    <string name="next_service_image">Imagen de moto</string>
+    <string name="upcoming_label">PRÓXIMO</string>
+    <string name="your_primary_bike">Tu Moto Principal</string>
+    <string name="days_left">DÍAS REST.</string>
+    <string name="oil_change">CAMBIO DE ACEITE</string>
+    <string name="schedule_service">Agendar Servicio</string>
+    <string name="stats_title">ESTADÍSTICAS</string>
+    <string name="kilometers">Kilómetros</string>
+    <string name="add">Añadir</string>
+    <string name="menu">Menú</string>
+    <string name="settings">Configuración</string>
+    <string name="my_profile">Mi Perfil</string>
+    <string name="app_settings">Ajustes de la aplicación</string>
+    <string name="logout">Cerrar Sesión</string>
+    <string name="logged_out">Sesión cerrada</string>
+    <string name="profile_title">Perfil</string>
+    <string name="profile_name">Nombre</string>
+    <string name="profile_birthday_hint">Fecha de nacimiento (YYYY-MM-DD)</string>
+    <string name="save">Guardar</string>
+    <string name="happy_birthday">¡Feliz cumpleaños!</string>
+</resources>
