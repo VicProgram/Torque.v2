@@ -34,6 +34,7 @@ import com.example.torque.ajustes.dataStore
 import com.example.torque.garage.AnadirMotoActivity
 import com.example.torque.perfil.PerfilRepositorio
 import com.example.torque.room.RepositorioApp
+import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
 
@@ -46,6 +47,7 @@ fun TorqueDashboardScreen(
     val contexto = LocalContext.current
     val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val motoPrincipal by repositorio.obtenerMotoPrincipalFlow().collectAsState(initial = null)
+    var fotosPrincipales by remember { mutableStateOf<List<FotoEntity>>(emptyList()) }
     var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
 
     val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
@@ -54,8 +56,10 @@ fun TorqueDashboardScreen(
     LaunchedEffect(motoPrincipal) {
         if (motoPrincipal != null) {
             ultimoMantenimiento = repositorio.obtenerUltimoMantenimiento(motoPrincipal!!.idMoto)
+            repositorio.obtenerFotosPorMoto(motoPrincipal!!.idMoto).collect { fotosPrincipales = it }
         } else {
             ultimoMantenimiento = null
+            fotosPrincipales = emptyList()
         }
     }
 
@@ -113,7 +117,8 @@ fun TorqueDashboardScreen(
                 }
 
                 item {
-                    TarjetaProximoServicio(moto = motoPrincipal, kmRestantes = kmRestantes, progreso = progreso, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
+                    val fotoPortada = if (fotosPrincipales.isNotEmpty()) fotosPrincipales.last().ruta else motoPrincipal?.uriFoto
+                    TarjetaProximoServicio(moto = motoPrincipal, fotoPortada = fotoPortada, kmRestantes = kmRestantes, progreso = progreso, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
                 }
 
                 item {
@@ -365,7 +370,7 @@ private fun exportarBaseDeDatos(contexto: Context) {
 }
 
 @Composable
-fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, progreso: Float = 0f, onClick: () -> Unit) {
+fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRestantes: Int? = null, progreso: Float = 0f, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -380,9 +385,9 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, progreso
                     .height(140.dp) // Reducido de 160.dp
                     .background(ColoresTorque.SurfaceVariant)
             ) {
-                if (moto?.uriFoto != null) {
+                if (fotoPortada != null) {
                     Image(
-                        painter = rememberAsyncImagePainter(moto.uriFoto),
+                        painter = rememberAsyncImagePainter(fotoPortada),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()

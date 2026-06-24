@@ -73,6 +73,7 @@ fun VistaMotoDetalle(idMoto: Long) {
     var mostrarMenu by remember { mutableStateOf(false) }
     var mostrarDialogoKm by remember { mutableStateOf(false) }
     var mostrarDialogoEliminar by remember { mutableStateOf(false) }
+    var mostrarDialogoEliminarFoto by remember { mutableStateOf<FotoEntity?>(null) }
     var nuevoKm by remember { mutableStateOf("") }
     val estadoScroll = rememberScrollState()
 
@@ -336,39 +337,17 @@ fun VistaMotoDetalle(idMoto: Long) {
                             )
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 items(fotos) { foto ->
-                                    Box {
-                                        Image(
-                                            painter = rememberAsyncImagePainter(foto.ruta),
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier
-                                                .size(100.dp)
-                                                .clip(RoundedCornerShape(12.dp))
-                                        )
-                                        IconButton(
-                                            onClick = {
-                                                scope.launch {
-                                                    repositorio.eliminarFoto(foto)
-                                                    File(foto.ruta).delete()
-                                                    Toast.makeText(contexto, "Foto eliminada", Toast.LENGTH_SHORT).show()
-                                                }
-                                            },
-                                            modifier = Modifier
-                                                .align(Alignment.TopEnd)
-                                                .size(24.dp)
-                                                .background(
-                                                    Color.Black.copy(alpha = 0.6f),
-                                                    RoundedCornerShape(topEnd = 12.dp, bottomStart = 8.dp)
-                                                )
-                                        ) {
-                                            Icon(
-                                                Icons.Default.Close,
-                                                contentDescription = "Eliminar foto",
-                                                tint = Color.White,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                        }
-                                    }
+                                    Image(
+                                        painter = rememberAsyncImagePainter(foto.ruta),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .clickable {
+                                                mostrarDialogoEliminarFoto = foto
+                                            }
+                                    )
                                 }
                             }
                         }
@@ -445,6 +424,35 @@ fun VistaMotoDetalle(idMoto: Long) {
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoEliminar = false }) {
+                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                    }
+                }
+            )
+        }
+
+        mostrarDialogoEliminarFoto?.let { foto ->
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoEliminarFoto = null },
+                containerColor = ColoresTorque.SurfaceDark,
+                titleContentColor = Color.White,
+                textContentColor = Color.White,
+                icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFEF4444)) },
+                title = { Text("¿Eliminar foto?") },
+                text = { Text("Esta acción no se puede deshacer.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        scope.launch {
+                            repositorio.eliminarFoto(foto)
+                            File(foto.ruta).delete()
+                            Toast.makeText(contexto, "Foto eliminada", Toast.LENGTH_SHORT).show()
+                        }
+                        mostrarDialogoEliminarFoto = null
+                    }) {
+                        Text("Eliminar", color = Color(0xFFEF4444))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogoEliminarFoto = null }) {
                         Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
