@@ -60,11 +60,19 @@ fun TorqueDashboardScreen(
         if (motoPrincipal != null) {
             ultimoMantenimiento = repositorio.obtenerUltimoMantenimiento(motoPrincipal!!.idMoto)
             repositorio.obtenerFotosPorMoto(motoPrincipal!!.idMoto).collect { fotosPrincipales = it }
-            val todos = repositorio.obtenerTodosMantenimientosPorMoto(motoPrincipal!!.idMoto)
-            resultadoSalud = SaludMotoCalculator.calcular(todos, motoPrincipal!!.kilometros)
         } else {
             ultimoMantenimiento = null
             fotosPrincipales = emptyList()
+            resultadoSalud = null
+        }
+    }
+
+    LaunchedEffect(motoPrincipal?.idMoto) {
+        if (motoPrincipal != null) {
+            repositorio.obtenerMantenimientosPorMoto(motoPrincipal!!.idMoto).collect { mantenimientos ->
+                resultadoSalud = SaludMotoCalculator.calcular(mantenimientos, motoPrincipal!!.kilometros)
+            }
+        } else {
             resultadoSalud = null
         }
     }
@@ -124,7 +132,7 @@ fun TorqueDashboardScreen(
 
                 item {
                     val fotoPortada = if (fotosPrincipales.isNotEmpty()) fotosPrincipales.last().ruta else motoPrincipal?.uriFoto
-                    TarjetaProximoServicio(moto = motoPrincipal, fotoPortada = fotoPortada, kmRestantes = kmRestantes, progreso = progreso, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
+                    TarjetaProximoServicio(moto = motoPrincipal, fotoPortada = fotoPortada, kmRestantes = kmRestantes, progreso = progreso, resultadoSalud = resultadoSalud, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
                 }
 
                 item {
@@ -165,10 +173,6 @@ fun TorqueDashboardScreen(
 
                 item {
                     TarjetaEstadisticas(moto = motoPrincipal)
-                }
-
-                item {
-                    TarjetaSaludMoto(resultadoSalud = resultadoSalud)
                 }
             }
         }
@@ -380,7 +384,7 @@ private fun exportarBaseDeDatos(contexto: Context) {
 }
 
 @Composable
-fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRestantes: Int? = null, progreso: Float = 0f, onClick: () -> Unit) {
+fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRestantes: Int? = null, progreso: Float = 0f, resultadoSalud: ResultadoSalud? = null, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -485,42 +489,69 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp)) // Reducido de 20.dp
+                val salud = resultadoSalud?.saludGlobal ?: 0
+                val colorSalud = when {
+                    salud >= 70 -> Color(0xFF22C55E)
+                    salud >= 40 -> Color(0xFFEAB308)
+                    else -> Color(0xFFEF4444)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
                 Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "ESTADO GENERAL",
+                            text = "SALUD DE LA MOTO",
                             color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         )
                         Text(
-                            text = "${(progreso * 100).toInt()}%",
-                            color = if (progreso > 0.8f) Color(0xFFEF4444) else ColoresTorque.Primary,
+                            text = "${salud}%",
+                            color = colorSalud,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
-                        progress = { progreso },
+                        progress = { salud / 100f },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(8.dp)
                             .clip(CircleShape),
-                        color = if (progreso > 0.8f) Color(0xFFEF4444) else ColoresTorque.Primary,
+                        color = colorSalud,
                         trackColor = Color.White.copy(alpha = 0.1f)
                     )
+                    if (resultadoSalud != null && resultadoSalud.proximosVencidos.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        resultadoSalud.proximosVencidos.take(3).forEach { detalle ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    detalle.tipo.nombre,
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontSize = 12.sp
+                                )
+                                Text(
+                                    "${detalle.cumplimiento}%",
+                                    color = if (detalle.cumplimiento < 40) Color(0xFFEF4444) else ColoresTorque.OnSurfaceVariant,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 BotonTorque(
                     text = "Ver Mantenimiento",
                     onClick = onClick,
-                    modifier = Modifier.height(48.dp) // Reducido de 56.dp (vía default en BotonTorque, aquí forzamos)
+                    modifier = Modifier.height(48.dp)
                 )
             }
         }
@@ -611,85 +642,3 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
     }
 }
 
-@Composable
-fun TarjetaSaludMoto(resultadoSalud: ResultadoSalud?) {
-    val salud = resultadoSalud?.saludGlobal ?: 0
-    val colorSalud = when {
-        salud >= 70 -> Color(0xFF22C55E)
-        salud >= 40 -> Color(0xFFEAB308)
-        else -> Color(0xFFEF4444)
-    }
-
-    Card(
-        colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceContainer),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Favorite,
-                        contentDescription = null,
-                        tint = colorSalud,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Salud de la Moto",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Text(
-                    "${salud}%",
-                    color = colorSalud,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Black
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            LinearProgressIndicator(
-                progress = { salud / 100f },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(10.dp)
-                    .clip(RoundedCornerShape(5.dp)),
-                color = colorSalud,
-                trackColor = Color.White.copy(alpha = 0.1f)
-            )
-            if (resultadoSalud != null && resultadoSalud.proximosVencidos.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    "Próximos vencidos",
-                    color = ColoresTorque.OnSurfaceVariant,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
-                resultadoSalud.proximosVencidos.forEach { detalle ->
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            detalle.tipo.nombre,
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 13.sp
-                        )
-                        Text(
-                            "${detalle.cumplimiento}%",
-                            color = if (detalle.cumplimiento < 40) Color(0xFFEF4444) else ColoresTorque.OnSurfaceVariant,
-                            fontSize = 13.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
