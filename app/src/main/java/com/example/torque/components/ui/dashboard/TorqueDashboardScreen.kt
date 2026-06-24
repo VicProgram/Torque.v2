@@ -60,11 +60,19 @@ fun TorqueDashboardScreen(
     }
 
     val kmRestantes = remember(motoPrincipal, ultimoMantenimiento) {
-        if (motoPrincipal != null && ultimoMantenimiento != null) {
+        if (motoPrincipal != null && ultimoMantenimiento != null && ultimoMantenimiento!!.intervaloKms > 0) {
             val proxServicio = ultimoMantenimiento!!.kms + ultimoMantenimiento!!.intervaloKms
             val restante = proxServicio - motoPrincipal!!.kilometros
             if (restante < 0) -1 else restante
         } else null
+    }
+
+    val progreso = remember(motoPrincipal, ultimoMantenimiento, kmRestantes) {
+        if (motoPrincipal != null && ultimoMantenimiento != null && ultimoMantenimiento!!.intervaloKms > 0 && kmRestantes != null) {
+            val transcurrido = motoPrincipal!!.kilometros - ultimoMantenimiento!!.kms
+            val total = ultimoMantenimiento!!.intervaloKms
+            if (total > 0) (transcurrido.toFloat() / total).coerceIn(0f, 1f) else 0f
+        } else 0f
     }
 
     Box(
@@ -105,7 +113,7 @@ fun TorqueDashboardScreen(
                 }
 
                 item {
-                    TarjetaProximoServicio(moto = motoPrincipal, kmRestantes = kmRestantes, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
+                    TarjetaProximoServicio(moto = motoPrincipal, kmRestantes = kmRestantes, progreso = progreso, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
                 }
 
                 item {
@@ -357,7 +365,7 @@ private fun exportarBaseDeDatos(contexto: Context) {
 }
 
 @Composable
-fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick: () -> Unit) {
+fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, progreso: Float = 0f, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -476,20 +484,20 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                             letterSpacing = 1.sp
                         )
                         Text(
-                            text = "85%",
-                            color = ColoresTorque.Primary,
+                            text = "${(progreso * 100).toInt()}%",
+                            color = if (progreso > 0.8f) Color(0xFFEF4444) else ColoresTorque.Primary,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp)) // Reducido de 12.dp
+                    Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
-                        progress = { 0.85f },
+                        progress = { progreso },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(8.dp) // Reducido de 10.dp
+                            .height(8.dp)
                             .clip(CircleShape),
-                        color = ColoresTorque.Primary,
+                        color = if (progreso > 0.8f) Color(0xFFEF4444) else ColoresTorque.Primary,
                         trackColor = Color.White.copy(alpha = 0.1f)
                     )
                 }
@@ -570,7 +578,7 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
         Spacer(modifier = Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
-                text = moto?.kilometros?.toString() ?: "0",
+                text = if (moto != null) moto.kilometros.toString() else "—",
                 color = Color.White,
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Black,
