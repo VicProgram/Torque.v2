@@ -336,14 +336,39 @@ fun VistaMotoDetalle(idMoto: Long) {
                             )
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 items(fotos) { foto ->
-                                    Image(
-                                        painter = rememberAsyncImagePainter(foto.ruta),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(100.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                    )
+                                    Box {
+                                        Image(
+                                            painter = rememberAsyncImagePainter(foto.ruta),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .size(100.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                        )
+                                        IconButton(
+                                            onClick = {
+                                                scope.launch {
+                                                    repositorio.eliminarFoto(foto)
+                                                    File(foto.ruta).delete()
+                                                    Toast.makeText(contexto, "Foto eliminada", Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .size(24.dp)
+                                                .background(
+                                                    Color.Black.copy(alpha = 0.6f),
+                                                    RoundedCornerShape(topEnd = 12.dp, bottomStart = 8.dp)
+                                                )
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Close,
+                                                contentDescription = "Eliminar foto",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }

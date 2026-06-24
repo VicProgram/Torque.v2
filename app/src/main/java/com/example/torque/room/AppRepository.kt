@@ -104,4 +104,10 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
     } catch (e: Exception) {
         Log.e(TAG, "Error al insertar foto", e)
     }
+
+    suspend fun eliminarFoto(foto: FotoEntity) = try {
+        db.fotoDao().eliminar(foto)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al eliminar foto", e)
+    }
 }
