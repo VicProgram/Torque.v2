@@ -57,7 +57,7 @@ private suspend fun guardarMantenimiento(
     tiempo: String,
     notas: String,
     fechaActual: String,
-    repositorio: com.example.torque.room.RepositorioApp,
+    repositorio: RepositorioApp,
     contexto: android.content.Context
 ) {
     try {
@@ -75,12 +75,12 @@ private suspend fun guardarMantenimiento(
         )
         repositorio.insertarMantenimiento(mantenimiento)
         withContext(Dispatchers.Main) {
-            android.widget.Toast.makeText(contexto, "¡Mantenimiento guardado!", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(contexto, "¡Mantenimiento guardado!", Toast.LENGTH_SHORT).show()
             (contexto as? Activity)?.finish()
         }
     } catch (e: Exception) {
         withContext(Dispatchers.Main) {
-            android.widget.Toast.makeText(contexto, "Error al guardar: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+            Toast.makeText(contexto, "Error al guardar: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 }

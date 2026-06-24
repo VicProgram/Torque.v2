@@ -13,7 +13,7 @@
 
         <!-- Activity Principal -->
         <activity
-            android:name=".MenuPrincipal.MenuPrincipal"
+            android:name=".menuPrincipal.MenuPrincipal"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
