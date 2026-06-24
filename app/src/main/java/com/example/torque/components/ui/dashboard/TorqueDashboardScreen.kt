@@ -229,7 +229,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                         leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, tint = ColoresTorque.Primary) },
                         onClick = {
                             mostrarMenuPrincipal = false
-                            contexto.startActivity(Intent(contexto, com.example.torque.garage.AnadirMotoActivity::class.java))
+                            contexto.startActivity(Intent(contexto, AnadirMotoActivity::class.java))
                         }
                     )
                     HorizontalDivider(color = ColoresTorque.Outline.copy(alpha = 0.2f))
@@ -365,12 +365,12 @@ private fun exportarBaseDeDatos(contexto: Context) {
                     input.copyTo(output)
                 }
             }
-            android.widget.Toast.makeText(contexto, "Backup guardado en Descargas", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(contexto, "Backup guardado en Descargas", Toast.LENGTH_SHORT).show()
         } else {
-            android.widget.Toast.makeText(contexto, "No se encontró la base de datos", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(contexto, "No se encontró la base de datos", Toast.LENGTH_SHORT).show()
         }
     } catch (e: Exception) {
-        android.widget.Toast.makeText(contexto, "Error al exportar: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+        Toast.makeText(contexto, "Error al exportar: ${e.message}", Toast.LENGTH_LONG).show()
     }
 }
 
