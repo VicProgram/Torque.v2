@@ -2,7 +2,7 @@ package com.example.torque.utils
 
 import android.content.Context
 import android.net.Uri
-import android.widget.Toast
+import com.example.torque.room.BaseDeDatosApp
 import com.example.torque.room.RepositorioApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,8 +19,29 @@ object BackupManager {
     private const val CARPETA_FOTOS = "fotos/"
     private const val PREFERENCIAS = "preferencias/"
 
+    private fun vaciarWal(contexto: Context) {
+        try {
+            val db = BaseDeDatosApp.obtenerInstancia(contexto)
+            db.openHelper.writableDatabase.execSQL("PRAGMA wal_checkpoint(FULL)")
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun eliminarArchivosDb(contexto: Context) {
+        val dbPath = contexto.getDatabasePath(NOMBRE_DB)
+        val dir = dbPath.parentFile
+        val nombreBase = dbPath.name
+        dir?.listFiles()?.forEach { archivo ->
+            if (archivo.name.startsWith(nombreBase)) {
+                archivo.delete()
+            }
+        }
+    }
+
     suspend fun exportar(contexto: Context, uri: Uri): Result<Unit> = withContext(Dispatchers.IO) {
         try {
+            vaciarWal(contexto)
+
             val cacheDir = File(contexto.cacheDir, "backup_temp")
             cacheDir.mkdirs()
             val zipTemp = File(cacheDir, "torque_backup_${System.currentTimeMillis()}.zip")
@@ -96,10 +117,10 @@ object BackupManager {
 
             RepositorioApp.obtenerInstancia(contexto).cerrarBaseDeDatos()
 
-            val dbDestino = contexto.getDatabasePath(NOMBRE_DB)
             val dbOrigen = File(extraerDir, NOMBRE_DB)
             if (dbOrigen.exists()) {
-                contexto.deleteDatabase(NOMBRE_DB)
+                eliminarArchivosDb(contexto)
+                val dbDestino = contexto.getDatabasePath(NOMBRE_DB)
                 dbOrigen.copyTo(dbDestino, overwrite = true)
             }
 
