@@ -71,6 +71,13 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
 
     fun obtenerMantenimientosPorMoto(idMoto: Long) = db.mantenimientoDao().obtenerPorMotoFlow(idMoto)
 
+    suspend fun obtenerTodosMantenimientosPorMoto(idMoto: Long): List<MantenimientoEntity> = try {
+        db.mantenimientoDao().obtenerPorMoto(idMoto)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al obtener mantenimientos", e)
+        emptyList()
+    }
+
     suspend fun insertarMantenimiento(mantenimiento: MantenimientoEntity): Long = try {
         db.mantenimientoDao().insertar(mantenimiento)
     } catch (e: Exception) {

@@ -16,6 +16,9 @@ interface MantenimientoDao {
     @Query("SELECT * FROM mantenimientos WHERE idMoto = :idMoto ORDER BY fecha DESC")
     fun obtenerPorMotoFlow(idMoto: Long): Flow<List<MantenimientoEntity>>
 
+    @Query("SELECT * FROM mantenimientos WHERE idMoto = :idMoto ORDER BY fecha DESC")
+    suspend fun obtenerPorMoto(idMoto: Long): List<MantenimientoEntity>
+
     @Query("SELECT * FROM mantenimientos WHERE idMoto = :idMoto ORDER BY fecha DESC LIMIT 1")
     suspend fun obtenerUltimoPorMoto(idMoto: Long): MantenimientoEntity?
 

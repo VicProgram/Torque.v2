@@ -37,6 +37,8 @@ import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
+import com.example.torque.utils.ResultadoSalud
+import com.example.torque.utils.SaludMotoCalculator
 
 @Composable
 fun TorqueDashboardScreen(
@@ -49,6 +51,7 @@ fun TorqueDashboardScreen(
     val motoPrincipal by repositorio.obtenerMotoPrincipalFlow().collectAsState(initial = null)
     var fotosPrincipales by remember { mutableStateOf<List<FotoEntity>>(emptyList()) }
     var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
+    var resultadoSalud by remember { mutableStateOf<ResultadoSalud?>(null) }
 
     val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
     val nombrePerfil by perfilRepositorio.nombreFlow.collectAsState(initial = null)
@@ -57,9 +60,12 @@ fun TorqueDashboardScreen(
         if (motoPrincipal != null) {
             ultimoMantenimiento = repositorio.obtenerUltimoMantenimiento(motoPrincipal!!.idMoto)
             repositorio.obtenerFotosPorMoto(motoPrincipal!!.idMoto).collect { fotosPrincipales = it }
+            val todos = repositorio.obtenerTodosMantenimientosPorMoto(motoPrincipal!!.idMoto)
+            resultadoSalud = SaludMotoCalculator.calcular(todos, motoPrincipal!!.kilometros)
         } else {
             ultimoMantenimiento = null
             fotosPrincipales = emptyList()
+            resultadoSalud = null
         }
     }
 
@@ -159,6 +165,10 @@ fun TorqueDashboardScreen(
 
                 item {
                     TarjetaEstadisticas(moto = motoPrincipal)
+                }
+
+                item {
+                    TarjetaSaludMoto(resultadoSalud = resultadoSalud)
                 }
             }
         }
@@ -597,6 +607,89 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun TarjetaSaludMoto(resultadoSalud: ResultadoSalud?) {
+    val salud = resultadoSalud?.saludGlobal ?: 0
+    val colorSalud = when {
+        salud >= 70 -> Color(0xFF22C55E)
+        salud >= 40 -> Color(0xFFEAB308)
+        else -> Color(0xFFEF4444)
+    }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceContainer),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.Favorite,
+                        contentDescription = null,
+                        tint = colorSalud,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Salud de la Moto",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Text(
+                    "${salud}%",
+                    color = colorSalud,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Black
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            LinearProgressIndicator(
+                progress = { salud / 100f },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp)),
+                color = colorSalud,
+                trackColor = Color.White.copy(alpha = 0.1f)
+            )
+            if (resultadoSalud != null && resultadoSalud.proximosVencidos.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    "Próximos vencidos",
+                    color = ColoresTorque.OnSurfaceVariant,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+                resultadoSalud.proximosVencidos.forEach { detalle ->
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            detalle.tipo.nombre,
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp
+                        )
+                        Text(
+                            "${detalle.cumplimiento}%",
+                            color = if (detalle.cumplimiento < 40) Color(0xFFEF4444) else ColoresTorque.OnSurfaceVariant,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
         }
     }
 }

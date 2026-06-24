@@ -28,6 +28,7 @@ import com.example.torque.components.ui.dashboard.CampoTextoTorque
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.utils.TiposMantenimiento
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -61,6 +62,10 @@ private suspend fun guardarMantenimiento(
     contexto: android.content.Context
 ) {
     try {
+        val tipoId = if (tareasSeleccionadas.size == 1)
+            TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.id ?: 0L
+        else 0L
+
         val mantenimiento = MantenimientoEntity(
             idMoto = idMoto,
             nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else "Mantenimiento General",
@@ -71,7 +76,8 @@ private suspend fun guardarMantenimiento(
             tiempo = tiempo,
             notas = notas,
             tareas = tareasSeleccionadas.joinToString(", "),
-            creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+            creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()),
+            tipoMantenimientoId = tipoId
         )
         repositorio.insertarMantenimiento(mantenimiento)
         withContext(Dispatchers.Main) {

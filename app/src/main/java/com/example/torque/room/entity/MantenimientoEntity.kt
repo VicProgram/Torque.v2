@@ -15,5 +15,6 @@ data class MantenimientoEntity(
     val tiempo: String? = null,
     val notas: String? = null,
     val tareas: String? = null,
-    val creadoEn: String? = null
+    val creadoEn: String? = null,
+    val tipoMantenimientoId: Long = 0
 )
