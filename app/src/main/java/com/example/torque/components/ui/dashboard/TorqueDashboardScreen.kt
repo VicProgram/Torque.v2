@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
+import com.example.torque.ajustes.dataStore
 import com.example.torque.garage.AnadirMotoActivity
+import com.example.torque.perfil.PerfilRepositorio
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
@@ -45,6 +47,9 @@ fun TorqueDashboardScreen(
     val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val motoPrincipal by repositorio.obtenerMotoPrincipalFlow().collectAsState(initial = null)
     var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
+
+    val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
+    val nombrePerfil by perfilRepositorio.nombreFlow.collectAsState(initial = null)
 
     LaunchedEffect(motoPrincipal) {
         if (motoPrincipal != null) {
@@ -87,13 +92,13 @@ fun TorqueDashboardScreen(
                         Text(
                             text = stringResource(id = R.string.welcome_prefix),
                             color = ColoresTorque.OnSurfaceVariant,
-                            fontSize = 12.sp, // Ligeramente más pequeño
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = stringResource(id = R.string.welcome_name),
+                            text = if (nombrePerfil.isNullOrBlank()) stringResource(id = R.string.welcome_name) else nombrePerfil!!,
                             color = Color.White,
-                            fontSize = 28.sp, // Reducido de 32sp
+                            fontSize = 28.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }

@@ -29,6 +29,8 @@ import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,6 +48,43 @@ class FormularioMantenimiento : ComponentActivity() {
     }
 }
 
+private suspend fun guardarMantenimiento(
+    tareasSeleccionadas: List<String>,
+    idMoto: Long,
+    kmNuevos: Int,
+    intervaloKms: Int,
+    precio: String,
+    tiempo: String,
+    notas: String,
+    fechaActual: String,
+    repositorio: com.example.torque.room.RepositorioApp,
+    contexto: android.content.Context
+) {
+    try {
+        val mantenimiento = MantenimientoEntity(
+            idMoto = idMoto,
+            nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else "Mantenimiento General",
+            fecha = fechaActual,
+            kms = kmNuevos,
+            intervaloKms = intervaloKms,
+            precio = precio,
+            tiempo = tiempo,
+            notas = notas,
+            tareas = tareasSeleccionadas.joinToString(", "),
+            creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        )
+        repositorio.insertarMantenimiento(mantenimiento)
+        withContext(Dispatchers.Main) {
+            android.widget.Toast.makeText(contexto, "¡Mantenimiento guardado!", android.widget.Toast.LENGTH_SHORT).show()
+            (contexto as? Activity)?.finish()
+        }
+    } catch (e: Exception) {
+        withContext(Dispatchers.Main) {
+            android.widget.Toast.makeText(contexto, "Error al guardar: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+}
+
 @Composable
 fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long) {
     val contexto = LocalContext.current
@@ -59,6 +98,8 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
     var notas by remember { mutableStateOf("") }
     var errorKms by remember { mutableStateOf(false) }
     var mostrarDialogoDescartar by remember { mutableStateOf(false) }
+    var mostrarDialogoActualizarKm by remember { mutableStateOf(false) }
+    var kmMotoActual by remember { mutableStateOf(0) }
 
     val hayCambios = kms.isNotBlank() || intervalo.isNotBlank() || precio.isNotBlank() ||
         tiempo.isNotBlank() || notas.isNotBlank()
@@ -175,6 +216,40 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             )
         }
 
+        if (mostrarDialogoActualizarKm) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoActualizarKm = false },
+                containerColor = ColoresTorque.SurfaceDark,
+                title = { Text("¿Actualizar kilometraje?") },
+                text = {
+                    Text("El mantenimiento registra ${kms} km, pero la moto tiene $kmMotoActual km. ¿Actualizar el kilometraje de la moto?")
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        mostrarDialogoActualizarKm = false
+                        scope.launch {
+                            val kmNuevos = kms.toIntOrNull() ?: 0
+                            repositorio.actualizarKilometros(idMoto, kmNuevos)
+                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto)
+                        }
+                    }) {
+                        Text("Sí, actualizar", color = ColoresTorque.Primary)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        mostrarDialogoActualizarKm = false
+                        scope.launch {
+                            val kmNuevos = kms.toIntOrNull() ?: 0
+                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto)
+                        }
+                    }) {
+                        Text("No", color = ColoresTorque.OnSurfaceVariant)
+                    }
+                }
+            )
+        }
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -198,24 +273,15 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                     }
 
                     scope.launch {
-                        val mantenimiento = MantenimientoEntity(
-                            idMoto = idMoto,
-                            nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else "Mantenimiento General",
-                            fecha = fechaActual,
-                            kms = kms.toIntOrNull() ?: 0,
-                            intervaloKms = intervalo.toIntOrNull() ?: 0,
-                            precio = precio,
-                            tiempo = tiempo,
-                            notas = notas,
-                            tareas = tareasSeleccionadas.joinToString(", "),
-                            creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                        )
-                        repositorio.insertarMantenimiento(mantenimiento)
-                        
-                        launch(kotlinx.coroutines.Dispatchers.Main) {
-                            Toast.makeText(contexto, "¡Mantenimiento guardado!", Toast.LENGTH_SHORT).show()
-                            (contexto as? Activity)?.finish()
+                        val kmNuevos = kms.toIntOrNull() ?: 0
+                        val moto = repositorio.obtenerMotoPorId(idMoto)
+                        if (moto != null && kmNuevos > moto.kilometros) {
+                            kmMotoActual = moto.kilometros
+                            mostrarDialogoActualizarKm = true
+                            return@launch
                         }
+
+                        guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto)
                     }
                 }
             )
