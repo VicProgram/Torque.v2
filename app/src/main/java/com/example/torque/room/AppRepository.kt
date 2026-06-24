@@ -110,4 +110,9 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
     } catch (e: Exception) {
         Log.e(TAG, "Error al eliminar foto", e)
     }
+
+    fun cerrarBaseDeDatos() {
+        BaseDeDatosApp.cerrarYReiniciar()
+        instance = null
+    }
 }

@@ -33,5 +33,10 @@ abstract class BaseDeDatosApp : RoomDatabase() {
                     "torque_room.db"
                 ).build().also { INSTANCE = it }
             }
+
+        fun cerrarYReiniciar() {
+            INSTANCE?.close()
+            INSTANCE = null
+        }
     }
 }
