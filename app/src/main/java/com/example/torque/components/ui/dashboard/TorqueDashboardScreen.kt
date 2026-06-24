@@ -47,8 +47,15 @@ fun TorqueDashboardScreen(
     val contexto = LocalContext.current
     val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val motoPrincipal by repositorio.obtenerMotoPrincipalFlow().collectAsState(initial = null)
-    var fotosPrincipales by remember { mutableStateOf<List<FotoEntity>>(emptyList()) }
     var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
+    val fotosPrincipales by produceState<List<FotoEntity>>(
+        initialValue = emptyList(),
+        key1 = motoPrincipal?.idMoto
+    ) {
+        if (motoPrincipal != null) {
+            repositorio.obtenerFotosPorMoto(motoPrincipal!!.idMoto).collect { value = it }
+        }
+    }
 
     val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
     val nombrePerfil by perfilRepositorio.nombreFlow.collectAsState(initial = null)
@@ -56,10 +63,8 @@ fun TorqueDashboardScreen(
     LaunchedEffect(motoPrincipal) {
         if (motoPrincipal != null) {
             ultimoMantenimiento = repositorio.obtenerUltimoMantenimiento(motoPrincipal!!.idMoto)
-            repositorio.obtenerFotosPorMoto(motoPrincipal!!.idMoto).collect { fotosPrincipales = it }
         } else {
             ultimoMantenimiento = null
-            fotosPrincipales = emptyList()
         }
     }
 
