@@ -171,6 +171,9 @@ fun TorqueDashboardScreen(
 fun CabeceraDashboard(onIrPerfil: () -> Unit) {
     val contexto = LocalContext.current
     var mostrarMenuAjustes by remember { mutableStateOf(false) }
+    var mostrarMenuPrincipal by remember { mutableStateOf(false) }
+    var mostrarAcercaDe by remember { mutableStateOf(false) }
+    var mostrarExportar by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -181,13 +184,62 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { /* Menú Lateral */ }) {
-                Icon(
-                    Icons.Default.Menu,
-                    contentDescription = "Menú",
-                    tint = ColoresTorque.OnSurface,
-                    modifier = Modifier.size(24.dp)
-                )
+            Box {
+                IconButton(onClick = { mostrarMenuPrincipal = true }) {
+                    Icon(
+                        Icons.Default.Menu,
+                        contentDescription = "Menú",
+                        tint = ColoresTorque.OnSurface,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = mostrarMenuPrincipal,
+                    onDismissRequest = { mostrarMenuPrincipal = false },
+                    modifier = Modifier.background(ColoresTorque.SurfaceDark)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Ir al Garaje", color = Color.White) },
+                        leadingIcon = { Icon(Icons.Default.Motorcycle, contentDescription = null, tint = ColoresTorque.Primary) },
+                        onClick = {
+                            mostrarMenuPrincipal = false
+                            contexto.startActivity(Intent(contexto, com.example.torque.garage.ListaGaraje::class.java))
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Añadir Moto", color = Color.White) },
+                        leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, tint = ColoresTorque.Primary) },
+                        onClick = {
+                            mostrarMenuPrincipal = false
+                            contexto.startActivity(Intent(contexto, com.example.torque.garage.AnadirMotoActivity::class.java))
+                        }
+                    )
+                    HorizontalDivider(color = ColoresTorque.Outline.copy(alpha = 0.2f))
+                    DropdownMenuItem(
+                        text = { Text("Recordatorios", color = Color.White) },
+                        leadingIcon = { Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.Primary) },
+                        onClick = {
+                            mostrarMenuPrincipal = false
+                            contexto.startActivity(Intent(contexto, AjustesActivity::class.java))
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Exportar Datos", color = Color.White) },
+                        leadingIcon = { Icon(Icons.Default.Upload, contentDescription = null, tint = ColoresTorque.Primary) },
+                        onClick = {
+                            mostrarMenuPrincipal = false
+                            mostrarExportar = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Acerca de", color = Color.White) },
+                        leadingIcon = { Icon(Icons.Default.Info, contentDescription = null, tint = ColoresTorque.Primary) },
+                        onClick = {
+                            mostrarMenuPrincipal = false
+                            mostrarAcercaDe = true
+                        }
+                    )
+                }
             }
             Text(
                 text = "Torque",
@@ -197,14 +249,6 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { /* Notificaciones */ }) {
-                Icon(
-                    Icons.Default.Notifications,
-                    contentDescription = "Notificaciones",
-                    tint = ColoresTorque.OnSurfaceVariant,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
             Box {
                 Box(
                     modifier = Modifier
@@ -245,6 +289,70 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
             }
             Spacer(modifier = Modifier.width(8.dp))
         }
+    }
+
+    if (mostrarAcercaDe) {
+        AlertDialog(
+            onDismissRequest = { mostrarAcercaDe = false },
+            containerColor = ColoresTorque.SurfaceDark,
+            icon = { Icon(Icons.Default.Info, contentDescription = null, tint = ColoresTorque.Primary) },
+            title = { Text("Torque v1.0") },
+            text = {
+                Column {
+                    Text("App de gestión de mantenimiento para motocicletas.", color = Color.White)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Desarrollada con Jetpack Compose y Room.", color = ColoresTorque.OnSurfaceVariant, fontSize = 13.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { mostrarAcercaDe = false }) {
+                    Text("Cerrar", color = ColoresTorque.Primary)
+                }
+            }
+        )
+    }
+
+    if (mostrarExportar) {
+        AlertDialog(
+            onDismissRequest = { mostrarExportar = false },
+            containerColor = ColoresTorque.SurfaceDark,
+            icon = { Icon(Icons.Default.Upload, contentDescription = null, tint = ColoresTorque.Primary) },
+            title = { Text("Exportar Datos") },
+            text = { Text("Copia de seguridad guardada en Descargas/Torque_backup.db", color = Color.White) },
+            confirmButton = {
+                TextButton(onClick = {
+                    mostrarExportar = false
+                    exportarBaseDeDatos(contexto)
+                }) {
+                    Text("Exportar", color = ColoresTorque.Primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarExportar = false }) {
+                    Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                }
+            }
+        )
+    }
+}
+
+private fun exportarBaseDeDatos(contexto: Context) {
+    try {
+        val dbPath = contexto.getDatabasePath("torque_room.db")
+        if (dbPath.exists()) {
+            val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+            val backupFile = java.io.File(downloadsDir, "Torque_backup.db")
+            dbPath.inputStream().use { input ->
+                backupFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            android.widget.Toast.makeText(contexto, "Backup guardado en Descargas", android.widget.Toast.LENGTH_SHORT).show()
+        } else {
+            android.widget.Toast.makeText(contexto, "No se encontró la base de datos", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    } catch (e: Exception) {
+        android.widget.Toast.makeText(contexto, "Error al exportar: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
     }
 }
 
