@@ -131,7 +131,7 @@
     <string name="btn_continue">Continuar</string>
 
     <!-- ListaGaraje -->
-    <string name="search_by_brand_hint">Buscar por marca o modelo...</string>
+    <string name="search_by_brand_hint">Buscar por marca, modelo o matrícula...</string>
     <string name="content_desc_clear">Limpiar</string>
     <string name="my_garage_title">Mi Garaje</string>
     <string name="content_desc_search">Buscar</string>
