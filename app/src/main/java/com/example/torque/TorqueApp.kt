@@ -36,5 +36,5 @@ class TorqueApp : Application() {
 
 val appModule = module {
     single { RepositorioApp.obtenerInstancia(get()) }
-    single { AjustesRepositorio(get().dataStore) }
+    single { AjustesRepositorio(get<android.content.Context>().dataStore) }
 }

@@ -1,0 +1,22 @@
+Unresolved reference 'detekt'.
+Unresolved reference 'util'.
+Unresolved reference 'load'.
+<html>Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:<br/>fun ExtensionContainer.get(name: String): Any
+<html>Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:<br/>fun ExtensionContainer.get(name: String): Any
+<html>Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:<br/>fun ExtensionContainer.get(name: String): Any
+<html>Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:<br/>fun ExtensionContainer.get(name: String): Any
+Unresolved reference 'detekt'.
+Unresolved reference 'config'.
+Unresolved reference 'buildUponDefaultConfig'.
+Unresolved reference 'allRules'.
+Unresolved reference 'splashscreen'.
+Unresolved reference 'koin'.
+Unresolved reference 'koin'.
+Unresolved reference 'sentry'.
+A newer version of `compileSdk` than 35 is available: 37
+Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details.
+Unnecessary safe call on a non-null receiver of type 'Any'.
+Unnecessary safe call on a non-null receiver of type 'Any'.
+Unnecessary safe call on a non-null receiver of type 'Any'.
+Unnecessary safe call on a non-null receiver of type 'Any'.
+The ‘apply’ plugin syntax is older and not recommended

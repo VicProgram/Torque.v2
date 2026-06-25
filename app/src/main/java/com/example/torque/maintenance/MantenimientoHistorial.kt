@@ -322,22 +322,25 @@ fun DetalleMantenimientoEntityScreen(
         Text(text = mantenimiento.nombreMantenimiento, color = ColoresTorque.Primary, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
         Text(text = "${mantenimiento.fecha} · ${mantenimiento.kms} kms", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
         
-        if (!mantenimiento.notas.isNullOrBlank()) {
+        val notas = mantenimiento.notas
+        if (!notas.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = stringResource(R.string.section_notes), color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            Text(text = mantenimiento.notas, color = Color.White, fontSize = 16.sp)
+            Text(text = notas, color = Color.White, fontSize = 16.sp)
         }
 
-        if (!mantenimiento.tareas.isNullOrBlank()) {
+        val tareas = mantenimiento.tareas
+        if (!tareas.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = stringResource(R.string.section_tasks_done), color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            Text(text = mantenimiento.tareas, color = Color.White, fontSize = 16.sp)
+            Text(text = tareas, color = Color.White, fontSize = 16.sp)
         }
 
-        if (!mantenimiento.precio.isNullOrBlank()) {
+        val precio = mantenimiento.precio
+        if (!precio.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = stringResource(R.string.section_cost), color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            Text(text = mantenimiento.precio, color = Color(0xFF81C784), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = precio, color = Color(0xFF81C784), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
 }

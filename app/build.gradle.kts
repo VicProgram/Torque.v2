@@ -6,10 +6,18 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-val keystorePropertiesFile = rootProject.file("keystore.properties")
-val keystoreProperties = java.util.Properties().apply {
-    if (keystorePropertiesFile.exists()) {
-        load(keystorePropertiesFile.inputStream())
+val keystoreFile = rootProject.file("keystore.properties")
+val keystoreExists = keystoreFile.exists()
+val keystoreProps = mutableMapOf<String, String>()
+if (keystoreExists) {
+    keystoreFile.readLines().forEach { line ->
+        val trimmed = line.trim()
+        if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
+            val eq = trimmed.indexOf('=')
+            if (eq > 0) {
+                keystoreProps[trimmed.substring(0, eq).trim()] = trimmed.substring(eq + 1).trim()
+            }
+        }
     }
 }
 
@@ -34,10 +42,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = keystoreProperties["storeFile"]?.toString()?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"]?.toString()
-            keyAlias = keystoreProperties["keyAlias"]?.toString()
-            keyPassword = keystoreProperties["keyPassword"]?.toString()
+            storeFile = keystoreProps["storeFile"]?.let { rootProject.file(it) }
+            storePassword = keystoreProps["storePassword"]
+            keyAlias = keystoreProps["keyAlias"]
+            keyPassword = keystoreProps["keyPassword"]
         }
     }
 
@@ -75,7 +83,7 @@ android {
 }
 
 detekt {
-    config.setFrom(rootProject.file("config/detekt/detekt.yml"))
+    config.setFrom(files("${rootDir}/config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
     allRules = false
 }
