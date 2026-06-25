@@ -45,7 +45,9 @@ abstract class BaseDeDatosApp : RoomDatabase() {
                     context.applicationContext,
                     BaseDeDatosApp::class.java,
                     "torque_room.db"
-                ).addMigrations(MIGRACION_1_2, MIGRACION_2_3).build().also { INSTANCE = it }
+                ).addMigrations(MIGRACION_1_2, MIGRACION_2_3)
+                    .fallbackToDestructiveMigration()
+                    .build().also { INSTANCE = it }
             }
 
         fun cerrarYReiniciar() {

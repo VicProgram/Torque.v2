@@ -179,6 +179,7 @@
     <string name="error_brand_required">La marca es obligatoria</string>
     <string name="field_model_required">Modelo *</string>
     <string name="error_model_required">El modelo es obligatorio</string>
+    <string name="error_plate_required">La matrícula es obligatoria</string>
     <string name="field_current_kms_short">Kms Actuales</string>
     <string name="label_set_as_primary">Establecer como principal</string>
     <string name="btn_update_bike">Actualizar Moto</string>

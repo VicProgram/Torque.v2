@@ -199,9 +199,23 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         CampoTextoTorque(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
-                        CampoTextoTorque(matricula, { matricula = it }, stringResource(R.string.label_plate), modifier = Modifier.weight(1f))
-                        if (errorMatricula) {
-                            Text("La matrícula es obligatoria", color = Color.Red, fontSize = 12.sp)
+                        Column(modifier = Modifier.weight(1f)) {
+                            CampoTextoTorque(
+                                value = matricula,
+                                onValueChange = {
+                                    matricula = it
+                                    errorMatricula = false
+                                },
+                                label = stringResource(R.string.label_plate)
+                            )
+                            if (errorMatricula) {
+                                Text(
+                                    text = stringResource(R.string.error_plate_required),
+                                    color = Color(0xFFEF4444),
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(start = 4.dp)
+                                )
+                            }
                         }
                     }
 

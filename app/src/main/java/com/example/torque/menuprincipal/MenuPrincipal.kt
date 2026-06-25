@@ -24,8 +24,8 @@ import com.example.torque.ui.theme.TorqueTheme
 
 class MenuPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         installSplashScreen()
+        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val repositorio = remember { AjustesRepositorio(this.dataStore) }
