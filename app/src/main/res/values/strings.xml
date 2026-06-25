@@ -75,6 +75,15 @@
     <string name="btn_cancel">Cancelar</string>
     <string name="content_desc_back">Atrás</string>
 
+    <!-- Dashboard km / notifications -->
+    <string name="notifications_title">Notificaciones de Mantenimiento</string>
+    <string name="no_notifications_pending">No hay avisos pendientes</string>
+    <string name="notification_expired">Vencido</string>
+    <string name="notification_soon">Próximo a vencer</string>
+    <string name="km_edit_title">Editar Kilometraje</string>
+    <string name="km_current_label">KMS ACTUALES</string>
+    <string name="km_tap_to_edit">Toca para editar</string>
+
     <!-- FormularioMantenimiento -->
     <string name="maintenance_details_title">Detalles del Mantenimiento</string>
     <string name="label_tasks">Tareas</string>

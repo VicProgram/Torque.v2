@@ -64,6 +64,11 @@ fun TorqueDashboardScreen(
     var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
     var resultadoSalud by remember { mutableStateOf<ResultadoSalud?>(null) }
     var mostrarDialogoDesgaste by remember { mutableStateOf(false) }
+    var mostrarDialogoKm by remember { mutableStateOf(false) }
+    var kmEditText by remember { mutableStateOf("") }
+    var mostrarDialogoNotificaciones by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
     val nombrePerfil by perfilRepositorio.nombreFlow.collectAsState(initial = null)
@@ -122,6 +127,10 @@ fun TorqueDashboardScreen(
         } else 0f
     }
 
+    val notificacionesPendientes = remember(resultadoSalud) {
+        resultadoSalud?.desglose?.count { it.cumplimiento <= 20 && !it.tipo.esDesgaste } ?: 0
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -133,7 +142,11 @@ fun TorqueDashboardScreen(
                 .fillMaxSize()
                 .padding(bottom = 64.dp)
         ) {
-            CabeceraDashboard(onIrPerfil)
+            CabeceraDashboard(
+                onIrPerfil = onIrPerfil,
+                notificacionesPendientes = notificacionesPendientes,
+                onNotificacionesClick = { mostrarDialogoNotificaciones = true }
+            )
 
             LazyColumn(
                 modifier = Modifier
@@ -156,6 +169,52 @@ fun TorqueDashboardScreen(
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(ColoresTorque.SurfaceContainer)
+                                .clickable {
+                                    if (motoPrincipal != null) {
+                                        kmEditText = motoPrincipal!!.kilometros.toString()
+                                        mostrarDialogoKm = true
+                                    }
+                                }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.km_current_label),
+                                    color = ColoresTorque.Tertiary,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.5.sp
+                                )
+                                Text(
+                                    text = if (motoPrincipal != null) "${motoPrincipal!!.kilometros}" else "—",
+                                    color = Color.White,
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Black
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = stringResource(R.string.km_tap_to_edit),
+                                    color = ColoresTorque.OnSurfaceVariant,
+                                    fontSize = 11.sp
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = null,
+                                    tint = ColoresTorque.Primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -209,9 +268,6 @@ fun TorqueDashboardScreen(
                     }
                 }
 
-                item {
-                    TarjetaEstadisticas(moto = motoPrincipal)
-                }
             }
         }
 
@@ -236,11 +292,138 @@ fun TorqueDashboardScreen(
             )
         }
 
+        if (mostrarDialogoKm && motoPrincipal != null) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoKm = false },
+                containerColor = ColoresTorque.SurfaceDark,
+                title = { Text(stringResource(R.string.km_edit_title), color = Color.White, fontWeight = FontWeight.Bold) },
+                text = {
+                    OutlinedTextField(
+                        value = kmEditText,
+                        onValueChange = { kmEditText = it.filter { c -> c.isDigit() } },
+                        label = { Text(stringResource(R.string.field_kilometers), color = ColoresTorque.OnSurfaceVariant) },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = ColoresTorque.Primary,
+                            unfocusedBorderColor = ColoresTorque.Outline,
+                            cursorColor = ColoresTorque.Primary,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedLabelColor = ColoresTorque.Primary,
+                            unfocusedLabelColor = ColoresTorque.OnSurfaceVariant
+                        )
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val km = kmEditText.toIntOrNull()
+                        if (km != null && km >= 0) {
+                            scope.launch {
+                                repositorio.actualizarKilometros(motoPrincipal!!.idMoto, km)
+                            }
+                        }
+                        mostrarDialogoKm = false
+                    }) {
+                        Text(stringResource(R.string.save), color = ColoresTorque.Primary)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogoKm = false }) {
+                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
+                    }
+                }
+            )
+        }
+
+        if (mostrarDialogoNotificaciones) {
+            val saludActual = resultadoSalud
+            val itemsNotificacion = remember(saludActual) {
+                saludActual?.desglose
+                    ?.filter { it.cumplimiento <= 20 && !it.tipo.esDesgaste }
+                    ?.sortedBy { it.cumplimiento }
+                    ?: emptyList()
+            }
+
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoNotificaciones = false },
+                containerColor = ColoresTorque.SurfaceDark,
+                icon = {
+                    Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.Primary)
+                },
+                title = {
+                    Text(stringResource(R.string.notifications_title), color = Color.White, fontWeight = FontWeight.Bold)
+                },
+                text = {
+                    if (itemsNotificacion.isEmpty()) {
+                        Text(
+                            stringResource(R.string.no_notifications_pending),
+                            color = ColoresTorque.OnSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 16.dp)
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            itemsNotificacion.forEach { detalle ->
+                                val vencido = detalle.cumplimiento == 0
+                                val colorEstado = if (vencido) Color(0xFFEF4444) else Color(0xFFEAB308)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(ColoresTorque.SurfaceContainer)
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = if (vencido) Icons.Default.Warning else Icons.Default.Info,
+                                        contentDescription = null,
+                                        tint = colorEstado,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = detalle.tipo.nombre,
+                                            color = Color.White,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = if (vencido) stringResource(R.string.notification_expired)
+                                                   else stringResource(R.string.notification_soon),
+                                            color = colorEstado,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                    Text(
+                                        text = "${detalle.cumplimiento}%",
+                                        color = colorEstado,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Black
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { mostrarDialogoNotificaciones = false }) {
+                        Text(stringResource(R.string.btn_close), color = ColoresTorque.Primary)
+                    }
+                }
+            )
+        }
+
     }
 }
 
 @Composable
-fun CabeceraDashboard(onIrPerfil: () -> Unit) {
+fun CabeceraDashboard(
+    onIrPerfil: () -> Unit,
+    notificacionesPendientes: Int = 0,
+    onNotificacionesClick: () -> Unit = {}
+) {
     val contexto = LocalContext.current
     var mostrarMenuAjustes by remember { mutableStateOf(false) }
     var mostrarMenuPrincipal by remember { mutableStateOf(false) }
@@ -321,6 +504,39 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .border(1.dp, ColoresTorque.Outline.copy(alpha = 0.5f), CircleShape)
+                .clickable { onNotificacionesClick() }
+            ) {
+                BadgedBox(
+                    badge = {
+                        if (notificacionesPendientes > 0) {
+                            Badge(
+                                containerColor = Color(0xFFEF4444),
+                                contentColor = Color.White
+                            ) {
+                                Text(
+                                    text = notificacionesPendientes.toString(),
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = stringResource(R.string.notifications),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        tint = ColoresTorque.OnSurfaceVariant
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(8.dp))
             Box {
                 Box(
                     modifier = Modifier
