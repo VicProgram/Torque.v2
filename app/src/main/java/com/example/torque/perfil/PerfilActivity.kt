@@ -64,18 +64,23 @@ fun PerfilScreen(onBack: () -> Unit) {
     val telefono by repositorio.telefonoFlow.collectAsState(initial = "")
     val fotoPerfil by repositorio.fotoFlow.collectAsState(initial = null)
     val fechaNacimiento by repositorio.fechaNacimientoFlow.collectAsState(initial = "")
+    val carnetsGuardados by repositorio.carnetsFlow.collectAsState(initial = emptySet())
 
     var editando by remember { mutableStateOf(false) }
     var editNombre by remember { mutableStateOf(nombre ?: "") }
     var editEmail by remember { mutableStateOf(email ?: "") }
     var editTelefono by remember { mutableStateOf(telefono ?: "") }
     var editFecha by remember { mutableStateOf(fechaNacimiento ?: "") }
+    var editCarnets by remember { mutableStateOf(emptySet<String>()) }
 
-    LaunchedEffect(nombre, email, telefono, fechaNacimiento) {
+    val carnetsDisponibles = remember { listOf("AM", "A1", "A2", "A") }
+
+    LaunchedEffect(nombre, email, telefono, fechaNacimiento, carnetsGuardados) {
         editNombre = nombre ?: ""
         editEmail = email ?: ""
         editTelefono = telefono ?: ""
         editFecha = fechaNacimiento ?: ""
+        editCarnets = carnetsGuardados
     }
 
     val selectorImagen = rememberLauncherForActivityResult(
@@ -120,6 +125,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                             repositorio.establecerEmail(editEmail.trim())
                             repositorio.establecerTelefono(editTelefono.trim())
                             repositorio.establecerFechaNacimientoIso(editFecha.trim())
+                            repositorio.establecerCarnets(editCarnets)
                         }
                         Toast.makeText(contexto, "Perfil guardado", Toast.LENGTH_SHORT).show()
                     }
@@ -223,24 +229,36 @@ fun PerfilScreen(onBack: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    val carnets = listOf("AM", "A1", "A2", "A")
+                    val carnetsMostrar = if (editando) carnetsDisponibles else carnetsDisponibles.filter { it in carnetsGuardados }
                     @OptIn(ExperimentalLayoutApi::class)
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        carnets.forEach { carnet ->
+                        carnetsMostrar.forEach { carnet ->
+                            val seleccionado = carnet in editCarnets
+                            val bgColor = if (editando && seleccionado) ColoresTorque.Primary else ColoresTorque.SurfaceDark
+                            val borderColor = if (editando && seleccionado) Color.Transparent else ColoresTorque.BorderDark
+                            val textoColor = if (editando && seleccionado) Color.White else Color.White
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(ColoresTorque.SurfaceDark)
-                                    .border(1.dp, ColoresTorque.BorderDark, RoundedCornerShape(12.dp))
+                                    .background(bgColor)
+                                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                    .clickable(enabled = editando) {
+                                        editCarnets = if (seleccionado) editCarnets - carnet else editCarnets + carnet
+                                    }
                                     .padding(horizontal = 20.dp, vertical = 12.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Badge, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(18.dp))
+                                    Icon(
+                                        Icons.Default.Badge,
+                                        contentDescription = null,
+                                        tint = if (editando && seleccionado) Color.White else ColoresTorque.Primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = carnet, color = Color.White, fontWeight = FontWeight.Bold)
+                                    Text(text = carnet, color = textoColor, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }

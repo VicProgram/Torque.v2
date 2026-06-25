@@ -13,6 +13,7 @@ object ClavesPerfil {
     val TELEFONO = stringPreferencesKey("perfil_telefono")
     val FOTO_PERFIL = stringPreferencesKey("perfil_foto")
     val FECHA_NACIMIENTO = stringPreferencesKey("perfil_fecha_nacimiento_iso")
+    val CARNETS = stringPreferencesKey("perfil_carnets")
 }
 
 class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
@@ -22,6 +23,9 @@ class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
     val telefonoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.TELEFONO] }
     val fotoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.FOTO_PERFIL] }
     val fechaNacimientoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.FECHA_NACIMIENTO] }
+    val carnetsFlow: Flow<Set<String>> = dataStore.data.map { prefs ->
+        prefs[ClavesPerfil.CARNETS]?.split(",")?.filter { it.isNotBlank() }?.toSet() ?: emptySet()
+    }
 
     suspend fun establecerNombre(nombre: String) {
         dataStore.edit { prefs -> prefs[ClavesPerfil.NOMBRE] = nombre }
@@ -41,5 +45,11 @@ class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
 
     suspend fun establecerFechaNacimientoIso(fechaIso: String) {
         dataStore.edit { prefs -> prefs[ClavesPerfil.FECHA_NACIMIENTO] = fechaIso }
+    }
+
+    suspend fun establecerCarnets(carnets: Set<String>) {
+        dataStore.edit { prefs ->
+            prefs[ClavesPerfil.CARNETS] = carnets.joinToString(",")
+        }
     }
 }
