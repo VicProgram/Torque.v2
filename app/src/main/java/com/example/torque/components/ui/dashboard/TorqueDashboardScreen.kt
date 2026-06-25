@@ -148,14 +148,10 @@ fun TorqueDashboardScreen(
                 .fillMaxSize()
                 .padding(bottom = 64.dp)
         ) {
-            val repoAjustes = remember { AjustesRepositorio(contexto.dataStore) }
-            val logoSelccionado by repoAjustes.logoSelccionadoFlow.collectAsState(initial = 1)
-
             CabeceraDashboard(
                 onIrPerfil = onIrPerfil,
                 notificacionesPendientes = notificacionesPendientes,
-                onNotificacionesClick = { mostrarDialogoNotificaciones = true },
-                logoSelccionado = logoSelccionado
+                onNotificacionesClick = { mostrarDialogoNotificaciones = true }
             )
 
             LazyColumn(
@@ -423,8 +419,7 @@ fun TorqueDashboardScreen(
 fun CabeceraDashboard(
     onIrPerfil: () -> Unit,
     notificacionesPendientes: Int = 0,
-    onNotificacionesClick: () -> Unit = {},
-    logoSelccionado: Int = 1
+    onNotificacionesClick: () -> Unit = {}
 ) {
     val contexto = LocalContext.current
     var mostrarMenuAjustes by remember { mutableStateOf(false) }
@@ -499,17 +494,8 @@ fun CabeceraDashboard(
                     )
                 }
             }
-            val logoResId = when (logoSelccionado) {
-                1 -> R.drawable.ic_logo1
-                2 -> R.drawable.ic_logo2
-                3 -> R.drawable.ic_logo3
-                4 -> R.drawable.ic_logo4
-                5 -> R.drawable.ic_logo5
-                6 -> R.drawable.ic_logo6
-                else -> R.drawable.ic_logo1
-            }
             Image(
-                painter = painterResource(id = logoResId),
+                painter = painterResource(id = R.drawable.ic_logo1),
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier.height(32.dp)
             )
