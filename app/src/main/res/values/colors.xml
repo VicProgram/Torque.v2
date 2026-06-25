@@ -6,4 +6,7 @@
     <color name="primary_text">#000000</color>
 
     <!-- Modo oscuro -->
+
+    <!-- Splash screen -->
+    <color name="splash_background">#0B0F19</color>
 </resources>

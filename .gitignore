@@ -15,6 +15,7 @@ app/build/
 *.tmp
 *.keystore
 *.jks
+keystore.properties
 torque.db
 *.db
 *.db-shm

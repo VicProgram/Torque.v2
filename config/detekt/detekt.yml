@@ -1,0 +1,28 @@
+build:
+  maxIssues: 0
+
+complexity:
+  LongMethod:
+    active: false
+  LongParameterList:
+    active: false
+  LargeClass:
+    active: false
+
+style:
+  MagicNumber:
+    active: false
+  UnusedPrivateMember:
+    active: false
+  WildcardImport:
+    active: false
+
+naming:
+  FunctionNaming:
+    active: false
+  TopLevelPropertyNaming:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false

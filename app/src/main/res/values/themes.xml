@@ -5,4 +5,10 @@
         <item name="android:windowBackground">@color/background</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
     </style>
+
+    <style name="Theme.TorqueSplash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo1</item>
+        <item name="postSplashScreenTheme">@style/Theme.TorqueLight</item>
+    </style>
 </resources>

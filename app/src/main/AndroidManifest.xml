@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".TorqueApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Torque"
@@ -15,7 +16,8 @@
         <!-- Activity Principal -->
         <activity
             android:name=".MenuPrincipal.MenuPrincipal"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.TorqueSplash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

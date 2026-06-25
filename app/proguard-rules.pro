@@ -1,21 +1,29 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Keep line numbers for crash stack traces
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep data classes used by Room (entities)
+-keep class com.example.torque.room.entity.** { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep Compose
+-dontwarn androidx.compose.**
+-keep class androidx.compose.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Keep Kotlin coroutines
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+
+# Keep DataStore
+-keepclassmembers class * extends androidx.datastore.preferences.protobuf.GeneratedMessageLite { *; }
+
+# Keep Sentry
+-keep class io.sentry.** { *; }
+-dontwarn io.sentry.**
+
+# Keep Koin
+-keep class org.koin.** { *; }
+-dontwarn org.koin.**
+
+# Keep Gson/Serialization if added later
+#-keepattributes Signature
+#-keepattributes *Annotation*

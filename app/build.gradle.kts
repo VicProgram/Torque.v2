@@ -3,6 +3,14 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.detekt)
+}
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = java.util.Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        load(keystorePropertiesFile.inputStream())
+    }
 }
 
 android {
@@ -17,18 +25,31 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "SENTRY_DSN", "\"https://example@sentry.io/placeholder\"")
         vectorDrawables {
             useSupportLibrary = true
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = keystoreProperties["storeFile"]?.toString()?.let { file(it) }
+            storePassword = keystoreProperties["storePassword"]?.toString()
+            keyAlias = keystoreProperties["keyAlias"]?.toString()
+            keyPassword = keystoreProperties["keyPassword"]?.toString()
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 
@@ -43,6 +64,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -52,7 +74,17 @@ android {
     }
 }
 
+detekt {
+    config.setFrom(rootProject.file("config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    allRules = false
+}
+
 dependencies {
+    // --- Módulos internos ---
+    implementation(project(":core"))
+    implementation(project(":data"))
+
     // --- BOM de Compose ---
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -70,6 +102,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.splashscreen)
     // --- Persistencia de Datos (DataStore y Room) ---
     implementation(libs.androidx.datastore.preferences)
 
@@ -80,6 +113,13 @@ dependencies {
 
     // --- Imágenes (Coil) ---
     implementation(libs.coil.compose)
+
+    // --- DI (Koin) ---
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+
+    // --- Error Tracking (Sentry) ---
+    implementation(libs.sentry.android)
 
     // --- Testing ---
     testImplementation(libs.junit)
