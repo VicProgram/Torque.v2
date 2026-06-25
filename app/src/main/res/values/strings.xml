@@ -163,7 +163,7 @@
     <string name="toast_photo_deleted">Foto eliminada</string>
     <string name="label_brand">Marca</string>
     <string name="label_year">Año</string>
-    <string name="label_plate">Matrícula</string>
+    <string name="label_plate">Matrícula*</string>
     <string name="label_displacement">Cilindrada</string>
     <string name="label_power">Potencia</string>
     <string name="label_kilometers">Kilómetros</string>

@@ -80,6 +80,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
     var esPrincipal by remember { mutableStateOf(false) }
     var errorMarca by remember { mutableStateOf(false) }
     var errorModelo by remember { mutableStateOf(false) }
+    var errorMatricula by remember { mutableStateOf(false) }
     var cargando by remember { mutableStateOf(editando) }
     var mostrarDialogoDescartar by remember { mutableStateOf(false) }
 
@@ -94,7 +95,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 marca = moto.marca
                 modelo = moto.modelo
                 anio = if (moto.anio > 0) moto.anio.toString() else ""
-                matricula = moto.matricula ?: ""
+                matricula = moto.matricula
                 cilindrada = moto.cilindrada ?: ""
                 caballos = moto.caballos ?: ""
                 estilo = moto.estilo ?: ""
@@ -199,6 +200,9 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         CampoTextoTorque(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
                         CampoTextoTorque(matricula, { matricula = it }, stringResource(R.string.label_plate), modifier = Modifier.weight(1f))
+                        if (errorMatricula) {
+                            Text("La matrícula es obligatoria", color = Color.Red, fontSize = 12.sp)
+                        }
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -262,7 +266,9 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 onClick = {
                     errorMarca = marca.isBlank()
                     errorModelo = modelo.isBlank()
-                    if (errorMarca || errorModelo) {
+                    errorMatricula = matricula.isBlank()
+
+                    if (errorMarca || errorModelo || errorMatricula) {
                         Toast.makeText(contexto, contexto.getString(R.string.toast_fill_required), Toast.LENGTH_SHORT).show()
                         return@BotonTorque
                     }
