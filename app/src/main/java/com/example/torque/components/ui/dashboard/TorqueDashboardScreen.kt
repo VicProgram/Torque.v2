@@ -50,6 +50,7 @@ import com.example.torque.utils.TiposMantenimiento
 import com.example.torque.utils.DateUtils
 import com.example.torque.utils.TipoMantenimiento
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Composable
 fun TorqueDashboardScreen(
@@ -930,7 +931,8 @@ fun DialogoAjusteDesgaste(idMoto: Long, onDismiss: () -> Unit) {
                             Slider(
                                 value = (porcentajes[tipo.id] ?: 100).toFloat(),
                                 onValueChange = { nuevo ->
-                                    porcentajes = porcentajes + (tipo.id to nuevo.toInt())
+                                    val redondeado = (nuevo / 5f).roundToInt() * 5
+                                    porcentajes = porcentajes + (tipo.id to redondeado.coerceIn(0, 100))
                                 },
                                 valueRange = 0f..100f,
                                 steps = 19,
