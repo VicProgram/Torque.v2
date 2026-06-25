@@ -29,7 +29,7 @@ class AjustesRepositorio(private val dataStore: DataStore<Preferences>) {
     }
 
     val logoSelccionadoFlow: Flow<Int> = dataStore.data.map { preferencias ->
-        preferencias[ClavesPreferencias.LOGO_SELECCIONADO] ?: 1
+        preferencias[ClavesPreferencias.LOGO_SELECCIONADO] ?: 4
     }
 
     suspend fun establecerNotificacionesActivadas(activadas: Boolean) {
