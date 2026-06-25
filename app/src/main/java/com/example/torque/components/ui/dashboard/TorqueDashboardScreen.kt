@@ -714,14 +714,31 @@ fun DialogoAjusteDesgaste(idMoto: Long, onDismiss: () -> Unit) {
         confirmButton = {
             TextButton(onClick = {
                 scope.launch {
-                    for ((tipoId, pct) in porcentajes) {
-                        val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipoId)
+                    for (tipo in wearTipos) {
+                        val pct = porcentajes[tipo.id] ?: 100
+                        val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipo.id)
                         if (ultimo != null) {
                             repositorio.actualizarPorcentajeVida(ultimo.id, pct)
+                        } else {
+                            val nuevo = MantenimientoEntity(
+                                idMoto = idMoto,
+                                nombreMantenimiento = tipo.nombre,
+                                fecha = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(java.util.Date()),
+                                kms = 0,
+                                intervaloKms = 0,
+                                precio = "",
+                                tiempo = "",
+                                notas = "Ajuste de desgaste",
+                                tareas = tipo.nombre,
+                                creadoEn = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date()),
+                                tipoMantenimientoId = tipo.id,
+                                porcentajeVida = pct
+                            )
+                            repositorio.insertarMantenimiento(nuevo)
                         }
                     }
+                    onDismiss()
                 }
-                onDismiss()
             }) {
                 Text("Guardar", color = ColoresTorque.Primary)
             }
