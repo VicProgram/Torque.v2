@@ -22,4 +22,3 @@ torque.db
 *.db-wal
 .dart_tool/
 .kotlin/
-docs/
