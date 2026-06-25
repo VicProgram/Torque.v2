@@ -53,7 +53,7 @@
     <string name="about_dialog_title">Torque v1.0</string>
     <string name="about_dialog_description">App de gestión de mantenimiento para motocicletas.</string>
     <string name="about_dialog_tech">Desarrollada con Jetpack Compose y Room.</string>
-    <string name="export_dialog_message">Copia de seguridad guardada en Descargas/Torque_backup.db</string>
+    <string name="export_dialog_message">Se guardará un ZIP con la base de datos, fotos y configuración en Descargas.</string>
     <string name="btn_export">Exportar</string>
     <string name="toast_backup_saved">Backup guardado en Descargas</string>
     <string name="next_service_badge">PRÓXIMO SERVICIO</string>

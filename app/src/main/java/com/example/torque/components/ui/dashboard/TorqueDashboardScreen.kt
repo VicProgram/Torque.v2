@@ -43,6 +43,7 @@ import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
+import com.example.torque.utils.BackupManager
 import com.example.torque.utils.NotificacionSalud
 import com.example.torque.utils.ResultadoSalud
 import com.example.torque.utils.SaludMotoCalculator
@@ -421,6 +422,7 @@ fun CabeceraDashboard(
     var mostrarMenuPrincipal by remember { mutableStateOf(false) }
     var mostrarAcercaDe by remember { mutableStateOf(false) }
     var mostrarExportar by remember { mutableStateOf(false) }
+    val scopeExportar = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
@@ -602,7 +604,9 @@ fun CabeceraDashboard(
             confirmButton = {
                 TextButton(onClick = {
                     mostrarExportar = false
-                    exportarBaseDeDatos(contexto)
+                    scopeExportar.launch {
+                        exportarBaseDeDatos(contexto)
+                    }
                 }) {
                     Text(stringResource(R.string.btn_export), color = ColoresTorque.Primary)
                 }
@@ -616,20 +620,16 @@ fun CabeceraDashboard(
     }
 }
 
-private fun exportarBaseDeDatos(contexto: Context) {
+private suspend fun exportarBaseDeDatos(contexto: Context) {
     try {
-        val dbPath = contexto.getDatabasePath("torque_room.db")
-        if (dbPath.exists()) {
-            val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
-            val backupFile = java.io.File(downloadsDir, "Torque_backup.db")
-            dbPath.inputStream().use { input ->
-                backupFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
+        val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+        val zipFile = java.io.File(downloadsDir, "Torque_backup_${System.currentTimeMillis()}.zip")
+        val uri = android.net.Uri.fromFile(zipFile)
+        val resultado = BackupManager.exportar(contexto, uri)
+        if (resultado.isSuccess) {
             Toast.makeText(contexto, contexto.getString(R.string.toast_backup_saved), Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(contexto, "No se encontró la base de datos", Toast.LENGTH_SHORT).show()
+            Toast.makeText(contexto, "Error al exportar: ${resultado.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
         }
     } catch (e: Exception) {
         Toast.makeText(contexto, "Error al exportar: ${e.message}", Toast.LENGTH_LONG).show()

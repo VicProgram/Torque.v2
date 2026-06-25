@@ -3,6 +3,7 @@ package com.example.torque
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.utils.SaludMotoCalculator
 import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.DateUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -224,5 +225,176 @@ class SaludMotoCalculatorTest {
     fun `no hay ids duplicados en TODOS`() {
         val ids = TiposMantenimiento.TODOS.map { it.id }
         assertEquals(ids.toSet().size, ids.size)
+    }
+
+    // ═══════════════════════════════════════════════════
+    //   NUEVOS TESTS
+    // ═══════════════════════════════════════════════════
+
+    // ───── 16. Exactamente en el intervalo (recién hecho) ─────
+    @Test
+    fun `mantenimiento recien hecho al mismo km del intervalo`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 5000, intervaloKms = 5000, tipoId = 1)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 5000)
+        val detalle = res.desglose.find { it.tipo.id == 1L }
+        assertEquals(100, detalle!!.cumplimiento)
+    }
+
+    // ───── 17. Borde: 5% restante por km ─────
+    @Test
+    fun `mantenimiento al 5 por ciento de cumplimiento`() {
+        // Cambio Aceite Motor tiene intervaloKms=5000
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 0, tipoId = 1)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 4750)
+        val detalle = res.desglose.find { it.tipo.id == 1L }
+        assertEquals(5, detalle!!.cumplimiento)
+    }
+
+    // ───── 18. Tipos con intervalo vencidos dan 0 ─────
+    @Test
+    fun `tipos con intervalo vencidos tienen cumplimiento 0`() {
+        val tiposConIntervalo = TiposMantenimiento.TODOS.filter { it.intervaloKms > 0 || it.intervaloDias > 0 }
+        val lista = tiposConIntervalo.map { tipo ->
+            if (tipo.esDesgaste) {
+                mant(tipo.nombre, tipoId = tipo.id, porcentajeVida = 0)
+            } else {
+                mant(tipo.nombre, kms = 0, tipoId = tipo.id)
+            }
+        }
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 999_999)
+        for (detalle in res.desglose) {
+            if (detalle.tipo.intervaloKms > 0 || detalle.tipo.intervaloDias > 0) {
+                assertEquals("${detalle.tipo.nombre} debería estar vencido", 0, detalle.cumplimiento)
+            }
+        }
+        assertTrue(res.saludGlobal < 100)
+    }
+
+    // ───── 19. Relevancia de un desgaste crítico ─────
+    @Test
+    fun `desgaste critico genera relevancia alta`() {
+        val lista = listOf(
+            mant("Pastillas de Freno Delantero", tipoId = 10, porcentajeVida = 5)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 0)
+        val detalle = res.desglose.find { it.tipo.id == 10L }
+        assertNotNull(detalle)
+        // peso=10, cumplimiento=5 → relevancia = (10 * 95)/100 = 9
+        assertTrue(detalle!!.relevancia > 0)
+        // Debe aparecer en próximos vencidos
+        assertTrue(res.proximosVencidos.any { it.tipo.id == 10L })
+    }
+
+    // ───── 20. WEAR_TIPOS son todos desgaste y están en TODOS ─────
+    @Test
+    fun `wear tipos estan incluidos en TODOS y son desgaste`() {
+        val idsTodos = TiposMantenimiento.TODOS.map { it.id }.toSet()
+        for (wear in TiposMantenimiento.WEAR_TIPOS) {
+            assertTrue("${wear.nombre} debería estar en TODOS", wear.id in idsTodos)
+            assertTrue("${wear.nombre} debería ser esDesgaste=true", wear.esDesgaste)
+        }
+    }
+
+    // ───── 21. No hay nombres duplicados entre tipos ─────
+    @Test
+    fun `no hay nombres duplicados en TODOS`() {
+        val nombres = TiposMantenimiento.TODOS.map { it.nombre.lowercase() }
+        assertEquals(nombres.toSet().size, nombres.size)
+    }
+
+    // ───── 22. Todos los tipos tienen peso positivo ─────
+    @Test
+    fun `todos los tipos tienen peso mayor a 0`() {
+        for (tipo in TiposMantenimiento.TODOS) {
+            assertTrue("${tipo.nombre} debería tener peso > 0", tipo.peso > 0)
+        }
+    }
+
+    // ───── 23. sin mantenimientos ni km → salud 100 ─────
+    @Test
+    fun `sin datos y con km cero salud es 100`() {
+        val res = SaludMotoCalculator.calcular(emptyList(), kmActuales = 0)
+        assertEquals(100, res.saludGlobal)
+        assertTrue(res.desglose.all { it.cumplimiento == 100 })
+    }
+
+    // ───── 24. Kilometraje negativo (no debería romperse) ─────
+    @Test
+    fun `kilometraje negativo no causa error`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 0, intervaloKms = 5000, tipoId = 1)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = -100)
+        // Avanzado = -100 - 0 = -100 → cumplimiento = 1 - (-100/5000) = 1.02 → 100%
+        val detalle = res.desglose.find { it.tipo.id == 1L }
+        assertEquals(100, detalle!!.cumplimiento)
+        assertEquals(100, res.saludGlobal)
+    }
+
+    // ───── 25. proximosVencidos solo contiene items con cumplimiento < 100 ─────
+    @Test
+    fun `proximos vencidos solo incluye items con cumplimiento menor a 100`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 5000, intervaloKms = 5000, tipoId = 1),
+            mant("Filtro de Aceite", kms = 0, intervaloKms = 5000, tipoId = 2),
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 5000)
+        // Aceite: 100% (no debería estar), Filtro: 0% (debería estar)
+        assertTrue(res.proximosVencidos.none { it.tipo.id == 1L })
+        assertTrue(res.proximosVencidos.any { it.tipo.id == 2L })
+    }
+
+    // ───── 26. Varios mantenimientos combinados ─────
+    @Test
+    fun `combinacion de varios tipos con distinto cumplimiento`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 0, intervaloKms = 5000, tipoId = 1),      // 0% vencido
+            mant("Filtro de Aceite", kms = 0, intervaloKms = 5000, tipoId = 2),              // 0% vencido
+            mant("Pastillas de Freno Delantero", tipoId = 10, porcentajeVida = 60),          // 60%
+            mant("Neumático Delantero", tipoId = 21, porcentajeVida = 80),                   // 80%
+            mant("Cambio de Cadena y Coronas", kms = 5000, intervaloKms = 20000, tipoId = 9),// 0% vencido
+            mant("Líquido de Frenos", kms = 0, intervaloKms = 20000, tipoId = 12),          // 0% vencido
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 10000)
+        assertTrue(res.saludGlobal in 0..100)
+        assertTrue(res.proximosVencidos.isNotEmpty())
+        // El resto (sin registro) al 100% → salud > 0
+        assertTrue(res.saludGlobal > 0)
+    }
+
+    // ───── 27. DateUtils formatos no vacíos ─────
+    @Test
+    fun `dateUtils formatos son correctos`() {
+        assertEquals("dd/MM/yyyy", DateUtils.FORMATO_FECHA_VISUAL)
+        assertEquals("yyyy-MM-dd HH:mm:ss", DateUtils.FORMATO_FECHA_COMPLETA)
+        assertTrue(DateUtils.FORMATO_FECHA_VISUAL.isNotBlank())
+        assertTrue(DateUtils.FORMATO_FECHA_COMPLETA.isNotBlank())
+    }
+
+    // ───── 28. desdeNombre con espacios extra ─────
+    @Test
+    fun `desdeNombre funciona con espacios alrededor`() {
+        val tipo = TiposMantenimiento.desdeNombre("  Cambio de Aceite Motor  ")
+        assertNotNull(tipo)
+        assertEquals(1L, tipo!!.id)
+    }
+
+    // ───── 29. WEAR_TIPOS no contiene duplicados ─────
+    @Test
+    fun `wear tipos no tiene ids duplicados`() {
+        val ids = TiposMantenimiento.WEAR_TIPOS.map { it.id }
+        assertEquals(ids.toSet().size, ids.size)
+    }
+
+    // ───── 30. Todos los tipos tienen categoría no vacía ─────
+    @Test
+    fun `todos los tipos tienen categoria`() {
+        for (tipo in TiposMantenimiento.TODOS) {
+            assertTrue("${tipo.nombre} debería tener categoría", tipo.categoria.isNotBlank())
+        }
     }
 }
