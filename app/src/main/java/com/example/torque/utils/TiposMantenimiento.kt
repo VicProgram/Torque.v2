@@ -35,10 +35,6 @@ object TiposMantenimiento {
         TipoMantenimiento(21, "Neumático Delantero", "Neumáticos", 0, peso = 8, esDesgaste = true),
         TipoMantenimiento(22, "Neumático Trasero", "Neumáticos", 0, peso = 8, esDesgaste = true),
         TipoMantenimiento(23, "Discos de Freno Traseros", "Frenos", 10000, peso = 8, esDesgaste = true),
-        TipoMantenimiento(17, "Luces y Señalización", "Eléctrico", 0, 30, peso = 3),
-        TipoMantenimiento(18, "Centralita / ECU", "Eléctrico", 0, 365, peso = 4),
-        TipoMantenimiento(19, "Suspensión Delantera", "Suspensión", 15000, peso = 5),
-        TipoMantenimiento(20, "Suspensión Trasera", "Suspensión", 15000, peso = 5),
     )
 
     val WEAR_TIPOS = TODOS.filter { it.esDesgaste }
