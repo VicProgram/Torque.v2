@@ -40,6 +40,9 @@ import com.example.torque.room.entity.MotoEntity
 import com.example.torque.utils.NotificacionSalud
 import com.example.torque.utils.ResultadoSalud
 import com.example.torque.utils.SaludMotoCalculator
+import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.TipoMantenimiento
+import kotlinx.coroutines.launch
 
 @Composable
 fun TorqueDashboardScreen(
@@ -53,6 +56,7 @@ fun TorqueDashboardScreen(
     var fotosPrincipales by remember { mutableStateOf<List<FotoEntity>>(emptyList()) }
     var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
     var resultadoSalud by remember { mutableStateOf<ResultadoSalud?>(null) }
+    var mostrarDialogoDesgaste by remember { mutableStateOf(false) }
 
     val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
     val nombrePerfil by perfilRepositorio.nombreFlow.collectAsState(initial = null)
@@ -171,6 +175,15 @@ fun TorqueDashboardScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = { onIrMantenimientos(motoPrincipal?.idMoto) }
                             )
+                            TarjetaAccionRapida(
+                                titulo = "Desgaste",
+                                subtitulo = "Pastillas, neumáticos",
+                                icono = Icons.Default.Build,
+                                colorContenedor = ColoresTorque.Secondary,
+                                colorContenido = ColoresTorque.OnSecondary,
+                                modifier = Modifier.weight(1f),
+                                onClick = { mostrarDialogoDesgaste = true }
+                            )
                         }
                     }
                 }
@@ -193,6 +206,13 @@ fun TorqueDashboardScreen(
             shape = RoundedCornerShape(16.dp)
         ) {
             Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add))
+        }
+
+        if (mostrarDialogoDesgaste && motoPrincipal != null) {
+            DialogoAjusteDesgaste(
+                idMoto = motoPrincipal!!.idMoto,
+                onDismiss = { mostrarDialogoDesgaste = false }
+            )
         }
 
     }
@@ -625,5 +645,92 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
             )
         }
     }
+}
+
+@Composable
+fun DialogoAjusteDesgaste(idMoto: Long, onDismiss: () -> Unit) {
+    val contexto = LocalContext.current
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
+    val scope = rememberCoroutineScope()
+
+    val wearTipos = remember { TiposMantenimiento.WEAR_TIPOS }
+    var porcentajes by remember { mutableStateOf<Map<Long, Int>>(emptyMap()) }
+    var cargando by remember { mutableStateOf(true) }
+
+    LaunchedEffect(idMoto) {
+        val mapa = mutableMapOf<Long, Int>()
+        for (tipo in wearTipos) {
+            val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipo.id)
+            mapa[tipo.id] = ultimo?.porcentajeVida ?: 100
+        }
+        porcentajes = mapa
+        cargando = false
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = ColoresTorque.SurfaceDark,
+        title = { Text("Estado de Desgaste", color = Color.White, fontWeight = FontWeight.Bold) },
+        text = {
+            if (cargando) {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = ColoresTorque.Primary)
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    wearTipos.forEach { tipo ->
+                        val pct = porcentajes[tipo.id] ?: 100
+                        val colorBarra = when {
+                            pct >= 70 -> Color(0xFF22C55E)
+                            pct >= 40 -> Color(0xFFEAB308)
+                            else -> Color(0xFFEF4444)
+                        }
+                        Column {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(tipo.nombre, color = Color.White, fontSize = 13.sp)
+                                Text("$pct%", color = colorBarra, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Slider(
+                                value = (porcentajes[tipo.id] ?: 100).toFloat(),
+                                onValueChange = { nuevo ->
+                                    porcentajes = porcentajes + (tipo.id to nuevo.toInt())
+                                },
+                                valueRange = 0f..100f,
+                                steps = 19,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = colorBarra,
+                                    activeTrackColor = colorBarra,
+                                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                scope.launch {
+                    for ((tipoId, pct) in porcentajes) {
+                        val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipoId)
+                        if (ultimo != null) {
+                            repositorio.actualizarPorcentajeVida(ultimo.id, pct)
+                        }
+                    }
+                }
+                onDismiss()
+            }) {
+                Text("Guardar", color = ColoresTorque.Primary)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+            }
+        }
+    )
 }
 

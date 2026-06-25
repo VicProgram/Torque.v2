@@ -15,7 +15,7 @@ import com.example.torque.room.entity.FotoEntity
 
 @Database(
     entities = [MotoEntity::class, MantenimientoEntity::class, FotoEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class BaseDeDatosApp : RoomDatabase() {
@@ -33,13 +33,19 @@ abstract class BaseDeDatosApp : RoomDatabase() {
             }
         }
 
+        val MIGRACION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE mantenimientos ADD COLUMN porcentajeVida INTEGER NOT NULL DEFAULT 100")
+            }
+        }
+
         fun obtenerInstancia(context: Context): BaseDeDatosApp =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     BaseDeDatosApp::class.java,
                     "torque_room.db"
-                ).addMigrations(MIGRACION_1_2).build().also { INSTANCE = it }
+                ).addMigrations(MIGRACION_1_2, MIGRACION_2_3).build().also { INSTANCE = it }
             }
 
         fun cerrarYReiniciar() {

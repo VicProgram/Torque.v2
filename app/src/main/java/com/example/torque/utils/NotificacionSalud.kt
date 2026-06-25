@@ -56,6 +56,7 @@ object NotificacionSalud {
         nuevosNotificados.addAll(yaNotificados)
 
         for (detalle in resultadoSalud.desglose) {
+            if (detalle.tipo.esDesgaste) continue
             if (detalle.tipo.intervaloKms == 0 && detalle.tipo.intervaloDias == 0) continue
 
             val tipoId = detalle.tipo.id

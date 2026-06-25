@@ -16,5 +16,6 @@ data class MantenimientoEntity(
     val notas: String? = null,
     val tareas: String? = null,
     val creadoEn: String? = null,
-    val tipoMantenimientoId: Long = 0
+    val tipoMantenimientoId: Long = 0,
+    val porcentajeVida: Int = 100
 )

@@ -59,7 +59,8 @@ private suspend fun guardarMantenimiento(
     notas: String,
     fechaActual: String,
     repositorio: RepositorioApp,
-    contexto: android.content.Context
+    contexto: android.content.Context,
+    porcentajeVida: Int = 100
 ) {
     try {
         val tipoId = if (tareasSeleccionadas.size == 1)
@@ -77,7 +78,8 @@ private suspend fun guardarMantenimiento(
             notas = notas,
             tareas = tareasSeleccionadas.joinToString(", "),
             creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()),
-            tipoMantenimientoId = tipoId
+            tipoMantenimientoId = tipoId,
+            porcentajeVida = porcentajeVida
         )
         repositorio.insertarMantenimiento(mantenimiento)
         withContext(Dispatchers.Main) {
@@ -111,6 +113,16 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
         tiempo.isNotBlank() || notas.isNotBlank()
 
     val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+
+    val esDesgaste = remember {
+        tareasSeleccionadas.size == 1 &&
+            TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.esDesgaste == true
+    }
+    var porcentajeVida by remember { mutableStateOf(100) }
+
+    val tipoDesgaste = remember {
+        if (esDesgaste) TiposMantenimiento.desdeNombre(tareasSeleccionadas[0]) else null
+    }
 
     Box(
         modifier = Modifier
@@ -196,6 +208,55 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                     modifier = Modifier.height(120.dp)
                 )
 
+                if (esDesgaste && tipoDesgaste != null) {
+                    val colorBarra = when {
+                        porcentajeVida >= 70 -> Color(0xFF22C55E)
+                        porcentajeVida >= 40 -> Color(0xFFEAB308)
+                        else -> Color(0xFFEF4444)
+                    }
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                "Vida útil restante",
+                                color = ColoresTorque.Slate500,
+                                fontSize = 12.sp
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    tipoDesgaste.nombre,
+                                    color = Color.White,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    "$porcentajeVida%",
+                                    color = colorBarra,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Slider(
+                                value = porcentajeVida.toFloat(),
+                                onValueChange = { porcentajeVida = it.toInt() },
+                                valueRange = 0f..100f,
+                                steps = 19,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = colorBarra,
+                                    activeTrackColor = colorBarra,
+                                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
+                                )
+                            )
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(100.dp))
             }
         }
@@ -236,7 +297,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                         scope.launch {
                             val kmNuevos = kms.toIntOrNull() ?: 0
                             repositorio.actualizarKilometros(idMoto, kmNuevos)
-                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto)
+                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
                         }
                     }) {
                         Text("Sí, actualizar", color = ColoresTorque.Primary)
@@ -247,7 +308,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                         mostrarDialogoActualizarKm = false
                         scope.launch {
                             val kmNuevos = kms.toIntOrNull() ?: 0
-                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto)
+                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
                         }
                     }) {
                         Text("No", color = ColoresTorque.OnSurfaceVariant)
@@ -287,7 +348,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                             return@launch
                         }
 
-                        guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto)
+                        guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
                     }
                 }
             )

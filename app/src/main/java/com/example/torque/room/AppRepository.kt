@@ -104,6 +104,19 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
         null
     }
 
+    suspend fun obtenerUltimoMantenimientoPorTipo(idMoto: Long, tipoId: Long) = try {
+        db.mantenimientoDao().obtenerUltimoPorTipo(idMoto, tipoId)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al obtener mantenimiento por tipo", e)
+        null
+    }
+
+    suspend fun actualizarPorcentajeVida(id: Long, porcentaje: Int) = try {
+        db.mantenimientoDao().actualizarPorcentajeVida(id, porcentaje)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al actualizar porcentaje de vida", e)
+    }
+
     fun obtenerFotosPorMoto(idMoto: Long) = db.fotoDao().obtenerPorMotoFlow(idMoto)
 
     suspend fun insertarFoto(foto: FotoEntity) = try {

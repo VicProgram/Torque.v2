@@ -28,22 +28,26 @@ object SaludMotoCalculator {
                 .maxByOrNull { it.kms }
 
             val cumplimiento = if (ultimo != null) {
-                val cumplimientoKm = if (tipo.intervaloKms > 0) {
-                    val avanzado = kmActuales - ultimo.kms
-                    val porcentaje = avanzado.toFloat() / tipo.intervaloKms
-                    1f - porcentaje
-                } else 1f
+                if (tipo.esDesgaste) {
+                    ultimo.porcentajeVida
+                } else {
+                    val cumplimientoKm = if (tipo.intervaloKms > 0) {
+                        val avanzado = kmActuales - ultimo.kms
+                        val porcentaje = avanzado.toFloat() / tipo.intervaloKms
+                        1f - porcentaje
+                    } else 1f
 
-                val cumplimientoDias = if (tipo.intervaloDias > 0) {
-                    val fechaUltimo = parseFecha(ultimo.fecha) ?: return@mapNotNull null
-                    val diasDesdeUltimo = ((Date().time - fechaUltimo.time) / (1000 * 60 * 60 * 24)).toInt()
-                    val porcentaje = diasDesdeUltimo.toFloat() / tipo.intervaloDias
-                    1f - porcentaje
-                } else 1f
+                    val cumplimientoDias = if (tipo.intervaloDias > 0) {
+                        val fechaUltimo = parseFecha(ultimo.fecha) ?: return@mapNotNull null
+                        val diasDesdeUltimo = ((Date().time - fechaUltimo.time) / (1000 * 60 * 60 * 24)).toInt()
+                        val porcentaje = diasDesdeUltimo.toFloat() / tipo.intervaloDias
+                        1f - porcentaje
+                    } else 1f
 
-                val cumplimientoFinal = minOf(cumplimientoKm, cumplimientoDias)
-                (cumplimientoFinal.coerceIn(0f, 1f) * 100).toInt()
-            } else 0
+                    val cumplimientoFinal = minOf(cumplimientoKm, cumplimientoDias)
+                    (cumplimientoFinal.coerceIn(0f, 1f) * 100).toInt()
+                }
+            } else 100
 
             val relevancia = (tipo.peso * (100 - cumplimiento)) / 100
 

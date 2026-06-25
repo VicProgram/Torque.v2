@@ -19,6 +19,12 @@ interface MantenimientoDao {
     @Query("SELECT * FROM mantenimientos WHERE idMoto = :idMoto ORDER BY fecha DESC")
     suspend fun obtenerPorMoto(idMoto: Long): List<MantenimientoEntity>
 
+    @Query("SELECT * FROM mantenimientos WHERE idMoto = :idMoto AND tipoMantenimientoId = :tipoId ORDER BY kms DESC LIMIT 1")
+    suspend fun obtenerUltimoPorTipo(idMoto: Long, tipoId: Long): MantenimientoEntity?
+
+    @Query("UPDATE mantenimientos SET porcentajeVida = :porcentaje WHERE id = :id")
+    suspend fun actualizarPorcentajeVida(id: Long, porcentaje: Int)
+
     @Query("SELECT * FROM mantenimientos WHERE idMoto = :idMoto ORDER BY fecha DESC LIMIT 1")
     suspend fun obtenerUltimoPorMoto(idMoto: Long): MantenimientoEntity?
 
