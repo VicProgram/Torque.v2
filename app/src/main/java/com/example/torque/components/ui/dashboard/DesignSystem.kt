@@ -19,14 +19,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.ui.platform.LocalContext
-import androidx.activity.ComponentActivity
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -235,9 +234,43 @@ fun BotonTorque(
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 16.sp,
                 letterSpacing = 0.5.sp
-            )
+        )
+    }
+}
+
+@Composable
+fun FiltroChip(
+    texto: String,
+    estaSeleccionado: Boolean,
+    onClick: () -> Unit = {},
+    forma: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp),
+    colorSeleccionado: Color = ColoresTorque.PrimaryContainer,
+    colorSeleccionadoContenido: Color = ColoresTorque.OnPrimaryContainer,
+    colorNoSeleccionadoFondo: Color = Color.Transparent,
+    colorNoSeleccionadoBorde: Color = ColoresTorque.Outline,
+    mostrarCheck: Boolean = false
+) {
+    val colorFondo = if (estaSeleccionado) colorSeleccionado else colorNoSeleccionadoFondo
+    val colorContenido = if (estaSeleccionado) colorSeleccionadoContenido else ColoresTorque.OnSurfaceVariant
+    val colorBorde = if (estaSeleccionado) Color.Transparent else colorNoSeleccionadoBorde
+
+    Box(
+        modifier = Modifier
+            .clip(forma)
+            .background(colorFondo)
+            .border(if (estaSeleccionado) 0.dp else 1.dp, colorBorde, forma)
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (estaSeleccionado && mostrarCheck) {
+                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = colorContenido)
+                Spacer(modifier = Modifier.width(6.dp))
+            }
+            Text(texto, color = colorContenido, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
+}
 }
 
 @Composable
@@ -320,5 +353,39 @@ fun ElementoCheckMotoKeep(
             ),
             modifier = Modifier.size(24.dp)
         )
+    }
+}
+
+@Composable
+fun FiltroChip(
+    texto: String,
+    estaSeleccionado: Boolean,
+    onClick: () -> Unit = {},
+    forma: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp),
+    colorSeleccionado: Color = ColoresTorque.PrimaryContainer,
+    colorSeleccionadoContenido: Color = ColoresTorque.OnPrimaryContainer,
+    colorNoSeleccionadoFondo: Color = Color.Transparent,
+    colorNoSeleccionadoBorde: Color = ColoresTorque.Outline,
+    mostrarCheck: Boolean = false
+) {
+    val colorFondo = if (estaSeleccionado) colorSeleccionado else colorNoSeleccionadoFondo
+    val colorContenido = if (estaSeleccionado) colorSeleccionadoContenido else ColoresTorque.OnSurfaceVariant
+    val colorBorde = if (estaSeleccionado) Color.Transparent else colorNoSeleccionadoBorde
+
+    Box(
+        modifier = Modifier
+            .clip(forma)
+            .background(colorFondo)
+            .border(if (estaSeleccionado) 0.dp else 1.dp, colorBorde, forma)
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (estaSeleccionado && mostrarCheck) {
+                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = colorContenido)
+                Spacer(modifier = Modifier.width(6.dp))
+            }
+            Text(texto, color = colorContenido, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        }
     }
 }

@@ -1,10 +1,8 @@
 package com.example.torque.garage
 
 import android.app.Activity
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -40,6 +38,8 @@ import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
+import com.example.torque.utils.DateUtils
+import com.example.torque.utils.terminar
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -97,7 +97,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                     val nuevaFoto = FotoEntity(
                         idMoto = idMoto,
                         ruta = ruta,
-                        creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                        creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
                     )
                     repositorio.insertarFoto(nuevaFoto)
                     Toast.makeText(contexto, "¡Foto añadida!", Toast.LENGTH_SHORT).show()
@@ -126,7 +126,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         .padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { (contexto as? Activity)?.finish() }) {
+                    IconButton(onClick = { (contexto as? Activity)?.terminar() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Atrás",
@@ -415,7 +415,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         scope.launch {
                             repositorio.eliminarMoto(moto!!)
                             (contexto as? Activity)?.setResult(Activity.RESULT_OK)
-                            (contexto as? Activity)?.finish()
+                            (contexto as? Activity)?.terminar()
                         }
                         mostrarDialogoEliminar = false
                     }) {

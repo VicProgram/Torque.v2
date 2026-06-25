@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     // Material Components
-    implementation("com.google.android.material:material:1.9.0")
+    implementation(libs.androidx.material)
 
     // Room - usando KSP
     implementation(libs.androidx.room.runtime)

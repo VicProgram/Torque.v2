@@ -58,6 +58,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
     val contexto = LocalContext.current
     val itemsSeleccionados = remember { mutableStateMapOf<String, Boolean>() }
     var consultaBusqueda by remember { mutableStateOf("") }
+    var filtroSeleccionado by remember { mutableStateOf("Todas") }
 
     val tareasMotor = listOf(
         Tarea("Cambio de Aceite Motor", "Recomendado cada 5,000 km", Icons.Default.OilBarrel, Color(0xFF3B82F6), "Motor"),
@@ -172,11 +173,11 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                         )
 
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            item { ChipFiltro("Todas", true) }
-                            item { ChipFiltro("Motor", false) }
-                            item { ChipFiltro("Transmisión", false) }
-                            item { ChipFiltro("Frenos", false) }
-                            item { ChipFiltro("Ruedas", false) }
+                            item { FiltroChip("Todas", estaSeleccionado = filtroSeleccionado == "Todas", onClick = { filtroSeleccionado = "Todas" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip("Motor", estaSeleccionado = filtroSeleccionado == "Motor", onClick = { filtroSeleccionado = "Motor" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip("Transmisión", estaSeleccionado = filtroSeleccionado == "Transmisión", onClick = { filtroSeleccionado = "Transmisión" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip("Frenos", estaSeleccionado = filtroSeleccionado == "Frenos", onClick = { filtroSeleccionado = "Frenos" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip("Ruedas", estaSeleccionado = filtroSeleccionado == "Ruedas", onClick = { filtroSeleccionado = "Ruedas" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
                         }
                     }
                 }
@@ -291,24 +292,3 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
     }
 }
 
-@Composable
-fun ChipFiltro(texto: String, estaSeleccionado: Boolean) {
-    val colorFondo = if (estaSeleccionado) ColoresTorque.Primary else ColoresTorque.SurfaceDark
-    val colorContenido = if (estaSeleccionado) Color.White else ColoresTorque.OnSurfaceVariant
-    val colorBorde = if (estaSeleccionado) Color.Transparent else ColoresTorque.BorderDark
-
-    Box(
-        modifier = Modifier
-            .clip(CircleShape)
-            .background(colorFondo)
-            .border(1.dp, colorBorde, CircleShape)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = texto,
-            color = colorContenido,
-            fontSize = 14.sp,
-            fontWeight = if (estaSeleccionado) FontWeight.SemiBold else FontWeight.Medium
-        )
-    }
-}

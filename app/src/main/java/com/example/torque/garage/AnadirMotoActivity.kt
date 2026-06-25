@@ -36,6 +36,8 @@ import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
+import com.example.torque.utils.DateUtils
+import com.example.torque.utils.terminar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -124,7 +126,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
             ) {
                 IconButton(onClick = {
                     if (hayCambios && !editando) mostrarDialogoDescartar = true
-                    else (contexto as? Activity)?.finish()
+                    else (contexto as? Activity)?.terminar()
                 }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
@@ -233,7 +235,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 confirmButton = {
                     TextButton(onClick = {
                         mostrarDialogoDescartar = false
-                        (contexto as? Activity)?.finish()
+                        (contexto as? Activity)?.terminar()
                     }) {
                         Text("Descartar", color = Color(0xFFEF4444))
                     }
@@ -264,7 +266,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                     }
 
                     scope.launch {
-                        val fecha = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                        val fecha = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
                         val rutaFoto = uriImagen?.let { ArchivoUtils.copiarImagenAInterno(contexto, it) } ?: fotoActual
 
                         if (editando && idMoto != -1L) {
@@ -289,7 +291,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                                 }
                                 withContext(Dispatchers.Main) {
                                     Toast.makeText(contexto, "¡Moto actualizada con éxito!", Toast.LENGTH_SHORT).show()
-                                    (contexto as? Activity)?.finish()
+                                    (contexto as? Activity)?.terminar()
                                 }
                             }
                         } else {
@@ -319,7 +321,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
 
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(contexto, "¡Moto añadida con éxito!", Toast.LENGTH_SHORT).show()
-                                (contexto as? Activity)?.finish()
+                                (contexto as? Activity)?.terminar()
                             }
                         }
                     }

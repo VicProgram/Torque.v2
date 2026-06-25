@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.torque.utils.terminar
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.AndroidViewModel
@@ -35,6 +36,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.components.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
@@ -125,7 +127,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { (contexto as? Activity)?.finish() }) {
+                IconButton(onClick = { (contexto as? Activity)?.terminar() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
@@ -150,10 +152,14 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                     ) {
                         val filtros = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos")
                         items(filtros) { filtro ->
-                            FiltroHistorialChip(
+                            FiltroChip(
                                 texto = filtro,
                                 estaSeleccionado = filtroSeleccionado == filtro,
-                                onClick = { filtroSeleccionado = filtro }
+                                onClick = { filtroSeleccionado = filtro },
+                                colorSeleccionado = ColoresTorque.SecondaryContainer,
+                                colorSeleccionadoContenido = ColoresTorque.OnSecondaryContainer,
+                                colorNoSeleccionadoBorde = ColoresTorque.Outline.copy(alpha = 0.5f),
+                                mostrarCheck = true
                             )
                         }
                     }
@@ -229,30 +235,6 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                     }
                 }
             )
-        }
-    }
-}
-
-@Composable
-fun FiltroHistorialChip(texto: String, estaSeleccionado: Boolean, onClick: () -> Unit) {
-    val colorFondo = if (estaSeleccionado) ColoresTorque.SecondaryContainer else Color.Transparent
-    val colorContenido = if (estaSeleccionado) ColoresTorque.OnSecondaryContainer else ColoresTorque.OnSurfaceVariant
-    val colorBorde = if (estaSeleccionado) Color.Transparent else ColoresTorque.Outline.copy(alpha = 0.5f)
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(colorFondo)
-            .border(if (estaSeleccionado) 0.dp else 1.dp, colorBorde, RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (estaSeleccionado) {
-                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = colorContenido)
-                Spacer(modifier = Modifier.width(6.dp))
-            }
-            Text(texto, color = colorContenido, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
 }

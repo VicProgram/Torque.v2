@@ -28,7 +28,9 @@ import com.example.torque.components.ui.dashboard.CampoTextoTorque
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.utils.DateUtils
 import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.terminar
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -77,14 +79,14 @@ private suspend fun guardarMantenimiento(
             tiempo = tiempo,
             notas = notas,
             tareas = tareasSeleccionadas.joinToString(", "),
-            creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()),
+            creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date()),
             tipoMantenimientoId = tipoId,
             porcentajeVida = porcentajeVida
         )
         repositorio.insertarMantenimiento(mantenimiento)
         withContext(Dispatchers.Main) {
             Toast.makeText(contexto, "¡Mantenimiento guardado!", Toast.LENGTH_SHORT).show()
-            (contexto as? Activity)?.finish()
+            (contexto as? Activity)?.terminar()
         }
     } catch (e: Exception) {
         withContext(Dispatchers.Main) {
@@ -112,7 +114,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
     val hayCambios = kms.isNotBlank() || intervalo.isNotBlank() || precio.isNotBlank() ||
         tiempo.isNotBlank() || notas.isNotBlank()
 
-    val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+    val fechaActual = SimpleDateFormat(DateUtils.FORMATO_FECHA_VISUAL, Locale.getDefault()).format(Date())
 
     val esDesgaste = remember {
         tareasSeleccionadas.size == 1 &&
@@ -141,7 +143,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             ) {
                 IconButton(onClick = {
                     if (hayCambios) mostrarDialogoDescartar = true
-                    else (contexto as? Activity)?.finish()
+                    else (contexto as? Activity)?.terminar()
                 }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
@@ -270,7 +272,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                 confirmButton = {
                     TextButton(onClick = {
                         mostrarDialogoDescartar = false
-                        (contexto as? Activity)?.finish()
+                        (contexto as? Activity)?.terminar()
                     }) {
                         Text("Descartar", color = Color(0xFFEF4444))
                     }

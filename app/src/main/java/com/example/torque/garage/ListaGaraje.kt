@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 
 import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.components.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
@@ -260,34 +261,6 @@ fun CabeceraGaraje(onSearchToggle: () -> Unit = {}, mostrandoBusqueda: Boolean =
                 )
             }
         }
-    }
-}
-
-@Composable
-fun FiltroChip(texto: String, estaSeleccionado: Boolean, onClick: () -> Unit = {}) {
-    val colorFondo = if (estaSeleccionado) ColoresTorque.PrimaryContainer else Color.Transparent
-    val colorContenido =
-        if (estaSeleccionado) ColoresTorque.OnPrimaryContainer else ColoresTorque.OnSurfaceVariant
-    val colorBorde = if (estaSeleccionado) Color.Transparent else ColoresTorque.Outline
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(colorFondo)
-            .border(
-                width = if (estaSeleccionado) 0.dp else 1.dp,
-                color = colorBorde,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        Text(
-            text = texto,
-            color = colorContenido,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
-        )
     }
 }
 

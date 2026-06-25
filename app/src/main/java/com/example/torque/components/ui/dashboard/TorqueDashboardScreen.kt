@@ -1,8 +1,13 @@
 package com.example.torque.components.ui.dashboard
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +47,7 @@ import com.example.torque.utils.NotificacionSalud
 import com.example.torque.utils.ResultadoSalud
 import com.example.torque.utils.SaludMotoCalculator
 import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.DateUtils
 import com.example.torque.utils.TipoMantenimiento
 import kotlinx.coroutines.launch
 
@@ -60,6 +67,20 @@ fun TorqueDashboardScreen(
 
     val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
     val nombrePerfil by perfilRepositorio.nombreFlow.collectAsState(initial = null)
+
+    val launcherPermisoNotificaciones = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ -> Unit }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(contexto, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                launcherPermisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
 
     LaunchedEffect(motoPrincipal?.idMoto) {
         if (motoPrincipal != null) {
@@ -723,14 +744,14 @@ fun DialogoAjusteDesgaste(idMoto: Long, onDismiss: () -> Unit) {
                             val nuevo = MantenimientoEntity(
                                 idMoto = idMoto,
                                 nombreMantenimiento = tipo.nombre,
-                                fecha = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(java.util.Date()),
+                                fecha = java.text.SimpleDateFormat(DateUtils.FORMATO_FECHA_VISUAL, java.util.Locale.getDefault()).format(java.util.Date()),
                                 kms = 0,
                                 intervaloKms = 0,
                                 precio = "",
                                 tiempo = "",
                                 notas = "Ajuste de desgaste",
                                 tareas = tipo.nombre,
-                                creadoEn = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date()),
+                                creadoEn = java.text.SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, java.util.Locale.getDefault()).format(java.util.Date()),
                                 tipoMantenimientoId = tipo.id,
                                 porcentajeVida = pct
                             )
