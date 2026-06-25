@@ -37,7 +37,14 @@ object TiposMantenimiento {
         TipoMantenimiento(23, "Discos de Freno Traseros", "Frenos", 10000, peso = 8, esDesgaste = true),
     )
 
-    val WEAR_TIPOS = TODOS.filter { it.esDesgaste }
+    val WEAR_TIPOS = listOf(
+        TipoMantenimiento(21, "Neumático Delantero", "Neumáticos", 0, peso = 8, esDesgaste = true),
+        TipoMantenimiento(22, "Neumático Trasero", "Neumáticos", 0, peso = 8, esDesgaste = true),
+        TipoMantenimiento(10, "Pastillas de Freno Delantero", "Frenos", 5000, peso = 10, esDesgaste = true),
+        TipoMantenimiento(11, "Pastillas de Freno Trasero", "Frenos", 5000, peso = 10, esDesgaste = true),
+        TipoMantenimiento(13, "Discos de Freno Delanteros", "Frenos", 10000, peso = 8, esDesgaste = true),
+        TipoMantenimiento(23, "Discos de Freno Traseros", "Frenos", 10000, peso = 8, esDesgaste = true),
+    )
 
     fun desdeNombre(nombre: String): TipoMantenimiento? =
         TODOS.find { it.nombre.equals(nombre.trim(), ignoreCase = true) }
