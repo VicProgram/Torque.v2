@@ -495,7 +495,7 @@ fun CabeceraDashboard(
                 }
             }
             Image(
-                painter = painterResource(id = R.drawable.ic_logo1),
+                painter = painterResource(id = R.drawable.logo15),
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier.height(32.dp)
             )

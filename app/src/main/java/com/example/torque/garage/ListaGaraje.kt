@@ -66,7 +66,8 @@ fun VistaListaGaraje() {
     val motosFiltradas = motos.filter { moto ->
         val coincideBusqueda = textoBusqueda.isBlank() ||
             moto.marca.contains(textoBusqueda, ignoreCase = true) ||
-            moto.modelo.contains(textoBusqueda, ignoreCase = true)
+            moto.modelo.contains(textoBusqueda, ignoreCase = true) ||
+            moto.matricula.contains(textoBusqueda, ignoreCase = true)
         val coincideFiltro = when (filtroActivo) {
             "En Uso" -> moto.esPrincipal == 1
             "Históricas" -> moto.esPrincipal == 0
