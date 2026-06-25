@@ -197,8 +197,8 @@ fun TorqueDashboardScreen(
                                 onClick = { onIrMantenimientos(motoPrincipal?.idMoto) }
                             )
                             TarjetaAccionRapida(
-                                titulo = "Desgaste",
-                                subtitulo = "Pastillas, neumáticos",
+                                titulo = stringResource(R.string.menu_wear),
+                                subtitulo = stringResource(R.string.menu_wear_subtitle),
                                 icono = Icons.Default.Build,
                                 colorContenedor = ColoresTorque.Secondary,
                                 colorContenido = ColoresTorque.OnSecondary,
@@ -260,7 +260,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                 IconButton(onClick = { mostrarMenuPrincipal = true }) {
                     Icon(
                         Icons.Default.Menu,
-                        contentDescription = "Menú",
+                        contentDescription = stringResource(R.string.menu),
                         tint = ColoresTorque.OnSurface,
                         modifier = Modifier.size(24.dp)
                     )
@@ -271,7 +271,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                     modifier = Modifier.background(ColoresTorque.SurfaceDark)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Ir al Garaje", color = Color.White) },
+                        text = { Text(stringResource(R.string.menu_go_to_garage), color = Color.White) },
                         leadingIcon = { Icon(Icons.Default.Motorcycle, contentDescription = null, tint = ColoresTorque.Primary) },
                         onClick = {
                             mostrarMenuPrincipal = false
@@ -279,7 +279,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Añadir Moto", color = Color.White) },
+                        text = { Text(stringResource(R.string.menu_add_motorcycle), color = Color.White) },
                         leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, tint = ColoresTorque.Primary) },
                         onClick = {
                             mostrarMenuPrincipal = false
@@ -288,7 +288,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                     )
                     HorizontalDivider(color = ColoresTorque.Outline.copy(alpha = 0.2f))
                     DropdownMenuItem(
-                        text = { Text("Recordatorios", color = Color.White) },
+                        text = { Text(stringResource(R.string.menu_reminders), color = Color.White) },
                         leadingIcon = { Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.Primary) },
                         onClick = {
                             mostrarMenuPrincipal = false
@@ -296,7 +296,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Exportar Datos", color = Color.White) },
+                        text = { Text(stringResource(R.string.menu_export_data), color = Color.White) },
                         leadingIcon = { Icon(Icons.Default.Upload, contentDescription = null, tint = ColoresTorque.Primary) },
                         onClick = {
                             mostrarMenuPrincipal = false
@@ -304,7 +304,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Acerca de", color = Color.White) },
+                        text = { Text(stringResource(R.string.menu_about), color = Color.White) },
                         leadingIcon = { Icon(Icons.Default.Info, contentDescription = null, tint = ColoresTorque.Primary) },
                         onClick = {
                             mostrarMenuPrincipal = false
@@ -314,7 +314,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                 }
             }
             Text(
-                text = "Torque",
+                text = stringResource(R.string.app_name),
                 color = ColoresTorque.OnSurface,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
@@ -331,7 +331,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Ajustes",
+                        contentDescription = stringResource(R.string.settings_title),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(8.dp),
@@ -344,14 +344,14 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                     modifier = Modifier.background(ColoresTorque.SurfaceDark)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Mi Perfil", color = Color.White) },
+                        text = { Text(stringResource(R.string.my_profile), color = Color.White) },
                         onClick = {
                             mostrarMenuAjustes = false
                             onIrPerfil()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Ajustes", color = Color.White) },
+                        text = { Text(stringResource(R.string.settings_title), color = Color.White) },
                         onClick = {
                             mostrarMenuAjustes = false
                             contexto.startActivity(Intent(contexto, AjustesActivity::class.java))
@@ -368,17 +368,17 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
             onDismissRequest = { mostrarAcercaDe = false },
             containerColor = ColoresTorque.SurfaceDark,
             icon = { Icon(Icons.Default.Info, contentDescription = null, tint = ColoresTorque.Primary) },
-            title = { Text("Torque v1.0") },
+            title = { Text(stringResource(R.string.about_dialog_title)) },
             text = {
                 Column {
-                    Text("App de gestión de mantenimiento para motocicletas.", color = Color.White)
+                    Text(stringResource(R.string.about_dialog_description), color = Color.White)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Desarrollada con Jetpack Compose y Room.", color = ColoresTorque.OnSurfaceVariant, fontSize = 13.sp)
+                    Text(stringResource(R.string.about_dialog_tech), color = ColoresTorque.OnSurfaceVariant, fontSize = 13.sp)
                 }
             },
             confirmButton = {
                 TextButton(onClick = { mostrarAcercaDe = false }) {
-                    Text("Cerrar", color = ColoresTorque.Primary)
+                    Text(stringResource(R.string.btn_close), color = ColoresTorque.Primary)
                 }
             }
         )
@@ -389,19 +389,19 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
             onDismissRequest = { mostrarExportar = false },
             containerColor = ColoresTorque.SurfaceDark,
             icon = { Icon(Icons.Default.Upload, contentDescription = null, tint = ColoresTorque.Primary) },
-            title = { Text("Exportar Datos") },
-            text = { Text("Copia de seguridad guardada en Descargas/Torque_backup.db", color = Color.White) },
+            title = { Text(stringResource(R.string.menu_export_data)) },
+            text = { Text(stringResource(R.string.export_dialog_message), color = Color.White) },
             confirmButton = {
                 TextButton(onClick = {
                     mostrarExportar = false
                     exportarBaseDeDatos(contexto)
                 }) {
-                    Text("Exportar", color = ColoresTorque.Primary)
+                    Text(stringResource(R.string.btn_export), color = ColoresTorque.Primary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { mostrarExportar = false }) {
-                    Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                    Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
                 }
             }
         )
@@ -419,7 +419,7 @@ private fun exportarBaseDeDatos(contexto: Context) {
                     input.copyTo(output)
                 }
             }
-            Toast.makeText(contexto, "Backup guardado en Descargas", Toast.LENGTH_SHORT).show()
+            Toast.makeText(contexto, contexto.getString(R.string.toast_backup_saved), Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(contexto, "No se encontró la base de datos", Toast.LENGTH_SHORT).show()
         }
@@ -474,7 +474,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                         .padding(horizontal = 10.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "PRÓXIMO SERVICIO",
+                        text = stringResource(R.string.next_service_badge),
                         color = ColoresTorque.OnPrimary,
                         fontSize = 10.sp, // Reducido de 11.sp
                         fontWeight = FontWeight.Bold,
@@ -490,13 +490,13 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                 ) {
                     Column {
                         Text(
-                            text = moto?.modelo ?: "Sin Moto",
+                            text = moto?.modelo ?: stringResource(R.string.no_bike),
                             color = Color.White,
                             fontSize = 20.sp, // Reducido de 24.sp
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (moto != null) "Tu moto principal" else "Añade una moto",
+                            text = if (moto != null) stringResource(R.string.your_main_bike) else stringResource(R.string.add_a_bike),
                             color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 12.sp, // Reducido de 14.sp
                             fontWeight = FontWeight.Medium
@@ -505,13 +505,13 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                     Column(horizontalAlignment = Alignment.End) {
                         if (kmRestantes != null) {
                             Text(
-                                text = if (kmRestantes < 0) "¡VENCIDO!" else kmRestantes.toString(),
+                                text = if (kmRestantes < 0) stringResource(R.string.overdue) else kmRestantes.toString(),
                                 color = if (kmRestantes < 0) Color(0xFFEF4444) else ColoresTorque.Primary,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Black
                             )
                             Text(
-                                text = if (kmRestantes < 0) "KM DE SERVICIO" else "KM RESTANTES",
+                                text = if (kmRestantes < 0) stringResource(R.string.service_km) else stringResource(R.string.km_remaining),
                                 color = ColoresTorque.Outline,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
@@ -525,7 +525,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                                 fontWeight = FontWeight.Black
                             )
                             Text(
-                                text = "SIN DATOS",
+                                text = stringResource(R.string.no_data),
                                 color = ColoresTorque.Outline,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
@@ -548,7 +548,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "SALUD DE LA MOTO",
+                            text = stringResource(R.string.bike_health),
                             color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
@@ -575,7 +575,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 BotonTorque(
-                    text = "Ver Mantenimiento",
+                    text = stringResource(R.string.btn_view_maintenance),
                     onClick = onClick,
                     modifier = Modifier.height(48.dp)
                 )
@@ -639,7 +639,7 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "KILOMETRAJE TOTAL",
+                text = stringResource(R.string.total_mileage),
                 color = ColoresTorque.Tertiary,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -658,7 +658,7 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "KILÓMETROS",
+                text = stringResource(R.string.kilometers_label),
                 color = ColoresTorque.OnSurfaceVariant,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
@@ -691,7 +691,7 @@ fun DialogoAjusteDesgaste(idMoto: Long, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ColoresTorque.SurfaceDark,
-        title = { Text("Estado de Desgaste", color = Color.White, fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.wear_status_title), color = Color.White, fontWeight = FontWeight.Bold) },
         text = {
             if (cargando) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -761,12 +761,12 @@ fun DialogoAjusteDesgaste(idMoto: Long, onDismiss: () -> Unit) {
                     onDismiss()
                 }
             }) {
-                Text("Guardar", color = ColoresTorque.Primary)
+                Text(stringResource(R.string.save), color = ColoresTorque.Primary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
             }
         }
     )

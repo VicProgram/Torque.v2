@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.torque.utils.terminar
@@ -35,6 +36,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+import com.example.torque.R
 import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.components.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
@@ -130,12 +132,12 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 IconButton(onClick = { (contexto as? Activity)?.terminar() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
+                        contentDescription = stringResource(R.string.content_desc_back),
                         tint = ColoresTorque.Primary
                     )
                 }
                 Text(
-                    text = "Historial de Mantenimientos",
+                    text = stringResource(R.string.maintenance_history_title),
                     modifier = Modifier.weight(1f),
                     color = ColoresTorque.OnSurface,
                     fontSize = 20.sp,
@@ -167,7 +169,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
 
                 item {
                     Text(
-                        "ACTIVIDAD RECIENTE",
+                        stringResource(R.string.recent_activity),
                         color = ColoresTorque.Primary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
@@ -178,8 +180,8 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 if (historialFiltrado.isEmpty()) {
                     item {
                         Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                            Text(
-                                text = if (historial.isEmpty()) "Sin mantenimientos registrados" else "Sin resultados para \"$filtroSeleccionado\"",
+                        Text(
+                            text = if (historial.isEmpty()) stringResource(R.string.no_maintenance_records) else stringResource(R.string.no_results_for, filtroSeleccionado),
                                 color = ColoresTorque.OnSurfaceVariant
                             )
                         }
@@ -212,26 +214,26 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
             contentColor = ColoresTorque.OnPrimaryContainer,
             shape = RoundedCornerShape(16.dp)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Añadir")
+            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add))
         }
 
         if (itemAEliminar != null) {
             AlertDialog(
                 onDismissRequest = { itemAEliminar = null },
                 containerColor = ColoresTorque.SurfaceDark,
-                title = { Text("¿Eliminar registro?") },
-                text = { Text("Esta acción no se puede deshacer.") },
+                title = { Text(stringResource(R.string.dialog_delete_record_title)) },
+                text = { Text(stringResource(R.string.action_irreversible)) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.eliminarMantenimiento(itemAEliminar!!)
                         itemAEliminar = null
                     }) {
-                        Text("Eliminar", color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_delete), color = Color(0xFFEF4444))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { itemAEliminar = null }) {
-                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -276,7 +278,7 @@ fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit, onEliminar:
 
         Column(modifier = Modifier.weight(1f)) {
             Text(item.nombreMantenimiento, color = ColoresTorque.OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-            Text("${item.fecha} · ${item.precio ?: "Sin precio"}", color = ColoresTorque.OnSurfaceVariant, fontSize = 13.sp)
+            Text("${item.fecha} · ${item.precio ?: stringResource(R.string.no_price)}", color = ColoresTorque.OnSurfaceVariant, fontSize = 13.sp)
         }
 
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -284,7 +286,7 @@ fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit, onEliminar:
             Text("${item.kms} km", color = ColoresTorque.Outline, fontSize = 11.sp)
         }
         IconButton(onClick = onEliminar, modifier = Modifier.size(32.dp)) {
-            Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color(0xFFEF4444).copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_desc_delete), tint = Color(0xFFEF4444).copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -305,13 +307,13 @@ fun DetalleMantenimientoEntityScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Detalle del Mantenimiento",
+                text = stringResource(R.string.maintenance_detail_title),
                 color = Color.White,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.White)
+                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.content_desc_close), tint = Color.White)
             }
         }
         
@@ -322,19 +324,19 @@ fun DetalleMantenimientoEntityScreen(
         
         if (!mantenimiento.notas.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "NOTAS", color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.section_notes), color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             Text(text = mantenimiento.notas, color = Color.White, fontSize = 16.sp)
         }
 
         if (!mantenimiento.tareas.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "TAREAS REALIZADAS", color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.section_tasks_done), color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             Text(text = mantenimiento.tareas, color = Color.White, fontSize = 16.sp)
         }
 
         if (!mantenimiento.precio.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "COSTE", color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.section_cost), color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             Text(text = mantenimiento.precio, color = Color(0xFF81C784), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }

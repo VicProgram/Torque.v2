@@ -19,9 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.R
 import com.example.torque.components.ui.dashboard.BotonTorque
 import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.components.ui.dashboard.CampoTextoTorque
@@ -85,7 +87,7 @@ private suspend fun guardarMantenimiento(
         )
         repositorio.insertarMantenimiento(mantenimiento)
         withContext(Dispatchers.Main) {
-            Toast.makeText(contexto, "¡Mantenimiento guardado!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
             (contexto as? Activity)?.terminar()
         }
     } catch (e: Exception) {
@@ -147,12 +149,12 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                 }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
+                        contentDescription = stringResource(R.string.content_desc_back),
                         tint = ColoresTorque.Primary
                     )
                 }
                 Text(
-                    text = "Detalles del Mantenimiento",
+                    text = stringResource(R.string.maintenance_details_title),
                     modifier = Modifier.weight(1f),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     color = Color.White,
@@ -177,7 +179,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("Tareas", color = ColoresTorque.Slate500, fontSize = 12.sp)
+                        Text(stringResource(R.string.label_tasks), color = ColoresTorque.Slate500, fontSize = 12.sp)
                         Text(
                             tareasSeleccionadas.joinToString(" · "),
                             color = Color.White,
@@ -189,23 +191,23 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
 
                 Column {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CampoTextoTorque(kms, { kms = it.filter { c -> c.isDigit() }; errorKms = false }, "Kms actuales *", modifier = Modifier.weight(1f))
-                        CampoTextoTorque(intervalo, { intervalo = it.filter { c -> c.isDigit() } }, "Cada X kms", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(kms, { kms = it.filter { c -> c.isDigit() }; errorKms = false }, stringResource(R.string.field_current_kms), modifier = Modifier.weight(1f))
+                        CampoTextoTorque(intervalo, { intervalo = it.filter { c -> c.isDigit() } }, stringResource(R.string.field_every_x_kms), modifier = Modifier.weight(1f))
                     }
                     if (errorKms) {
-                        Text("Los kilómetros son obligatorios", color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                        Text(stringResource(R.string.error_kms_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                     }
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CampoTextoTorque(precio, { precio = it }, "Precio (€)", modifier = Modifier.weight(1f))
-                    CampoTextoTorque(tiempo, { tiempo = it }, "Tiempo", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(precio, { precio = it }, stringResource(R.string.field_price), modifier = Modifier.weight(1f))
+                    CampoTextoTorque(tiempo, { tiempo = it }, stringResource(R.string.field_time), modifier = Modifier.weight(1f))
                 }
 
                 CampoTextoTorque(
                     value = notas,
                     onValueChange = { notas = it },
-                    label = "Notas",
+                    label = stringResource(R.string.field_notes),
                     singleLine = false,
                     modifier = Modifier.height(120.dp)
                 )
@@ -222,7 +224,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(
-                                "Vida útil restante",
+                                stringResource(R.string.label_remaining_life),
                                 color = ColoresTorque.Slate500,
                                 fontSize = 12.sp
                             )
@@ -267,19 +269,19 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             AlertDialog(
                 onDismissRequest = { mostrarDialogoDescartar = false },
                 containerColor = ColoresTorque.SurfaceDark,
-                title = { Text("¿Descartar cambios?") },
-                text = { Text("Los datos introducidos se perderán.") },
+                title = { Text(stringResource(R.string.dialog_discard_title)) },
+                text = { Text(stringResource(R.string.dialog_discard_message)) },
                 confirmButton = {
                     TextButton(onClick = {
                         mostrarDialogoDescartar = false
                         (contexto as? Activity)?.terminar()
                     }) {
-                        Text("Descartar", color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_discard), color = Color(0xFFEF4444))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoDescartar = false }) {
-                        Text("Seguir editando", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(R.string.btn_keep_editing), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -289,9 +291,9 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             AlertDialog(
                 onDismissRequest = { mostrarDialogoActualizarKm = false },
                 containerColor = ColoresTorque.SurfaceDark,
-                title = { Text("¿Actualizar kilometraje?") },
+                title = { Text(stringResource(R.string.dialog_update_km_title)) },
                 text = {
-                    Text("El mantenimiento registra ${kms} km, pero la moto tiene $kmMotoActual km. ¿Actualizar el kilometraje de la moto?")
+                    Text(stringResource(R.string.dialog_update_km_message, kms, kmMotoActual))
                 },
                 confirmButton = {
                     TextButton(onClick = {
@@ -302,7 +304,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                             guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
                         }
                     }) {
-                        Text("Sí, actualizar", color = ColoresTorque.Primary)
+                        Text(stringResource(R.string.btn_yes_update), color = ColoresTorque.Primary)
                     }
                 },
                 dismissButton = {
@@ -313,7 +315,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                             guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
                         }
                     }) {
-                        Text("No", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(R.string.btn_no), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -327,7 +329,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                 .padding(24.dp)
         ) {
             BotonTorque(
-                text = "Guardar Mantenimiento",
+                text = stringResource(R.string.btn_save_maintenance),
                 icon = Icons.Default.Save,
                 onClick = {
                     if (idMoto == -1L) {
@@ -337,7 +339,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
 
                     errorKms = kms.isBlank()
                     if (errorKms) {
-                        Toast.makeText(contexto, "Rellena los campos obligatorios", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(contexto, contexto.getString(R.string.toast_fill_required), Toast.LENGTH_SHORT).show()
                         return@BotonTorque
                     }
 

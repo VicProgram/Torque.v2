@@ -28,10 +28,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.torque.R
 import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.FotoEntity
@@ -100,7 +102,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
                     )
                     repositorio.insertarFoto(nuevaFoto)
-                    Toast.makeText(contexto, "¡Foto añadida!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(contexto, contexto.getString(R.string.toast_photo_added), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -127,15 +129,15 @@ fun VistaMotoDetalle(idMoto: Long) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { (contexto as? Activity)?.terminar() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás",
-                            tint = ColoresTorque.Primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Text(
-                        text = moto!!.modelo,
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.content_desc_back),
+                        tint = ColoresTorque.Primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Text(
+                    text = moto!!.modelo,
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -144,7 +146,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         Spacer(modifier = Modifier.width(6.dp))
                         Icon(
                             Icons.Default.Star,
-                            contentDescription = "Principal",
+                            contentDescription = stringResource(R.string.content_desc_principal),
                             tint = ColoresTorque.Primary,
                             modifier = Modifier.size(18.dp)
                         )
@@ -154,7 +156,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         IconButton(onClick = { mostrarMenu = true }) {
                             Icon(
                                 Icons.Default.MoreVert,
-                                contentDescription = "Menú",
+                                contentDescription = stringResource(R.string.menu),
                                 tint = Color.White,
                                 modifier = Modifier.size(22.dp)
                             )
@@ -165,7 +167,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                             modifier = Modifier.background(ColoresTorque.SurfaceDark)
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Hacer Principal", color = Color.White) },
+                                text = { Text(stringResource(R.string.menu_make_primary), color = Color.White) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.Star,
@@ -178,7 +180,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                         repositorio.establecerMotoPrincipal(idMoto)
                                         moto = repositorio.obtenerMotoPorId(idMoto)
                                         launch(kotlinx.coroutines.Dispatchers.Main) {
-                                            Toast.makeText(contexto, "Moto principal actualizada", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(contexto, contexto.getString(R.string.toast_primary_updated), Toast.LENGTH_SHORT).show()
                                             (contexto as? Activity)?.setResult(Activity.RESULT_OK)
                                         }
                                     }
@@ -186,7 +188,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Registrar Mantenimiento", color = Color.White) },
+                                text = { Text(stringResource(R.string.menu_register_maintenance), color = Color.White) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.Build,
@@ -203,7 +205,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Ver Historial", color = Color.White) },
+                                text = { Text(stringResource(R.string.menu_view_history), color = Color.White) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.History,
@@ -220,7 +222,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Editar Moto", color = Color.White) },
+                                text = { Text(stringResource(R.string.menu_edit_bike), color = Color.White) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.Edit,
@@ -238,7 +240,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Eliminar Moto", color = Color.Red) },
+                                text = { Text(stringResource(R.string.menu_delete_bike), color = Color.Red) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.Delete,
@@ -292,7 +294,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                     tint = ColoresTorque.OnSurfaceVariant,
                                     modifier = Modifier.size(48.dp)
                                 )
-                                Text("Sin fotos aún", color = ColoresTorque.OnSurfaceVariant)
+                                Text(stringResource(R.string.no_photos_yet), color = ColoresTorque.OnSurfaceVariant)
                             }
                         }
                     }
@@ -307,30 +309,30 @@ fun VistaMotoDetalle(idMoto: Long) {
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            "ESPECIFICACIONES",
+                            stringResource(R.string.section_specifications),
                             color = ColoresTorque.Primary,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         )
 
-                        FilaDetalle("Marca", moto!!.marca)
-                        FilaDetalle("Año", moto!!.anio.toString())
-                        FilaDetalle("Matrícula", moto!!.matricula ?: "N/A")
-                        FilaDetalle("Cilindrada", moto!!.cilindrada ?: "N/A")
-                        FilaDetalle("Potencia", if (moto!!.caballos != null) "${moto!!.caballos} CV" else "N/A")
-                        FilaDetalle("Kilómetros", "${moto!!.kilometros} km", editable = true, onClick = {
+                        FilaDetalle(stringResource(R.string.label_brand), moto!!.marca)
+                        FilaDetalle(stringResource(R.string.label_year), moto!!.anio.toString())
+                        FilaDetalle(stringResource(R.string.label_plate), moto!!.matricula ?: stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_displacement), moto!!.cilindrada ?: stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_power), if (moto!!.caballos != null) stringResource(R.string.power_cv_format, moto!!.caballos!!) else stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_kilometers), "${moto!!.kilometros} km", editable = true, onClick = {
                             nuevoKm = moto!!.kilometros.toString()
                             mostrarDialogoKm = true
                         })
-                        FilaDetalle("Estilo", moto!!.estilo ?: "N/A")
+                        FilaDetalle(stringResource(R.string.label_style), moto!!.estilo ?: stringResource(R.string.not_available))
                     }
 
                     // --- Fila de Fotos ---
                     if (fotos.size > 1) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Text(
-                                "GALERÍA",
+                                stringResource(R.string.section_gallery),
                                 color = ColoresTorque.OnSurfaceVariant,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold
@@ -362,12 +364,12 @@ fun VistaMotoDetalle(idMoto: Long) {
                 containerColor = ColoresTorque.SurfaceDark,
                 titleContentColor = Color.White,
                 textContentColor = Color.White,
-                title = { Text("Actualizar Kilometraje") },
+                title = { Text(stringResource(R.string.dialog_update_mileage_title)) },
                 text = {
                     OutlinedTextField(
                         value = nuevoKm,
                         onValueChange = { nuevoKm = it.filter { c -> c.isDigit() } },
-                        label = { Text("Kilómetros") },
+                        label = { Text(stringResource(R.string.field_kilometers)) },
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Color.White,
@@ -390,12 +392,12 @@ fun VistaMotoDetalle(idMoto: Long) {
                         }
                         mostrarDialogoKm = false
                     }) {
-                        Text("Guardar", color = ColoresTorque.Primary)
+                        Text(stringResource(R.string.save), color = ColoresTorque.Primary)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoKm = false }) {
-                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -408,8 +410,8 @@ fun VistaMotoDetalle(idMoto: Long) {
                 titleContentColor = Color.White,
                 textContentColor = Color.White,
                 icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFEF4444)) },
-                title = { Text("¿Eliminar moto?") },
-                text = { Text("Esta acción no se puede deshacer. Se eliminarán todos los datos y fotos asociados.") },
+                title = { Text(stringResource(R.string.dialog_delete_bike_title)) },
+                text = { Text(stringResource(R.string.dialog_delete_bike_message)) },
                 confirmButton = {
                     TextButton(onClick = {
                         scope.launch {
@@ -419,12 +421,12 @@ fun VistaMotoDetalle(idMoto: Long) {
                         }
                         mostrarDialogoEliminar = false
                     }) {
-                        Text("Eliminar", color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_delete), color = Color(0xFFEF4444))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoEliminar = false }) {
-                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -437,23 +439,23 @@ fun VistaMotoDetalle(idMoto: Long) {
                 titleContentColor = Color.White,
                 textContentColor = Color.White,
                 icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFEF4444)) },
-                title = { Text("¿Eliminar foto?") },
-                text = { Text("Esta acción no se puede deshacer.") },
+                title = { Text(stringResource(R.string.dialog_delete_photo_title)) },
+                text = { Text(stringResource(R.string.action_irreversible)) },
                 confirmButton = {
                     TextButton(onClick = {
                         scope.launch {
                             repositorio.eliminarFoto(foto)
                             File(foto.ruta).delete()
-                            Toast.makeText(contexto, "Foto eliminada", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(contexto, contexto.getString(R.string.toast_photo_deleted), Toast.LENGTH_SHORT).show()
                         }
                         mostrarDialogoEliminarFoto = null
                     }) {
-                        Text("Eliminar", color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_delete), color = Color(0xFFEF4444))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoEliminarFoto = null }) {
-                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -473,7 +475,7 @@ fun FilaDetalle(etiqueta: String, valor: String?, editable: Boolean = false, onC
         Text(text = etiqueta, color = ColoresTorque.OnSurfaceVariant, fontSize = 14.sp)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = valor ?: "N/A",
+                text = valor ?: stringResource(R.string.not_available),
                 color = Color.White,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium

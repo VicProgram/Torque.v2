@@ -43,4 +43,136 @@
     <string name="profile_birthday_hint">Fecha de nacimiento (YYYY-MM-DD)</string>
     <string name="save">Guardar</string>
     <string name="happy_birthday">¡Feliz cumpleaños!</string>
+
+    <!-- TorqueDashboardScreen -->
+    <string name="menu_go_to_garage">Ir al Garaje</string>
+    <string name="menu_add_motorcycle">Añadir Moto</string>
+    <string name="menu_reminders">Recordatorios</string>
+    <string name="menu_export_data">Exportar Datos</string>
+    <string name="menu_about">Acerca de</string>
+    <string name="about_dialog_title">Torque v1.0</string>
+    <string name="about_dialog_description">App de gestión de mantenimiento para motocicletas.</string>
+    <string name="about_dialog_tech">Desarrollada con Jetpack Compose y Room.</string>
+    <string name="export_dialog_message">Copia de seguridad guardada en Descargas/Torque_backup.db</string>
+    <string name="btn_export">Exportar</string>
+    <string name="toast_backup_saved">Backup guardado en Descargas</string>
+    <string name="next_service_badge">PRÓXIMO SERVICIO</string>
+    <string name="no_bike">Sin Moto</string>
+    <string name="your_main_bike">Tu moto principal</string>
+    <string name="add_a_bike">Añade una moto</string>
+    <string name="overdue">¡VENCIDO!</string>
+    <string name="service_km">KM DE SERVICIO</string>
+    <string name="km_remaining">KM RESTANTES</string>
+    <string name="no_data">SIN DATOS</string>
+    <string name="bike_health">SALUD DE LA MOTO</string>
+    <string name="btn_view_maintenance">Ver Mantenimiento</string>
+    <string name="total_mileage">KILOMETRAJE TOTAL</string>
+    <string name="kilometers_label">KILÓMETROS</string>
+    <string name="wear_status_title">Estado de Desgaste</string>
+    <string name="menu_wear">Desgaste</string>
+    <string name="menu_wear_subtitle">Pastillas, neumáticos</string>
+    <string name="btn_close">Cerrar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="content_desc_back">Atrás</string>
+
+    <!-- FormularioMantenimiento -->
+    <string name="maintenance_details_title">Detalles del Mantenimiento</string>
+    <string name="label_tasks">Tareas</string>
+    <string name="field_current_kms">Kms actuales *</string>
+    <string name="field_every_x_kms">Cada X kms</string>
+    <string name="error_kms_required">Los kilómetros son obligatorios</string>
+    <string name="field_price">Precio (€)</string>
+    <string name="field_time">Tiempo</string>
+    <string name="field_notes">Notas</string>
+    <string name="label_remaining_life">Vida útil restante</string>
+    <string name="dialog_discard_title">¿Descartar cambios?</string>
+    <string name="dialog_discard_message">Los datos introducidos se perderán.</string>
+    <string name="btn_discard">Descartar</string>
+    <string name="btn_keep_editing">Seguir editando</string>
+    <string name="dialog_update_km_title">¿Actualizar kilometraje?</string>
+    <string name="dialog_update_km_message">El mantenimiento registra %1$s km, pero la moto tiene %2$d km. ¿Actualizar el kilometraje de la moto?</string>
+    <string name="btn_yes_update">Sí, actualizar</string>
+    <string name="btn_no">No</string>
+    <string name="btn_save_maintenance">Guardar Mantenimiento</string>
+    <string name="toast_maintenance_saved">¡Mantenimiento guardado!</string>
+    <string name="toast_fill_required">Rellena los campos obligatorios</string>
+
+    <!-- MantenimientoHistorial -->
+    <string name="maintenance_history_title">Historial de Mantenimientos</string>
+    <string name="recent_activity">ACTIVIDAD RECIENTE</string>
+    <string name="no_maintenance_records">Sin mantenimientos registrados</string>
+    <string name="no_results_for">Sin resultados para &quot;%s&quot;</string>
+    <string name="dialog_delete_record_title">¿Eliminar registro?</string>
+    <string name="action_irreversible">Esta acción no se puede deshacer.</string>
+    <string name="btn_delete">Eliminar</string>
+    <string name="content_desc_delete">Eliminar</string>
+    <string name="maintenance_detail_title">Detalle del Mantenimiento</string>
+    <string name="content_desc_close">Cerrar</string>
+    <string name="section_notes">NOTAS</string>
+    <string name="section_tasks_done">TAREAS REALIZADAS</string>
+    <string name="section_cost">COSTE</string>
+    <string name="no_price">Sin precio</string>
+
+    <!-- RegistroMantenimiento -->
+    <string name="register_maintenance_title">Registrar Mantenimiento</string>
+    <string name="search_tasks_hint">Buscar tareas...</string>
+    <string name="no_tasks_for">No se encontraron tareas para &quot;%s&quot;</string>
+    <string name="tasks_selected">%d tareas seleccionadas</string>
+    <string name="estimated_45_min">Estimado 45 min</string>
+    <string name="btn_continue">Continuar</string>
+
+    <!-- ListaGaraje -->
+    <string name="search_by_brand_hint">Buscar por marca o modelo...</string>
+    <string name="content_desc_clear">Limpiar</string>
+    <string name="my_garage_title">Mi Garaje</string>
+    <string name="content_desc_search">Buscar</string>
+    <string name="no_bikes_yet">Aún no tienes motos</string>
+    <string name="add_first_bike_hint">Pulsa el botón + para añadir tu primera moto</string>
+    <string name="no_results">Sin resultados</string>
+    <string name="try_different_filters">Prueba con otros términos o filtros</string>
+    <string name="content_desc_principal">Principal</string>
+    <string name="healthy_status">Estado Saludable</string>
+    <string name="btn_view_details">Ver Detalles</string>
+    <string name="content_desc_new_moto">Nueva Moto</string>
+
+    <!-- MotoDetalle -->
+    <string name="menu_make_primary">Hacer Principal</string>
+    <string name="menu_register_maintenance">Registrar Mantenimiento</string>
+    <string name="menu_view_history">Ver Historial</string>
+    <string name="menu_edit_bike">Editar Moto</string>
+    <string name="menu_delete_bike">Eliminar Moto</string>
+    <string name="toast_primary_updated">Moto principal actualizada</string>
+    <string name="toast_photo_added">¡Foto añadida!</string>
+    <string name="no_photos_yet">Sin fotos aún</string>
+    <string name="section_specifications">ESPECIFICACIONES</string>
+    <string name="section_gallery">GALERÍA</string>
+    <string name="dialog_update_mileage_title">Actualizar Kilometraje</string>
+    <string name="field_kilometers">Kilómetros</string>
+    <string name="dialog_delete_bike_title">¿Eliminar moto?</string>
+    <string name="dialog_delete_bike_message">Esta acción no se puede deshacer. Se eliminarán todos los datos y fotos asociados.</string>
+    <string name="dialog_delete_photo_title">¿Eliminar foto?</string>
+    <string name="toast_photo_deleted">Foto eliminada</string>
+    <string name="label_brand">Marca</string>
+    <string name="label_year">Año</string>
+    <string name="label_plate">Matrícula</string>
+    <string name="label_displacement">Cilindrada</string>
+    <string name="label_power">Potencia</string>
+    <string name="label_kilometers">Kilómetros</string>
+    <string name="label_style">Estilo</string>
+    <string name="not_available">N/A</string>
+    <string name="power_cv_format">%s CV</string>
+
+    <!-- AnadirMotoActivity -->
+    <string name="title_edit_motorcycle">Editar Motocicleta</string>
+    <string name="title_new_motorcycle">Nueva Motocicleta</string>
+    <string name="add_photo">Añadir Foto</string>
+    <string name="field_brand_required">Marca *</string>
+    <string name="error_brand_required">La marca es obligatoria</string>
+    <string name="field_model_required">Modelo *</string>
+    <string name="error_model_required">El modelo es obligatorio</string>
+    <string name="field_current_kms_short">Kms Actuales</string>
+    <string name="label_set_as_primary">Establecer como principal</string>
+    <string name="btn_update_bike">Actualizar Moto</string>
+    <string name="toast_bike_updated">¡Moto actualizada con éxito!</string>
+    <string name="toast_bike_added">¡Moto añadida con éxito!</string>
 </resources>

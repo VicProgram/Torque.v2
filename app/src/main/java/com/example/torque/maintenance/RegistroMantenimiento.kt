@@ -25,10 +25,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.R
 import com.example.torque.components.ui.dashboard.*
 import com.example.torque.ui.theme.TorqueTheme
 
@@ -117,12 +119,12 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                 IconButton(onClick = { (contexto as? android.app.Activity)?.finish() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
+                        contentDescription = stringResource(R.string.content_desc_back),
                         tint = ColoresTorque.Primary
                     )
                 }
                 Text(
-                    "Registrar Mantenimiento",
+                    stringResource(R.string.register_maintenance_title),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     color = Color.White,
@@ -149,7 +151,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                                 .height(56.dp),
                             placeholder = {
                                 Text(
-                                    "Buscar tareas...",
+                                    stringResource(R.string.search_tasks_hint),
                                     color = ColoresTorque.Slate500
                                 )
                             },
@@ -201,7 +203,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                "No se encontraron tareas para \"$consultaBusqueda\"",
+                                stringResource(R.string.no_tasks_for, consultaBusqueda),
                                 color = ColoresTorque.OnSurfaceVariant,
                                 textAlign = TextAlign.Center
                             )
@@ -260,20 +262,20 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "$cantidadSeleccionada tareas seleccionadas",
+                        stringResource(R.string.tasks_selected, cantidadSeleccionada),
                         color = ColoresTorque.Slate500,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        "Estimado 45 min",
+                        stringResource(R.string.estimated_45_min),
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
                 }
                 BotonTorque(
-                    text = "Continuar",
+                    text = stringResource(R.string.btn_continue),
                     color = ColoresTorque.Accent,
                     icon = Icons.Default.ArrowForward,
                     onClick = {

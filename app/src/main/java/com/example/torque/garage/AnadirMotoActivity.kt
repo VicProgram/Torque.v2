@@ -26,11 +26,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.torque.R
 import com.example.torque.components.ui.dashboard.*
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
@@ -130,12 +132,12 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
+                        contentDescription = stringResource(R.string.content_desc_back),
                         tint = ColoresTorque.Primary
                     )
                 }
                 Text(
-                    text = if (editando) "Editar Motocicleta" else "Nueva Motocicleta",
+                    text = if (editando) stringResource(R.string.title_edit_motorcycle) else stringResource(R.string.title_new_motorcycle),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     color = Color.White,
@@ -179,33 +181,33 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                     } else {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
-                            Text("Añadir Foto", color = ColoresTorque.OnSurfaceVariant)
+                            Text(stringResource(R.string.add_photo), color = ColoresTorque.OnSurfaceVariant)
                         }
                     }
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CampoTextoTorque(marca, { marca = it; errorMarca = false }, "Marca *")
+                    CampoTextoTorque(marca, { marca = it; errorMarca = false }, stringResource(R.string.field_brand_required))
                     if (errorMarca) {
-                        Text("La marca es obligatoria", color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                        Text(stringResource(R.string.error_brand_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                     }
-                    CampoTextoTorque(modelo, { modelo = it; errorModelo = false }, "Modelo *")
+                    CampoTextoTorque(modelo, { modelo = it; errorModelo = false }, stringResource(R.string.field_model_required))
                     if (errorModelo) {
-                        Text("El modelo es obligatorio", color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                        Text(stringResource(R.string.error_model_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CampoTextoTorque(anio, { anio = it }, "Año", modifier = Modifier.weight(1f))
-                        CampoTextoTorque(matricula, { matricula = it }, "Matrícula", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
+                        CampoTextoTorque(matricula, { matricula = it }, stringResource(R.string.label_plate), modifier = Modifier.weight(1f))
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CampoTextoTorque(kilometros, { kilometros = it }, "Kms Actuales", modifier = Modifier.weight(1f))
-                        CampoTextoTorque(cilindrada, { cilindrada = it }, "Cilindrada", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(kilometros, { kilometros = it }, stringResource(R.string.field_current_kms_short), modifier = Modifier.weight(1f))
+                        CampoTextoTorque(cilindrada, { cilindrada = it }, stringResource(R.string.label_displacement), modifier = Modifier.weight(1f))
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text("Establecer como principal", color = Color.White, modifier = Modifier.weight(1f))
+                        Text(stringResource(R.string.label_set_as_primary), color = Color.White, modifier = Modifier.weight(1f))
                         Switch(
                             checked = esPrincipal,
                             onCheckedChange = { esPrincipal = it },
@@ -216,7 +218,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                     CampoTextoTorque(
                         value = estilo,
                         onValueChange = { estilo = it },
-                        label = "Notas",
+                        label = stringResource(R.string.field_notes),
                         singleLine = false,
                         modifier = Modifier.height(100.dp)
                     )
@@ -230,19 +232,19 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
             AlertDialog(
                 onDismissRequest = { mostrarDialogoDescartar = false },
                 containerColor = ColoresTorque.SurfaceDark,
-                title = { Text("¿Descartar cambios?") },
-                text = { Text("Los datos introducidos se perderán.") },
+                title = { Text(stringResource(R.string.dialog_discard_title)) },
+                text = { Text(stringResource(R.string.dialog_discard_message)) },
                 confirmButton = {
                     TextButton(onClick = {
                         mostrarDialogoDescartar = false
                         (contexto as? Activity)?.terminar()
                     }) {
-                        Text("Descartar", color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_discard), color = Color(0xFFEF4444))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoDescartar = false }) {
-                        Text("Seguir editando", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(R.string.btn_keep_editing), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -255,13 +257,13 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 .padding(24.dp)
         ) {
             BotonTorque(
-                text = if (editando) "Actualizar Moto" else "Guardar Moto",
+                text = if (editando) stringResource(R.string.btn_update_bike) else stringResource(R.string.save_motorcycle),
                 icon = Icons.Default.Save,
                 onClick = {
                     errorMarca = marca.isBlank()
                     errorModelo = modelo.isBlank()
                     if (errorMarca || errorModelo) {
-                        Toast.makeText(contexto, "Rellena los campos obligatorios", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(contexto, contexto.getString(R.string.toast_fill_required), Toast.LENGTH_SHORT).show()
                         return@BotonTorque
                     }
 
@@ -290,7 +292,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                                     repositorio.establecerMotoPrincipal(idMoto)
                                 }
                                 withContext(Dispatchers.Main) {
-                                    Toast.makeText(contexto, "¡Moto actualizada con éxito!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(contexto, contexto.getString(R.string.toast_bike_updated), Toast.LENGTH_SHORT).show()
                                     (contexto as? Activity)?.terminar()
                                 }
                             }
@@ -320,7 +322,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                             }
 
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(contexto, "¡Moto añadida con éxito!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(contexto, contexto.getString(R.string.toast_bike_added), Toast.LENGTH_SHORT).show()
                                 (contexto as? Activity)?.terminar()
                             }
                         }

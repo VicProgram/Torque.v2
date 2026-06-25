@@ -26,11 +26,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 
+import com.example.torque.R
 import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.components.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
@@ -92,12 +94,12 @@ fun VistaListaGaraje() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    placeholder = { Text("Buscar por marca o modelo...", color = ColoresTorque.OnSurfaceVariant) },
+                    placeholder = { Text(stringResource(R.string.search_by_brand_hint), color = ColoresTorque.OnSurfaceVariant) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant) },
                     trailingIcon = {
                         if (textoBusqueda.isNotEmpty()) {
                             IconButton(onClick = { textoBusqueda = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = ColoresTorque.OnSurfaceVariant)
+                                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.content_desc_clear), tint = ColoresTorque.OnSurfaceVariant)
                             }
                         }
                     },
@@ -148,12 +150,12 @@ fun VistaListaGaraje() {
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    "Aún no tienes motos",
+                                    stringResource(R.string.no_bikes_yet),
                                     color = ColoresTorque.OnSurfaceVariant,
                                     fontSize = 18.sp
                                 )
                                 Text(
-                                    "Pulsa el botón + para añadir tu primera moto",
+                                    stringResource(R.string.add_first_bike_hint),
                                     color = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.6f),
                                     fontSize = 14.sp
                                 )
@@ -177,12 +179,12 @@ fun VistaListaGaraje() {
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    "Sin resultados",
+                                    stringResource(R.string.no_results),
                                     color = ColoresTorque.OnSurfaceVariant,
                                     fontSize = 18.sp
                                 )
                                 Text(
-                                    "Prueba con otros términos o filtros",
+                                    stringResource(R.string.try_different_filters),
                                     color = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.6f),
                                     fontSize = 14.sp
                                 )
@@ -217,7 +219,7 @@ fun VistaListaGaraje() {
         ) {
             Icon(
                 Icons.Default.Add,
-                contentDescription = "Nueva Moto",
+                contentDescription = stringResource(R.string.content_desc_new_moto),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -239,13 +241,13 @@ fun CabeceraGaraje(onSearchToggle: () -> Unit = {}, mostrandoBusqueda: Boolean =
         IconButton(onClick = { (contexto as? android.app.Activity)?.finish() }) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Atrás",
+                contentDescription = stringResource(R.string.content_desc_back),
                 tint = ColoresTorque.Primary,
                 modifier = Modifier.size(24.dp)
             )
         }
         Text(
-            text = "Mi Garaje",
+            text = stringResource(R.string.my_garage_title),
             color = ColoresTorque.OnSurface,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -255,7 +257,7 @@ fun CabeceraGaraje(onSearchToggle: () -> Unit = {}, mostrandoBusqueda: Boolean =
             IconButton(onClick = onSearchToggle) {
                 Icon(
                     if (mostrandoBusqueda) Icons.Default.Close else Icons.Default.Search,
-                    contentDescription = "Buscar",
+                    contentDescription = stringResource(R.string.content_desc_search),
                     tint = if (mostrandoBusqueda) ColoresTorque.Primary else ColoresTorque.OnSurfaceVariant,
                     modifier = Modifier.size(22.dp)
                 )
@@ -318,7 +320,7 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                 if (moto.esPrincipal == 1) {
                     Icon(
                         imageVector = Icons.Default.Star,
-                        contentDescription = "Principal",
+                        contentDescription = stringResource(R.string.content_desc_principal),
                         tint = ColoresTorque.Primary,
                         modifier = Modifier.size(20.dp) // Reducido de 28.dp
                     )
@@ -348,7 +350,7 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Estado Saludable",
+                        text = stringResource(R.string.healthy_status),
                         color = Color(0xFF34D399),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
@@ -362,7 +364,7 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                         .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "Ver Detalles",
+                        text = stringResource(R.string.btn_view_details),
                         color = ColoresTorque.Primary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
