@@ -37,6 +37,7 @@ import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
+import com.example.torque.utils.NotificacionSalud
 import com.example.torque.utils.ResultadoSalud
 import com.example.torque.utils.SaludMotoCalculator
 
@@ -70,7 +71,10 @@ fun TorqueDashboardScreen(
     LaunchedEffect(motoPrincipal?.idMoto) {
         if (motoPrincipal != null) {
             repositorio.obtenerMantenimientosPorMoto(motoPrincipal!!.idMoto).collect { mantenimientos ->
-                resultadoSalud = SaludMotoCalculator.calcular(mantenimientos, motoPrincipal!!.kilometros)
+                val salud = SaludMotoCalculator.calcular(mantenimientos, motoPrincipal!!.kilometros)
+                resultadoSalud = salud
+                val nombreMoto = motoPrincipal?.modelo ?: "Tu moto"
+                NotificacionSalud.verificarYNotificar(contexto, salud, motoPrincipal!!.kilometros, nombreMoto)
             }
         } else {
             resultadoSalud = null
@@ -526,26 +530,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                         color = colorSalud,
                         trackColor = Color.White.copy(alpha = 0.1f)
                     )
-                    if (resultadoSalud != null && resultadoSalud.proximosVencidos.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        resultadoSalud.proximosVencidos.take(3).forEach { detalle ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    detalle.tipo.nombre,
-                                    color = Color.White.copy(alpha = 0.7f),
-                                    fontSize = 12.sp
-                                )
-                                Text(
-                                    "${detalle.cumplimiento}%",
-                                    color = if (detalle.cumplimiento < 40) Color(0xFFEF4444) else ColoresTorque.OnSurfaceVariant,
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
-                    }
+
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 BotonTorque(
