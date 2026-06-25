@@ -70,13 +70,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.appcompat)
-
     // --- Persistencia de Datos (DataStore y Room) ---
     implementation(libs.androidx.datastore.preferences)
-
-    // Material Components
-    implementation(libs.androidx.material)
 
     // Room - usando KSP
     implementation(libs.androidx.room.runtime)

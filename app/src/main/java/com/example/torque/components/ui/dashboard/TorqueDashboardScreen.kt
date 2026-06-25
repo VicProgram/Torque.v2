@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
+import com.example.torque.ajustes.AjustesRepositorio
 import com.example.torque.ajustes.dataStore
 import com.example.torque.garage.AnadirMotoActivity
 import com.example.torque.perfil.PerfilRepositorio
@@ -144,10 +146,14 @@ fun TorqueDashboardScreen(
                 .fillMaxSize()
                 .padding(bottom = 64.dp)
         ) {
+            val repoAjustes = remember { AjustesRepositorio(contexto.dataStore) }
+            val logoSelccionado by repoAjustes.logoSelccionadoFlow.collectAsState(initial = 1)
+
             CabeceraDashboard(
                 onIrPerfil = onIrPerfil,
                 notificacionesPendientes = notificacionesPendientes,
-                onNotificacionesClick = { mostrarDialogoNotificaciones = true }
+                onNotificacionesClick = { mostrarDialogoNotificaciones = true },
+                logoSelccionado = logoSelccionado
             )
 
             LazyColumn(
@@ -415,7 +421,8 @@ fun TorqueDashboardScreen(
 fun CabeceraDashboard(
     onIrPerfil: () -> Unit,
     notificacionesPendientes: Int = 0,
-    onNotificacionesClick: () -> Unit = {}
+    onNotificacionesClick: () -> Unit = {},
+    logoSelccionado: Int = 1
 ) {
     val contexto = LocalContext.current
     var mostrarMenuAjustes by remember { mutableStateOf(false) }
@@ -490,11 +497,19 @@ fun CabeceraDashboard(
                     )
                 }
             }
-            Text(
-                text = stringResource(R.string.app_name),
-                color = ColoresTorque.OnSurface,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+            val logoResId = when (logoSelccionado) {
+                1 -> R.drawable.ic_logo1
+                2 -> R.drawable.ic_logo2
+                3 -> R.drawable.ic_logo3
+                4 -> R.drawable.ic_logo4
+                5 -> R.drawable.ic_logo5
+                6 -> R.drawable.ic_logo6
+                else -> R.drawable.ic_logo1
+            }
+            Image(
+                painter = painterResource(id = logoResId),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier.height(32.dp)
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {

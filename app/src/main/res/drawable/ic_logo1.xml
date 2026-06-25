@@ -1,0 +1,54 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <path
+    android:fillColor="#0B0F19"
+    android:pathData="M 0,0 h 200 v 200 h -200 Z" />
+
+    <path
+    android:fillColor="#F97316"
+    android:pathData="M 50,75 A 60,60 0 0 1 70,45 L 75,52 A 52,52 0 0 0 57,78 Z" />
+
+    <path
+    android:fillColor="#EA580C"
+    android:pathData="M 73,42 A 60,60 0 0 1 100,32 L 102,40 A 52,52 0 0 0 78,49 Z" />
+
+    <path
+    android:fillColor="#DC2626"
+    android:pathData="M 104,32 A 60,60 0 0 1 133,40 L 130,48 A 52,52 0 0 0 106,40 Z" />
+
+    <path
+    android:fillColor="#B91C1C"
+    android:pathData="M 137,42 A 60,60 0 0 1 155,62 L 149,67 A 52,52 0 0 0 133,49 Z" />
+
+    <path
+    android:strokeColor="#EF4444"
+    android:strokeWidth="2.5"
+    android:strokeLineCap="round"
+    android:pathData="M 100,75 L 145,50" />
+
+    <path
+    android:fillColor="#FFFFFF"
+    android:pathData="M 60,82 L 140,82 L 132,96 L 109,96 L 109,134 L 118,139 L 114,147 L 100,140 L 86,147 L 82,139 L 91,134 L 91,96 L 68,96 Z" />
+
+    <path
+    android:fillColor="#0B0F19"
+    android:pathData="M 100,148 M 100,148 A 8,8 0 0 1 92,140 L 108,140 A 8,8 0 0 1 100,148" />
+
+    <path
+    android:fillColor="#FFFFFF"
+    android:pathData="M 32,165 L 49,165 L 46,172 L 40,172 L 35,188 L 29,188 L 34,172 L 28,172 Z 
+                      M 50,165 C 57,165 62,168 60,176 C 58,184 52,188 45,188 C 38,188 34,185 36,176 C 38,168 43,165 50,165 Z M 48,171 C 45,171 42,174 41,177 C 40,181 42,183 45,183 C 48,183 51,180 52,177 C 53,174 51,171 48,171 Z
+                      M 65,165 L 75,165 C 79,165 81,167 80,171 C 79,174 77,176 74,177 L 78,188 L 72,188 L 68,178 L 67,178 L 64,188 L 58,188 Z M 69,170 L 68,173 L 73,173 C 75,173 76,172 76,170 C 77,169 76,168 74,168 Z
+                      M 88,165 C 93,165 96,168 95,173 C 94,177 91,179 88,180 L 92,188 L 86,188 L 83,181 L 81,181 L 79,188 L 73,188 Z M 85,170 L 83,175 L 87,175 C 89,175 90,174 90,172 C 91,171 90,170 88,170 Z
+                      M 101,165 C 107,165 110,169 108,176 C 106,184 100,188 94,188 C 91,188 89,186 90,182 L 91,178 C 92,172 96,165 101,165 Z M 99,171 C 97,171 95,174 94,177 C 93,181 95,183 97,183 C 99,183 101,180 102,177 C 103,174 101,171 99,171 Z
+                      M 116,165 L 126,165 L 124,171 L 118,171 L 116,177 L 122,177 L 120,182 L 114,182 L 112,188 L 106,188 Z" />
+
+    <path
+    android:fillColor="#F97316"
+    android:pathData="M 50,195 L 53,195 L 51,198 L 49,198 Z" />
+
+</vector>

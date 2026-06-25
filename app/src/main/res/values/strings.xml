@@ -71,6 +71,8 @@
     <string name="wear_status_title">Estado de Desgaste</string>
     <string name="menu_wear">Desgaste</string>
     <string name="menu_wear_subtitle">Pastillas, neumáticos</string>
+    <string name="logo_header">LOGO DE LA APP</string>
+    <string name="logo_subtitle">Selecciona el logo que se muestra en la app</string>
     <string name="btn_close">Cerrar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="content_desc_back">Atrás</string>

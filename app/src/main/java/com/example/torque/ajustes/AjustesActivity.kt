@@ -55,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.launch
 import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.ui.theme.TorqueTheme
@@ -81,6 +82,7 @@ fun AjustesScreen(onBack: () -> Unit) {
 
     val notificacionesActivadas by repo.notificacionesActivadasFlow.collectAsState(initial = true)
     val modoOscuroActivado by repo.modoOscuroActivadoFlow.collectAsState(initial = true)
+    val logoSelccionado by repo.logoSelccionadoFlow.collectAsState(initial = 1)
 
     var mostrarDialogoRestaurar by remember { mutableStateOf(false) }
     var uriRestaurar by remember { mutableStateOf<Uri?>(null) }
@@ -191,6 +193,73 @@ fun AjustesScreen(onBack: () -> Unit) {
                         onCheckedChange = { activado -> coroutineScope.launch { repo.establecerModoOscuroActivado(activado) } },
                         colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary, uncheckedThumbColor = ColoresTorque.OnSurfaceVariant)
                     )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(id = com.example.torque.R.string.logo_header),
+                    color = ColoresTorque.Primary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(ColoresTorque.SurfaceDark)
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Palette, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = "Logo de la app", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(text = stringResource(id = com.example.torque.R.string.logo_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(ColoresTorque.SurfaceDark)
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    for (i in 1..6) {
+                        val resId = when (i) {
+                            1 -> com.example.torque.R.drawable.ic_logo1
+                            2 -> com.example.torque.R.drawable.ic_logo2
+                            3 -> com.example.torque.R.drawable.ic_logo3
+                            4 -> com.example.torque.R.drawable.ic_logo4
+                            5 -> com.example.torque.R.drawable.ic_logo5
+                            6 -> com.example.torque.R.drawable.ic_logo6
+                            else -> com.example.torque.R.drawable.ic_logo1
+                        }
+                        val borderModifier = if (logoSelccionado == i) {
+                            Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(ColoresTorque.Primary)
+                                .padding(2.dp)
+                        } else {
+                            Modifier
+                        }
+                        Box(
+                            modifier = borderModifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color.Transparent)
+                                .clickable { coroutineScope.launch { repo.establecerLogoSeleccionado(i) } }
+                                .padding(4.dp)
+                        ) {
+                            androidx.compose.foundation.Image(
+                                painter = painterResource(id = resId),
+                                contentDescription = "Logo $i",
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
