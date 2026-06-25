@@ -16,10 +16,13 @@ class TorqueApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        SentryAndroid.init(this) { options ->
-            options.dsn = BuildConfig.SENTRY_DSN
-            options.tracesSampleRate = 0.2
-            options.isEnableUserInteractionTracing = true
+        val dsn = BuildConfig.SENTRY_DSN
+        if (dsn.isNotBlank() && dsn != "https://example@sentry.io/placeholder") {
+            SentryAndroid.init(this) { options ->
+                options.dsn = dsn
+                options.tracesSampleRate = 0.2
+                options.isEnableUserInteractionTracing = true
+            }
         }
 
         startKoin {

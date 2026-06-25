@@ -13,6 +13,11 @@
         android:label="Torque"
         android:theme="@style/Theme.TorqueLight">
 
+        <!-- Desactivar auto-init de Sentry (lo inicializamos manualmente en TorqueApp) -->
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false" />
+
         <!-- Activity Principal -->
         <activity
             android:name=".menuprincipal.MenuPrincipal"
