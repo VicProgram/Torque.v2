@@ -812,16 +812,17 @@ fun TarjetaAccionRapida(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp)) // Reducido de 16.dp
+            .clip(RoundedCornerShape(12.dp))
             .background(ColoresTorque.SurfaceContainer)
             .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
             .clickable { onClick() }
-            .padding(12.dp), // Reducido de 20.dp
-        verticalArrangement = Arrangement.spacedBy(8.dp) // Reducido de 16.dp
+            .heightIn(min = 100.dp)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp) // Reducido de 48.dp
+                .size(40.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(colorContenedor),
             contentAlignment = Alignment.Center
@@ -830,12 +831,17 @@ fun TarjetaAccionRapida(
                 icono,
                 contentDescription = null,
                 tint = colorContenido,
-                modifier = Modifier.size(24.dp) // Reducido de 28.dp
+                modifier = Modifier.size(24.dp)
             )
         }
         Column {
-            Text(text = titulo, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) // Reducido de 16.sp
-            Text(text = subtitulo, color = ColoresTorque.OnSurfaceVariant, fontSize = 11.sp) // Reducido de 12.sp
+            Text(text = titulo, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = subtitulo,
+                color = ColoresTorque.OnSurfaceVariant,
+                fontSize = 11.sp,
+                maxLines = 1
+            )
         }
     }
 }
