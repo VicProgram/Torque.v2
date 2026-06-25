@@ -88,6 +88,7 @@ class SaludMotoCalculatorPerformanceTest {
     }
 
     @Test
+    @Suppress("ExplicitGarbageCollectionCall")
     fun `carga constante de memoria tras warmup`() {
         val mantenimientos = tipos.map { mant(it.nombre, kms = 5000, tipoId = it.id) }
 

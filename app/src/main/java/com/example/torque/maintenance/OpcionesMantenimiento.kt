@@ -68,7 +68,6 @@ fun PantallaOpcionesMantenimiento(
 ) {
     val contexto = LocalContext.current
     val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
-    val coroutineScope = rememberCoroutineScope()
     
     var motoSeleccionada by remember { mutableStateOf<MotoEntity?>(null) }
 

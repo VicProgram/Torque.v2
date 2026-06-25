@@ -15,7 +15,7 @@
 
         <!-- Activity Principal -->
         <activity
-            android:name=".MenuPrincipal.MenuPrincipal"
+            android:name=".menuprincipal.MenuPrincipal"
             android:exported="true"
             android:theme="@style/Theme.TorqueSplash">
             <intent-filter>

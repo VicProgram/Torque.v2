@@ -37,7 +37,7 @@ object NotificacionSalud {
     suspend fun verificarYNotificar(
         contexto: Context,
         resultadoSalud: ResultadoSalud,
-        kmActuales: Int,
+        @Suppress("UNUSED_PARAMETER") kmActuales: Int,
         motoNombre: String
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -56,39 +56,49 @@ object NotificacionSalud {
         nuevosNotificados.addAll(yaNotificados)
 
         for (detalle in resultadoSalud.desglose) {
-            if (detalle.tipo.esDesgaste) continue
-            if (detalle.tipo.intervaloKms == 0 && detalle.tipo.intervaloDias == 0) continue
-
-            val tipoId = detalle.tipo.id
-            val cumplimiento = detalle.cumplimiento
-            val nombreTipo = detalle.tipo.nombre
-
-            val claveWarning = "${tipoId}_warning"
-            val claveExpired = "${tipoId}_expired"
-
-            if (cumplimiento in 1..20 && claveWarning !in yaNotificados) {
-                mostrarNotificacion(
-                    contexto = contexto,
-                    id = (tipoId * 10 + 1).toInt(),
-                    titulo = "Mantenimiento próximo a vencer",
-                    mensaje = "$nombreTipo de $motoNombre necesita atención (${100 - cumplimiento}% del intervalo recorrido)"
-                )
-                nuevosNotificados.add(claveWarning)
-            }
-
-            if (cumplimiento == 0 && claveExpired !in yaNotificados) {
-                mostrarNotificacion(
-                    contexto = contexto,
-                    id = (tipoId * 10 + 2).toInt(),
-                    titulo = "Mantenimiento vencido",
-                    mensaje = "$nombreTipo de $motoNombre — ya deberías haberlo realizado"
-                )
-                nuevosNotificados.add(claveExpired)
-            }
+            procesarDetalle(detalle, motoNombre, yaNotificados, nuevosNotificados, contexto)
         }
 
         contexto.dataStore.edit { prefs ->
             prefs[ClaveNotificados] = nuevosNotificados.joinToString(",")
+        }
+    }
+
+    private fun procesarDetalle(
+        detalle: DetalleSalud,
+        motoNombre: String,
+        yaNotificados: Set<String>,
+        nuevosNotificados: MutableSet<String>,
+        contexto: Context
+    ) {
+        if (detalle.tipo.esDesgaste) return
+        if (detalle.tipo.intervaloKms == 0 && detalle.tipo.intervaloDias == 0) return
+
+        val tipoId = detalle.tipo.id
+        val cumplimiento = detalle.cumplimiento
+        val nombreTipo = detalle.tipo.nombre
+
+        val claveWarning = "${tipoId}_warning"
+        val claveExpired = "${tipoId}_expired"
+
+        if (cumplimiento in 1..20 && claveWarning !in yaNotificados) {
+            mostrarNotificacion(
+                contexto = contexto,
+                id = (tipoId * 10 + 1).toInt(),
+                titulo = "Mantenimiento próximo a vencer",
+                mensaje = "$nombreTipo de $motoNombre necesita atención (${100 - cumplimiento}% del intervalo recorrido)"
+            )
+            nuevosNotificados.add(claveWarning)
+        }
+
+        if (cumplimiento == 0 && claveExpired !in yaNotificados) {
+            mostrarNotificacion(
+                contexto = contexto,
+                id = (tipoId * 10 + 2).toInt(),
+                titulo = "Mantenimiento vencido",
+                mensaje = "$nombreTipo de $motoNombre — ya deberías haberlo realizado"
+            )
+            nuevosNotificados.add(claveExpired)
         }
     }
 

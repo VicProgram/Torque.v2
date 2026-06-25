@@ -1,4 +1,4 @@
-package com.example.torque.MenuPrincipal
+package com.example.torque.menuprincipal
 
 import android.content.Intent
 import android.os.Bundle

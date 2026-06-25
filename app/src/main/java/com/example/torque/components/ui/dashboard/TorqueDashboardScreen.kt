@@ -124,7 +124,9 @@ fun TorqueDashboardScreen(
     }
 
     val progreso = remember(motoPrincipal, ultimoMantenimiento, kmRestantes) {
-        if (motoPrincipal != null && ultimoMantenimiento != null && ultimoMantenimiento!!.intervaloKms > 0 && kmRestantes != null) {
+        val tieneMotoYMantenimiento = motoPrincipal != null && ultimoMantenimiento != null
+        val tieneIntervalo = ultimoMantenimiento?.intervaloKms ?: 0 > 0
+        if (tieneMotoYMantenimiento && tieneIntervalo && kmRestantes != null) {
             val transcurrido = motoPrincipal!!.kilometros - ultimoMantenimiento!!.kms
             val total = ultimoMantenimiento!!.intervaloKms
             if (total > 0) (transcurrido.toFloat() / total).coerceIn(0f, 1f) else 0f
@@ -652,7 +654,7 @@ private suspend fun exportarBaseDeDatos(contexto: Context) {
 }
 
 @Composable
-fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRestantes: Int? = null, progreso: Float = 0f, resultadoSalud: ResultadoSalud? = null, onClick: () -> Unit) {
+fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRestantes: Int? = null, @Suppress("UNUSED_PARAMETER") progreso: Float = 0f, resultadoSalud: ResultadoSalud? = null, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

@@ -112,6 +112,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
     var mostrarDialogoDescartar by remember { mutableStateOf(false) }
     var mostrarDialogoActualizarKm by remember { mutableStateOf(false) }
     var kmMotoActual by remember { mutableStateOf(0) }
+    var porcentajeVida by remember { mutableStateOf(100) }
 
     val hayCambios = kms.isNotBlank() || intervalo.isNotBlank() || precio.isNotBlank() ||
         tiempo.isNotBlank() || notas.isNotBlank()
@@ -122,7 +123,6 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
         tareasSeleccionadas.size == 1 &&
             TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.esDesgaste == true
     }
-    var porcentajeVida by remember { mutableStateOf(100) }
 
     val tipoDesgaste = remember {
         if (esDesgaste) TiposMantenimiento.desdeNombre(tareasSeleccionadas[0]) else null
@@ -135,227 +135,262 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Cabecera
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = {
-                    if (hayCambios) mostrarDialogoDescartar = true
-                    else (contexto as? Activity)?.terminar()
-                }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.content_desc_back),
-                        tint = ColoresTorque.Primary
-                    )
-                }
-                Text(
-                    text = stringResource(R.string.maintenance_details_title),
-                    modifier = Modifier.weight(1f),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-                Spacer(modifier = Modifier.width(48.dp))
-            }
+            CabeceraFormulario(hayCambios, contexto) { mostrarDialogoDescartar = it }
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Tareas seleccionadas
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(stringResource(R.string.label_tasks), color = ColoresTorque.Slate500, fontSize = 12.sp)
-                        Text(
-                            tareasSeleccionadas.joinToString(" · "),
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-
-                Column {
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CampoTextoTorque(kms, { kms = it.filter { c -> c.isDigit() }; errorKms = false }, stringResource(R.string.field_current_kms), modifier = Modifier.weight(1f))
-                        CampoTextoTorque(intervalo, { intervalo = it.filter { c -> c.isDigit() } }, stringResource(R.string.field_every_x_kms), modifier = Modifier.weight(1f))
-                    }
-                    if (errorKms) {
-                        Text(stringResource(R.string.error_kms_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
-                    }
-                }
-
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CampoTextoTorque(precio, { precio = it }, stringResource(R.string.field_price), modifier = Modifier.weight(1f))
-                    CampoTextoTorque(tiempo, { tiempo = it }, stringResource(R.string.field_time), modifier = Modifier.weight(1f))
-                }
-
-                CampoTextoTorque(
-                    value = notas,
-                    onValueChange = { notas = it },
-                    label = stringResource(R.string.field_notes),
-                    singleLine = false,
-                    modifier = Modifier.height(120.dp)
-                )
-
-                if (esDesgaste && tipoDesgaste != null) {
-                    val colorBarra = when {
-                        porcentajeVida >= 70 -> Color(0xFF22C55E)
-                        porcentajeVida >= 40 -> Color(0xFFEAB308)
-                        else -> Color(0xFFEF4444)
-                    }
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text(
-                                stringResource(R.string.label_remaining_life),
-                                color = ColoresTorque.Slate500,
-                                fontSize = 12.sp
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    tipoDesgaste.nombre,
-                                    color = Color.White,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    "$porcentajeVida%",
-                                    color = colorBarra,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Slider(
-                                value = porcentajeVida.toFloat(),
-                                onValueChange = { porcentajeVida = it.toInt() },
-                                valueRange = 0f..100f,
-                                steps = 19,
-                                colors = SliderDefaults.colors(
-                                    thumbColor = colorBarra,
-                                    activeTrackColor = colorBarra,
-                                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
-                                )
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(100.dp))
-            }
-        }
-
-        if (mostrarDialogoDescartar) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoDescartar = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                title = { Text(stringResource(R.string.dialog_discard_title)) },
-                text = { Text(stringResource(R.string.dialog_discard_message)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        mostrarDialogoDescartar = false
-                        (contexto as? Activity)?.terminar()
-                    }) {
-                        Text(stringResource(R.string.btn_discard), color = Color(0xFFEF4444))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { mostrarDialogoDescartar = false }) {
-                        Text(stringResource(R.string.btn_keep_editing), color = ColoresTorque.OnSurfaceVariant)
-                    }
-                }
+            FormularioCampos(
+                tareasSeleccionadas, kms, intervalo, precio, tiempo, notas,
+                errorKms, esDesgaste, tipoDesgaste, porcentajeVida,
+                modifier = Modifier.weight(1f),
+                onKmsChange = { kms = it.filter { c -> c.isDigit() }; errorKms = false },
+                onIntervaloChange = { intervalo = it.filter { c -> c.isDigit() } },
+                onPrecioChange = { precio = it },
+                onTiempoChange = { tiempo = it },
+                onNotasChange = { notas = it },
+                onPorcentajeVidaChange = { porcentajeVida = it }
             )
         }
 
-        if (mostrarDialogoActualizarKm) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoActualizarKm = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                title = { Text(stringResource(R.string.dialog_update_km_title)) },
-                text = {
-                    Text(stringResource(R.string.dialog_update_km_message, kms, kmMotoActual))
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        mostrarDialogoActualizarKm = false
-                        scope.launch {
-                            val kmNuevos = kms.toIntOrNull() ?: 0
-                            repositorio.actualizarKilometros(idMoto, kmNuevos)
-                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
-                        }
-                    }) {
-                        Text(stringResource(R.string.btn_yes_update), color = ColoresTorque.Primary)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = {
-                        mostrarDialogoActualizarKm = false
-                        scope.launch {
-                            val kmNuevos = kms.toIntOrNull() ?: 0
-                            guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
-                        }
-                    }) {
-                        Text(stringResource(R.string.btn_no), color = ColoresTorque.OnSurfaceVariant)
-                    }
+        DialogoDescartar(mostrarDialogoDescartar, contexto) { mostrarDialogoDescartar = false }
+        DialogoActualizarKm(mostrarDialogoActualizarKm, kms, kmMotoActual) {
+            mostrarDialogoActualizarKm = false
+            scope.launch {
+                val kmNuevos = kms.toIntOrNull() ?: 0
+                guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
+            }
+        }
+        BotonGuardarFormulario(idMoto, kms, contexto, repositorio) {
+            errorKms = it.errorKms
+            kmMotoActual = it.kmMotoActual
+            mostrarDialogoActualizarKm = it.mostrarActualizarKm
+            if (it.guardarDirecto) {
+                scope.launch {
+                    guardarMantenimiento(tareasSeleccionadas, idMoto, kms.toIntOrNull() ?: 0, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CabeceraFormulario(hayCambios: Boolean, contexto: android.content.Context, onDescartar: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = {
+            if (hayCambios) onDescartar(true)
+            else (contexto as? Activity)?.terminar()
+        }) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.content_desc_back),
+                tint = ColoresTorque.Primary
             )
         }
+        Text(
+            text = stringResource(R.string.maintenance_details_title),
+            modifier = Modifier.weight(1f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp
+        )
+        Spacer(modifier = Modifier.width(48.dp))
+    }
+}
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .background(ColoresTorque.Background)
-                .padding(24.dp)
+@Composable
+private fun FormularioCampos(
+    tareasSeleccionadas: List<String>,
+    kms: String, intervalo: String, precio: String, tiempo: String, notas: String,
+    errorKms: Boolean, esDesgaste: Boolean, tipoDesgaste: com.example.torque.utils.TipoMantenimiento?,
+    porcentajeVida: Int,
+    modifier: Modifier = Modifier,
+    onKmsChange: (String) -> Unit, onIntervaloChange: (String) -> Unit,
+    onPrecioChange: (String) -> Unit, onTiempoChange: (String) -> Unit,
+    onNotasChange: (String) -> Unit, onPorcentajeVidaChange: (Int) -> Unit
+) {
+    Column(
+        modifier = modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Card(
+            colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
         ) {
-            BotonTorque(
-                text = stringResource(R.string.btn_save_maintenance),
-                icon = Icons.Default.Save,
-                onClick = {
-                    if (idMoto == -1L) {
-                        Toast.makeText(contexto, "Error: No se identificó la moto", Toast.LENGTH_SHORT).show()
-                        return@BotonTorque
-                    }
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(stringResource(R.string.label_tasks), color = ColoresTorque.Slate500, fontSize = 12.sp)
+                Text(
+                    tareasSeleccionadas.joinToString(" · "),
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
 
-                    errorKms = kms.isBlank()
-                    if (errorKms) {
-                        Toast.makeText(contexto, contexto.getString(R.string.toast_fill_required), Toast.LENGTH_SHORT).show()
-                        return@BotonTorque
-                    }
+        Column {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                CampoTextoTorque(kms, { onKmsChange(it) }, stringResource(R.string.field_current_kms), modifier = Modifier.weight(1f))
+                CampoTextoTorque(intervalo, { onIntervaloChange(it) }, stringResource(R.string.field_every_x_kms), modifier = Modifier.weight(1f))
+            }
+            if (errorKms) {
+                Text(stringResource(R.string.error_kms_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+            }
+        }
 
-                    scope.launch {
-                        val kmNuevos = kms.toIntOrNull() ?: 0
-                        val moto = repositorio.obtenerMotoPorId(idMoto)
-                        if (moto != null && kmNuevos > moto.kilometros) {
-                            kmMotoActual = moto.kilometros
-                            mostrarDialogoActualizarKm = true
-                            return@launch
-                        }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            CampoTextoTorque(precio, { onPrecioChange(it) }, stringResource(R.string.field_price), modifier = Modifier.weight(1f))
+            CampoTextoTorque(tiempo, { onTiempoChange(it) }, stringResource(R.string.field_time), modifier = Modifier.weight(1f))
+        }
 
-                        guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
-                    }
-                }
+        CampoTextoTorque(
+            value = notas,
+            onValueChange = { onNotasChange(it) },
+            label = stringResource(R.string.field_notes),
+            singleLine = false,
+            modifier = Modifier.height(120.dp)
+        )
+
+        if (esDesgaste && tipoDesgaste != null) {
+            SeccionDesgaste(tipoDesgaste, porcentajeVida, onPorcentajeVidaChange)
+        }
+
+        Spacer(modifier = Modifier.height(100.dp))
+    }
+}
+
+@Composable
+private fun SeccionDesgaste(
+    tipoDesgaste: com.example.torque.utils.TipoMantenimiento,
+    porcentajeVida: Int,
+    onPorcentajeVidaChange: (Int) -> Unit
+) {
+    val colorBarra = when {
+        porcentajeVida >= 70 -> Color(0xFF22C55E)
+        porcentajeVida >= 40 -> Color(0xFFEAB308)
+        else -> Color(0xFFEF4444)
+    }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(stringResource(R.string.label_remaining_life), color = ColoresTorque.Slate500, fontSize = 12.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(tipoDesgaste.nombre, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text("$porcentajeVida%", color = colorBarra, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+            Slider(
+                value = porcentajeVida.toFloat(),
+                onValueChange = { onPorcentajeVidaChange(it.toInt()) },
+                valueRange = 0f..100f, steps = 19,
+                colors = SliderDefaults.colors(
+                    thumbColor = colorBarra, activeTrackColor = colorBarra,
+                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
+                )
             )
         }
+    }
+}
+
+@Composable
+private fun DialogoDescartar(
+    mostrar: Boolean, contexto: android.content.Context, onDismiss: () -> Unit
+) {
+    if (mostrar) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            containerColor = ColoresTorque.SurfaceDark,
+            title = { Text(stringResource(R.string.dialog_discard_title)) },
+            text = { Text(stringResource(R.string.dialog_discard_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDismiss()
+                    (contexto as? Activity)?.terminar()
+                }) {
+                    Text(stringResource(R.string.btn_discard), color = Color(0xFFEF4444))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.btn_keep_editing), color = ColoresTorque.OnSurfaceVariant)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun DialogoActualizarKm(
+    mostrar: Boolean, kms: String, kmMotoActual: Int,
+    onConfirm: () -> Unit
+) {
+    if (mostrar) {
+        AlertDialog(
+            onDismissRequest = onConfirm,
+            containerColor = ColoresTorque.SurfaceDark,
+            title = { Text(stringResource(R.string.dialog_update_km_title)) },
+            text = { Text(stringResource(R.string.dialog_update_km_message, kms, kmMotoActual)) },
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(R.string.btn_yes_update), color = ColoresTorque.Primary)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(R.string.btn_no), color = ColoresTorque.OnSurfaceVariant)
+                }
+            }
+        )
+    }
+}
+
+private data class EstadoGuardado(val errorKms: Boolean = false, val kmMotoActual: Int = 0, val mostrarActualizarKm: Boolean = false, val guardarDirecto: Boolean = false)
+
+@Composable
+private fun BotonGuardarFormulario(
+    idMoto: Long, kms: String,
+    contexto: android.content.Context,
+    repositorio: RepositorioApp,
+    onResult: (EstadoGuardado) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(ColoresTorque.Background)
+            .padding(24.dp)
+    ) {
+        BotonTorque(
+            text = stringResource(R.string.btn_save_maintenance),
+            icon = Icons.Default.Save,
+            onClick = {
+                if (idMoto == -1L) {
+                    Toast.makeText(contexto, "Error: No se identificó la moto", Toast.LENGTH_SHORT).show()
+                    return@BotonTorque
+                }
+                if (kms.isBlank()) {
+                    onResult(EstadoGuardado(errorKms = true))
+                    Toast.makeText(contexto, contexto.getString(R.string.toast_fill_required), Toast.LENGTH_SHORT).show()
+                    return@BotonTorque
+                }
+                scope.launch {
+                    val kmNuevos = kms.toIntOrNull() ?: 0
+                    val moto = repositorio.obtenerMotoPorId(idMoto)
+                    if (moto != null && kmNuevos > moto.kilometros) {
+                        onResult(EstadoGuardado(kmMotoActual = moto.kilometros, mostrarActualizarKm = true))
+                        return@launch
+                    }
+                    onResult(EstadoGuardado(guardarDirecto = true))
+                }
+            }
+        )
     }
 }
