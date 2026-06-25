@@ -9,7 +9,7 @@ data class MotoEntity(
     val marca: String = "",
     val modelo: String = "",
     val anio: Int = 0,
-    val matricula: String? = null,
+    val matricula: String = "",
     val color: String? = null,
     val cilindrada: String? = null,
     val caballos: String? = null,
