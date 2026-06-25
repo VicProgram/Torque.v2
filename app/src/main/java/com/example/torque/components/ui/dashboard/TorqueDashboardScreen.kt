@@ -235,7 +235,7 @@ fun TorqueDashboardScreen(
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp) // Reducido
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             TarjetaAccionRapida(
                                 titulo = stringResource(id = R.string.garage_title),
@@ -245,15 +245,6 @@ fun TorqueDashboardScreen(
                                 colorContenido = ColoresTorque.OnSecondaryContainer,
                                 modifier = Modifier.weight(1f),
                                 onClick = onIrGaraje
-                            )
-                            TarjetaAccionRapida(
-                                titulo = stringResource(id = R.string.maintenance_title),
-                                subtitulo = stringResource(id = R.string.maintenance_subtitle),
-                                icono = Icons.Default.History,
-                                colorContenedor = ColoresTorque.PrimaryContainer,
-                                colorContenido = ColoresTorque.OnPrimaryContainer,
-                                modifier = Modifier.weight(1f),
-                                onClick = { onIrMantenimientos(motoPrincipal?.idMoto) }
                             )
                             TarjetaAccionRapida(
                                 titulo = stringResource(R.string.menu_wear),
