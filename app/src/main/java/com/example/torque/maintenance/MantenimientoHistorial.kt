@@ -152,7 +152,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val filtros = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos")
+                        val filtros = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos", "Suspensión")
                         items(filtros) { filtro ->
                             FiltroChip(
                                 texto = filtro,
@@ -258,6 +258,9 @@ fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit, onEliminar:
         (item.tareas?.contains("eléctrico", ignoreCase = true) ?: false) -> Icons.Default.Bolt
         item.nombreMantenimiento.contains("freno", ignoreCase = true) ||
         (item.tareas?.contains("freno", ignoreCase = true) ?: false) -> Icons.Default.BackHand
+        item.nombreMantenimiento.contains("retenes", ignoreCase = true) ||
+        item.nombreMantenimiento.contains("horquilla", ignoreCase = true) ||
+        (item.tareas?.contains("suspensión", ignoreCase = true) ?: false) -> Icons.Default.Construction
         else -> Icons.Default.Build
     }
 

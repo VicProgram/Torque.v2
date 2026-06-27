@@ -97,7 +97,9 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
 
     val tareasSuspension = listOf(
         Tarea("Suspensión Delantera", "Revisión cada 15,000 km", Icons.Default.ArrowDownward, Color(0xFFE87930), "Suspensión"),
-        Tarea("Suspensión Trasera", "Revisión cada 15,000 km", Icons.Default.ArrowUpward, Color(0xFFE87930), "Suspensión")
+        Tarea("Suspensión Trasera", "Revisión cada 15,000 km", Icons.Default.ArrowUpward, Color(0xFFE87930), "Suspensión"),
+        Tarea("Revisión de Retenes Horquilla", "Revisión cada 5,000 km", Icons.Default.Visibility, Color(0xFFE87930), "Suspensión"),
+        Tarea("Cambio de Retenes Horquilla", "Cambio cada 10,000 km", Icons.Default.Build, Color(0xFFE87930), "Suspensión")
     )
 
 
