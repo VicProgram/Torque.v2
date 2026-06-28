@@ -35,7 +35,8 @@ data class DashboardUiState(
     val nombrePerfil: String? = null,
     val kmRestantes: Int? = null,
     val progreso: Float = 0f,
-    val notificacionesPendientes: Int = 0
+    val notificacionesPendientes: Int = 0,
+    val porcentajesDesgaste: Map<Long, Int> = emptyMap()
 )
 
 class TorqueDashboardViewModel(
@@ -101,9 +102,16 @@ class TorqueDashboardViewModel(
                         val pendientes = salud.desglose.count {
                             it.cumplimiento <= 20 && !it.tipo.esDesgaste
                         }
+                        val agrupados = mantenimientos
+                            .filter { it.tipoMantenimientoId > 0L }
+                            .groupBy { it.tipoMantenimientoId }
+                        val desgaste = TiposMantenimiento.WEAR_TIPOS.associate { wear ->
+                            wear.id to (agrupados[wear.id]?.maxByOrNull { it.kms }?.porcentajeVida ?: 100)
+                        }
                         _uiState.update { it.copy(
                             resultadoSalud = salud,
-                            notificacionesPendientes = pendientes
+                            notificacionesPendientes = pendientes,
+                            porcentajesDesgaste = desgaste
                         )}
                     }
                 }
