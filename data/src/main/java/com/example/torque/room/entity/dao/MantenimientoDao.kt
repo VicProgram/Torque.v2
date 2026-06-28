@@ -22,18 +22,6 @@ interface MantenimientoDao {
     @Query("SELECT * FROM mantenimientos WHERE idMoto = :idMoto AND tipoMantenimientoId = :tipoId ORDER BY kms DESC LIMIT 1")
     suspend fun obtenerUltimoPorTipo(idMoto: Long, tipoId: Long): MantenimientoEntity?
 
-    @Query("""
-        SELECT m1.* FROM mantenimientos m1
-        INNER JOIN (
-            SELECT tipoMantenimientoId, MAX(kms) AS max_kms
-            FROM mantenimientos
-            WHERE idMoto = :idMoto AND tipoMantenimientoId IN (:tipoIds)
-            GROUP BY tipoMantenimientoId
-        ) m2 ON m1.tipoMantenimientoId = m2.tipoMantenimientoId AND m1.kms = m2.max_kms
-        WHERE m1.idMoto = :idMoto
-    """)
-    suspend fun obtenerUltimosPorTipos(idMoto: Long, tipoIds: List<Long>): List<MantenimientoEntity>
-
     @Query("UPDATE mantenimientos SET porcentajeVida = :porcentaje WHERE id = :id")
     suspend fun actualizarPorcentajeVida(id: Long, porcentaje: Int)
 

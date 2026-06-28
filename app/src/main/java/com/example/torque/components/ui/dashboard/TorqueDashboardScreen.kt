@@ -303,10 +303,10 @@ fun TorqueDashboardScreen(
 
         if (mostrarDialogoDesgaste && motoActual != null) {
             DialogoAjusteDesgaste(
-                idMoto = motoActual.idMoto,
+                initialPorcentajes = uiState.porcentajesDesgaste,
                 onDismiss = { mostrarDialogoDesgaste = false },
-                onGuardar = { idMoto, porcentajes ->
-                    viewModel.guardarAjustesDesgaste(idMoto, porcentajes) {
+                onGuardar = { porcentajes ->
+                    viewModel.guardarAjustesDesgaste(motoActual.idMoto, porcentajes) {
                         mostrarDialogoDesgaste = false
                     }
                 }
