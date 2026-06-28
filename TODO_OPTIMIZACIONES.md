@@ -1,39 +1,29 @@
 # Optimizaciones pendientes
 
-## 🔴 Alta prioridad
-
-- [ ] **`TorqueDashboardScreen.kt`** — Revisar si hay `!!` que puedan crashear (antes en líneas 96,97,107,120 — refactorizadas).
-- [ ] **`DialogoAjusteDesgaste.kt`** — 6 queries secuenciales (`obtenerUltimoMantenimientoPorTipo` × 6). Usar una sola consulta con `IN(...)` en el DAO.
-- [ ] **`DialogoAjusteDesgaste` carga datos por su cuenta** — Usa `RepositorioApp.obtenerInstancia()` en vez de recibir porcentajes iniciales desde el ViewModel.
-
 ## 🟡 Media prioridad
 
-- [ ] **Unificar altura de cabeceras** — Mezcla 56dp y 64dp entre pantallas.
-- [ ] **Crear `DialogoTorque` reutilizable** — El patrón `AlertDialog` se repite ~10 veces.
-- [ ] **Extraer diálogos de `MotoDetalle.kt`** (~490 líneas) — Mismo patrón que se usó en dashboard.
+- [ ] **Galería de fotos — carrusel automático** — Que las fotos de la moto principal cambien cada X segundos en el dashboard.
+- [ ] **Galería de fotos — mejorar gestión** — Poder ver, eliminar y reordenar fotos desde la pantalla de detalle de moto.
 
 ## 🟢 Baja prioridad
 
-- [ ] **Separar `ColoresTorque.kt`** (~364 líneas) — Separar los objetos de color de los composables de UI (navegación, toasts, botones).
+- [ ] **Separar `ColoresTorque.kt`** — Separar los objetos de color de los composables de UI (navegación, toasts, botones).
 
-## ✅ Completadas recientemente
+## ✅ Completadas (todas las sesiones)
 
-- [x] **`SaludMotoCalculator.kt`** — Bucle cuadrático O(N×T) → O(N+23) con pre-agrupación por ID.
-- [x] **`AppRepository.kt`** — Excepciones en escrituras críticas ahora se relanzan tras loguear.
-- [x] **`SaludMotoCalculator.kt`** — `SimpleDateFormat` movido a `companion object`.
-- [x] **`FormularioMantenimiento.kt`** — `withContext(Dispatchers.Main)` redundante eliminado.
-- [x] **`ColoresTorque.kt`** — `FiltroChip` duplicado eliminado.
-- [x] **Reemplazar `0xFFEF4444`** con `RojoError` (~20 ocurrencias).
-- [x] **Reemplazar `0xFF22C55E`/`0xFFEAB308`** con `VerdeExito`/`AmarilloAdvertencia`.
-- [x] **`TorqueDashboardScreen.kt`** (~992→550 líneas) — Extraídos diálogos + ViewModel.
-- [x] **`TarjetaEstadisticas`** eliminada (no se usaba).
+- [x] **`!!` en `TorqueDashboardScreen.kt`** — No hay ninguno.
+- [x] **`DialogoAjusteDesgaste` — 6→1 query** — Ahora recibe datos desde ViewModel, sin queries.
+- [x] **`DialogoAjusteDesgaste` carga datos propios** — Recibe `initialPorcentajes` del ViewModel.
+- [x] **Unificar altura de cabeceras** — `ColoresTorque.ALTURA_CABECERA` (56dp) en 10 pantallas.
+- [x] **Crear `DialogoTorque` reutilizable** — Refactorizados `DialogoKm`, `DialogoAjusteDesgaste`, `DialogoNotificaciones`.
+- [x] **Extraer diálogos de `MotoDetalle.kt`** — Creados `DialogoActualizarKm`, `DialogoEliminarMoto`, `DialogoEliminarFoto`.
+- [x] **`SaludMotoCalculator.kt`** — Bucle cuadrático O(N×T) → O(N+23) con pre-agrupación.
+- [x] **`AppRepository.kt`** — Excepciones en escrituras críticas se relanzan tras loguear.
+- [x] **`SimpleDateFormat` a `companion object`** — En ViewModel y Calculator.
+- [x] **`withContext(Dispatchers.Main)` redundante** eliminado de `FormularioMantenimiento`.
+- [x] **`FiltroChip` duplicado** eliminado de `ColoresTorque.kt`.
+- [x] **Hardcoded colors reemplazados** — `0xFFEF4444`/`0xFF22C55E`/`0xFFEAB308` → constantes.
 
 ## ℹ️ Intencional (no cambiar)
 
-- **`MantenimientoDao.kt:28` vs `SaludMotoCalculator`** — DAO ordena por fecha (para "último registro"), Calculator por kms (para cumplimiento de intervalos). Cada uno sirve a su propósito.
-- **`obtenerUltimoPorTipo` (kms) vs `obtenerUltimoMantenimiento` (fecha)** — Ídem, intencional.
-
-
-
-hacer que las fotos de la moto que esta como principal vayan cambiando cada x tiempo
-mejorar la galeria de fotos de la moto
+- **`MantenimientoDao.kt` vs `SaludMotoCalculator`** — DAO ordena por fecha, Calculator por kms. Cada uno a su propósito.
