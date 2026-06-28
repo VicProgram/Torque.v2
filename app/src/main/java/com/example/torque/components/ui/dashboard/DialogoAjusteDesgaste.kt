@@ -46,12 +46,9 @@ fun DialogoAjusteDesgaste(
     var cargando by remember { mutableStateOf(true) }
 
     LaunchedEffect(idMoto) {
-        val mapa = mutableMapOf<Long, Int>()
-        for (tipo in wearTipos) {
-            val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipo.id)
-            mapa[tipo.id] = ultimo?.porcentajeVida ?: 100
-        }
-        porcentajes = mapa
+        val tipoIds = wearTipos.map { it.id }
+        val ultimos = repositorio.obtenerUltimosMantenimientosPorTipos(idMoto, tipoIds)
+        porcentajes = wearTipos.associate { it.id to (ultimos[it.id]?.porcentajeVida ?: 100) }
         cargando = false
     }
 

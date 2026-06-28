@@ -119,6 +119,13 @@ open class RepositorioApp(private val db: BaseDeDatosApp) {
         null
     }
 
+    open suspend fun obtenerUltimosMantenimientosPorTipos(idMoto: Long, tipoIds: List<Long>): Map<Long, MantenimientoEntity?> = try {
+        db.mantenimientoDao().obtenerUltimosPorTipos(idMoto, tipoIds).associateBy { it.tipoMantenimientoId }
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al obtener últimos mantenimientos por tipos", e)
+        emptyMap()
+    }
+
     open suspend fun actualizarPorcentajeVida(id: Long, porcentaje: Int) = try {
         db.mantenimientoDao().actualizarPorcentajeVida(id, porcentaje)
     } catch (e: Exception) {
