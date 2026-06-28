@@ -29,7 +29,7 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 
 | Funcionalidad | Descripción |
 |---|---|
-| **Panel de control** | Vista general con moto principal, salud global, kilometraje, próximo servicio y acciones rápidas |
+| **Panel de control** | Vista general con moto principal, salud global, kilometraje, próximo servicio y acciones rápidas — impulsado por ViewModel + StateFlow |
 | **Gestión de garaje** | Añade, edita y elimina motos con foto, marca, modelo, año, matrícula, cilindrada y potencia |
 | **Registro de mantenimiento** | 23 tipos predefinidos en 6 categorías (Motor, Transmisión, Frenos, Neumáticos, Eléctrico, Suspensión) |
 | **Historial** | Búsqueda, filtros por categoría y detalle completo de cada registro |
@@ -69,6 +69,7 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 ┌──────────────────────────────────────────┐
 │               :app (UI)                   │
 │  Activities · Composables · Theme         │
+│  ViewModel + StateFlow en dashboard       │
 │  Depende de: :core, :data                 │
 └──────────────────┬───────────────────────┘
                    │
@@ -121,7 +122,7 @@ Torque.v2/
 │   └── src/main/java/.../
 │       ├── TorqueApp.kt
 │       ├── menuprincipal/
-│       ├── components/ui/dashboard/
+│       ├── components/ui/dashboard/     # DashboardScreen + ViewModel + diálogos extraídos
 │       ├── garage/
 │       ├── maintenance/
 │       ├── perfil/
