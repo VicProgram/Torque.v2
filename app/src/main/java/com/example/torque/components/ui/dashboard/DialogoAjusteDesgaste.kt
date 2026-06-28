@@ -4,11 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,55 +31,45 @@ fun DialogoAjusteDesgaste(
     val wearTipos = TiposMantenimiento.WEAR_TIPOS
     var porcentajes by remember { mutableStateOf(initialPorcentajes) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = ColoresTorque.SurfaceDark,
-        title = { Text(stringResource(R.string.wear_status_title), color = Color.White, fontWeight = FontWeight.Bold) },
-        text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    wearTipos.forEach { tipo ->
-                        val pct = porcentajes[tipo.id] ?: 100
-                        val colorBarra = when {
-                            pct >= 70 -> ColoresTorque.VerdeExito
-                            pct >= 40 -> ColoresTorque.AmarilloAdvertencia
-                            else -> ColoresTorque.RojoError
+    DialogoTorque(
+        onDismiss = onDismiss,
+        title = stringResource(R.string.wear_status_title),
+        confirmText = stringResource(R.string.save),
+        dismissText = stringResource(R.string.btn_cancel),
+        onConfirm = { onGuardar(porcentajes) },
+        content = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                wearTipos.forEach { tipo ->
+                    val pct = porcentajes[tipo.id] ?: 100
+                    val colorBarra = when {
+                        pct >= 70 -> ColoresTorque.VerdeExito
+                        pct >= 40 -> ColoresTorque.AmarilloAdvertencia
+                        else -> ColoresTorque.RojoError
+                    }
+                    Column {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(tipo.nombre, color = Color.White, fontSize = 13.sp)
+                            Text("$pct%", color = colorBarra, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
-                        Column {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(tipo.nombre, color = Color.White, fontSize = 13.sp)
-                                Text("$pct%", color = colorBarra, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                            }
-                            Slider(
-                                value = (porcentajes[tipo.id] ?: 100).toFloat(),
-                                onValueChange = { nuevo ->
-                                    val redondeado = (nuevo / 5f).roundToInt() * 5
-                                    porcentajes = porcentajes + (tipo.id to redondeado.coerceIn(0, 100))
-                                },
-                                valueRange = 0f..100f,
-                                steps = 19,
-                                colors = SliderDefaults.colors(
-                                    thumbColor = colorBarra,
-                                    activeTrackColor = colorBarra,
-                                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
-                                )
+                        Slider(
+                            value = (porcentajes[tipo.id] ?: 100).toFloat(),
+                            onValueChange = { nuevo ->
+                                val redondeado = (nuevo / 5f).roundToInt() * 5
+                                porcentajes = porcentajes + (tipo.id to redondeado.coerceIn(0, 100))
+                            },
+                            valueRange = 0f..100f,
+                            steps = 19,
+                            colors = SliderDefaults.colors(
+                                thumbColor = colorBarra,
+                                activeTrackColor = colorBarra,
+                                inactiveTrackColor = Color.White.copy(alpha = 0.15f)
                             )
-                        }
+                        )
                     }
                 }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onGuardar(porcentajes)
-            }) {
-                Text(stringResource(R.string.save), color = ColoresTorque.Primary)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
             }
         }
     )

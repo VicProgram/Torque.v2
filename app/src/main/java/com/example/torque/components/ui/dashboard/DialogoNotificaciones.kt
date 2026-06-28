@@ -14,10 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,16 +41,14 @@ fun DialogoNotificaciones(
             ?: emptyList()
     }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = ColoresTorque.SurfaceDark,
-        icon = {
-            Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.Primary)
-        },
-        title = {
-            Text(stringResource(R.string.notifications_title), color = Color.White, fontWeight = FontWeight.Bold)
-        },
-        text = {
+    DialogoTorque(
+        onDismiss = onDismiss,
+        showDismiss = false,
+        title = stringResource(R.string.notifications_title),
+        icon = { Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.Primary) },
+        confirmText = stringResource(R.string.btn_close),
+        onConfirm = onDismiss,
+        content = {
             if (itemsNotificacion.isEmpty()) {
                 Text(
                     stringResource(R.string.no_notifications_pending),
@@ -102,11 +98,6 @@ fun DialogoNotificaciones(
                         }
                     }
                 }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.btn_close), color = ColoresTorque.Primary)
             }
         }
     )
