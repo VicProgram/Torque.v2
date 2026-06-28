@@ -157,6 +157,7 @@ fun DialogoTorque(
     icon: (@Composable () -> Unit)? = null,
     onConfirm: (() -> Unit)? = null,
     confirmText: String = "Guardar",
+    confirmColor: Color = ColoresTorque.Primary,
     dismissText: String = "Cancelar",
     content: @Composable () -> Unit
 ) {
@@ -169,7 +170,7 @@ fun DialogoTorque(
         confirmButton = {
             if (onConfirm != null) {
                 TextButton(onClick = onConfirm) {
-                    Text(confirmText, color = ColoresTorque.Primary)
+                    Text(confirmText, color = confirmColor)
                 }
             }
         },

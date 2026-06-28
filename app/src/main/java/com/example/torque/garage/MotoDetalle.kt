@@ -76,7 +76,6 @@ fun VistaMotoDetalle(idMoto: Long) {
     var mostrarDialogoKm by remember { mutableStateOf(false) }
     var mostrarDialogoEliminar by remember { mutableStateOf(false) }
     var mostrarDialogoEliminarFoto by remember { mutableStateOf<FotoEntity?>(null) }
-    var nuevoKm by remember { mutableStateOf("") }
     val estadoScroll = rememberScrollState()
 
     LaunchedEffect(idMoto) {
@@ -322,7 +321,6 @@ fun VistaMotoDetalle(idMoto: Long) {
                         FilaDetalle(stringResource(R.string.label_displacement), moto!!.cilindrada ?: stringResource(R.string.not_available))
                         FilaDetalle(stringResource(R.string.label_power), if (moto!!.caballos != null) stringResource(R.string.power_cv_format, moto!!.caballos!!) else stringResource(R.string.not_available))
                         FilaDetalle(stringResource(R.string.label_kilometers), "${moto!!.kilometros} km", editable = true, onClick = {
-                            nuevoKm = moto!!.kilometros.toString()
                             mostrarDialogoKm = true
                         })
                         FilaDetalle(stringResource(R.string.label_style), moto!!.estilo ?: stringResource(R.string.not_available))
@@ -359,105 +357,43 @@ fun VistaMotoDetalle(idMoto: Long) {
         }
 
         if (mostrarDialogoKm) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoKm = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                titleContentColor = Color.White,
-                textContentColor = Color.White,
-                title = { Text(stringResource(R.string.dialog_update_mileage_title)) },
-                text = {
-                    OutlinedTextField(
-                        value = nuevoKm,
-                        onValueChange = { nuevoKm = it.filter { c -> c.isDigit() } },
-                        label = { Text(stringResource(R.string.field_kilometers)) },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedBorderColor = ColoresTorque.Primary,
-                            unfocusedBorderColor = ColoresTorque.BorderDark,
-                            focusedLabelColor = ColoresTorque.Primary,
-                            unfocusedLabelColor = ColoresTorque.OnSurfaceVariant
-                        )
-                    )
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val km = nuevoKm.toIntOrNull()
-                        if (km != null && km >= 0) {
-                            scope.launch {
-                                repositorio.actualizarKilometros(idMoto, km)
-                                moto = repositorio.obtenerMotoPorId(idMoto)
-                            }
-                        }
-                        mostrarDialogoKm = false
-                    }) {
-                        Text(stringResource(R.string.save), color = ColoresTorque.Primary)
+            DialogoActualizarKm(
+                kmInicial = moto!!.kilometros,
+                onGuardar = { km ->
+                    scope.launch {
+                        repositorio.actualizarKilometros(idMoto, km)
+                        moto = repositorio.obtenerMotoPorId(idMoto)
                     }
                 },
-                dismissButton = {
-                    TextButton(onClick = { mostrarDialogoKm = false }) {
-                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
-                    }
-                }
+                onDismiss = { mostrarDialogoKm = false }
             )
         }
 
         if (mostrarDialogoEliminar) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoEliminar = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                titleContentColor = Color.White,
-                textContentColor = Color.White,
-                icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = ColoresTorque.RojoError) },
-                title = { Text(stringResource(R.string.dialog_delete_bike_title)) },
-                text = { Text(stringResource(R.string.dialog_delete_bike_message)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        scope.launch {
-                            repositorio.eliminarMoto(moto!!)
-                            (contexto as? Activity)?.setResult(Activity.RESULT_OK)
-                            (contexto as? Activity)?.terminar()
-                        }
-                        mostrarDialogoEliminar = false
-                    }) {
-                        Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
+            DialogoEliminarMoto(
+                onConfirmar = {
+                    scope.launch {
+                        repositorio.eliminarMoto(moto!!)
+                        (contexto as? Activity)?.setResult(Activity.RESULT_OK)
+                        (contexto as? Activity)?.terminar()
                     }
+                    mostrarDialogoEliminar = false
                 },
-                dismissButton = {
-                    TextButton(onClick = { mostrarDialogoEliminar = false }) {
-                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
-                    }
-                }
+                onDismiss = { mostrarDialogoEliminar = false }
             )
         }
 
         mostrarDialogoEliminarFoto?.let { foto ->
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoEliminarFoto = null },
-                containerColor = ColoresTorque.SurfaceDark,
-                titleContentColor = Color.White,
-                textContentColor = Color.White,
-                icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = ColoresTorque.RojoError) },
-                title = { Text(stringResource(R.string.dialog_delete_photo_title)) },
-                text = { Text(stringResource(R.string.action_irreversible)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        scope.launch {
-                            repositorio.eliminarFoto(foto)
-                            File(foto.ruta).delete()
-                            Toast.makeText(contexto, contexto.getString(R.string.toast_photo_deleted), Toast.LENGTH_SHORT).show()
-                        }
-                        mostrarDialogoEliminarFoto = null
-                    }) {
-                        Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
+            DialogoEliminarFoto(
+                onConfirmar = {
+                    scope.launch {
+                        repositorio.eliminarFoto(foto)
+                        File(foto.ruta).delete()
+                        Toast.makeText(contexto, contexto.getString(R.string.toast_photo_deleted), Toast.LENGTH_SHORT).show()
                     }
+                    mostrarDialogoEliminarFoto = null
                 },
-                dismissButton = {
-                    TextButton(onClick = { mostrarDialogoEliminarFoto = null }) {
-                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
-                    }
-                }
+                onDismiss = { mostrarDialogoEliminarFoto = null }
             )
         }
     }
