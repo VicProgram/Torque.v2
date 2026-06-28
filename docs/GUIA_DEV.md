@@ -269,6 +269,8 @@ Métodos principales:
 - `obtenerFotosPorMoto()` (Flow), `insertarFoto()`, `eliminarFoto()`
 - `cerrarBaseDeDatos()` — usado en backup restore
 
+**Manejo de errores**: La mayoría de métodos tragan excepciones con `Log.e()`. Los métodos críticos de escritura (`actualizarMoto`, `eliminarMoto`, `insertarMantenimiento`) relanzan la excepción tras loguearla para que el llamante pueda reaccionar.
+
 ### AjustesRepository — `data/src/main/java/.../ajustes/AjustesRepository.kt`
 
 DataStore Preferences con 3 claves:
@@ -580,6 +582,8 @@ data class ResultadoSalud(
 ```
 
 ### Algoritmo (`calcular(mantenimientos, kmActuales)`)
+
+> **Optimización**: Pre-agrupa los mantenimientos por `tipoMantenimientoId` en un `Map<Long, List<>>` (O(N)), luego para cada tipo hace lookup O(1). Solo los registros sin ID (multi-tarea o legacy) caen en fallback por nombre/tareas. Reduce O(23×N) a prácticamente O(N+23).
 
 1. **Para cada `TipoMantenimiento`** en `TiposMantenimiento.TODOS`:
    - Busca el último registro que coincida (por `tipoMantenimientoId`, nombre, o campo `tareas`)
