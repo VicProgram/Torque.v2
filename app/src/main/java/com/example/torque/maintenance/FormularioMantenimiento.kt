@@ -34,8 +34,6 @@ import com.example.torque.utils.DateUtils
 import com.example.torque.utils.TiposMantenimiento
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -86,14 +84,10 @@ private suspend fun guardarMantenimiento(
             porcentajeVida = porcentajeVida
         )
         repositorio.insertarMantenimiento(mantenimiento)
-        withContext(Dispatchers.Main) {
-            Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
-            (contexto as? Activity)?.terminar()
-        }
+        Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
+        (contexto as? Activity)?.terminar()
     } catch (e: Exception) {
-        withContext(Dispatchers.Main) {
-            Toast.makeText(contexto, "Error al guardar: ${e.message}", Toast.LENGTH_LONG).show()
-        }
+        Toast.makeText(contexto, "Error al guardar: ${e.message}", Toast.LENGTH_LONG).show()
     }
 }
 

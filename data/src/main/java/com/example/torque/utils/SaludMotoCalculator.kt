@@ -1,7 +1,9 @@
 package com.example.torque.utils
 
 import com.example.torque.room.entity.MantenimientoEntity
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 data class DetalleSalud(
     val tipo: TipoMantenimiento,
@@ -18,14 +20,27 @@ data class ResultadoSalud(
 
 object SaludMotoCalculator {
 
+    private val FORMATO_DD_MM_YYYY = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    private val FORMATO_YYYY_MM_DD = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
     fun calcular(
         mantenimientos: List<MantenimientoEntity>,
         kmActuales: Int
     ): ResultadoSalud {
+        val agrupadosPorId = mantenimientos
+            .filter { it.tipoMantenimientoId > 0L }
+            .groupBy { it.tipoMantenimientoId }
+
+        val sinId = mantenimientos.filter { it.tipoMantenimientoId == 0L }
+
+        fun mejorMatch(tipo: TipoMantenimiento): MantenimientoEntity? {
+            val porId = agrupadosPorId[tipo.id]?.maxByOrNull { it.kms }
+            if (porId != null) return porId
+            return sinId.filter { coincide(it, tipo) }.maxByOrNull { it.kms }
+        }
+
         val detalles = TiposMantenimiento.TODOS.mapNotNull { tipo ->
-            val ultimo = mantenimientos
-                .filter { coincide(it, tipo) }
-                .maxByOrNull { it.kms }
+            val ultimo = mejorMatch(tipo)
 
             val cumplimiento = if (ultimo != null) {
                 if (tipo.esDesgaste) {
@@ -86,16 +101,13 @@ object SaludMotoCalculator {
 
     private fun parseFecha(fecha: String): Date? {
         return try {
-            val formatos = listOf(
-                java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()),
-                java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-            )
-            for (formato in formatos) {
-                try {
-                    return formato.parse(fecha)
-                } catch (_: Exception) {}
+            FORMATO_DD_MM_YYYY.parse(fecha)
+        } catch (_: Exception) {
+            try {
+                FORMATO_YYYY_MM_DD.parse(fecha)
+            } catch (_: Exception) {
+                null
             }
-            null
-        } catch (_: Exception) { null }
+        }
     }
 }

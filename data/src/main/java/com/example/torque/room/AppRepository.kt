@@ -32,16 +32,22 @@ open class RepositorioApp(private val db: BaseDeDatosApp) {
         -1L
     }
 
-    suspend fun actualizarMoto(moto: MotoEntity) = try {
-        db.motoDao().actualizar(moto)
-    } catch (e: Exception) {
-        Log.e(TAG, "Error al actualizar moto", e)
+    suspend fun actualizarMoto(moto: MotoEntity) {
+        try {
+            db.motoDao().actualizar(moto)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al actualizar moto", e)
+            throw e
+        }
     }
 
-    suspend fun eliminarMoto(moto: MotoEntity) = try {
-        db.motoDao().eliminar(moto)
-    } catch (e: Exception) {
-        Log.e(TAG, "Error al eliminar moto", e)
+    suspend fun eliminarMoto(moto: MotoEntity) {
+        try {
+            db.motoDao().eliminar(moto)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al eliminar moto", e)
+            throw e
+        }
     }
 
     suspend fun obtenerMotoPorId(id: Long): MotoEntity? = try {
@@ -78,11 +84,13 @@ open class RepositorioApp(private val db: BaseDeDatosApp) {
         emptyList()
     }
 
-    open suspend fun insertarMantenimiento(mantenimiento: MantenimientoEntity): Long = try {
-        db.mantenimientoDao().insertar(mantenimiento)
-    } catch (e: Exception) {
-        Log.e(TAG, "Error al insertar mantenimiento", e)
-        -1L
+    open suspend fun insertarMantenimiento(mantenimiento: MantenimientoEntity): Long {
+        return try {
+            db.mantenimientoDao().insertar(mantenimiento)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al insertar mantenimiento", e)
+            throw e
+        }
     }
 
     suspend fun eliminarMantenimiento(mantenimiento: MantenimientoEntity) = try {
