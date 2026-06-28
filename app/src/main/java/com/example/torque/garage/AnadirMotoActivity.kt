@@ -153,109 +153,109 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 CircularProgressIndicator(color = ColoresTorque.Primary)
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .padding(top = 8.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(ColoresTorque.SurfaceDark)
-                        .clickable { selectorImagen.launch("image/*") },
-                    contentAlignment = Alignment.Center
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    val imagenAMostrar = uriImagen ?: fotoActual
-                    if (imagenAMostrar != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(imagenAMostrar),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
-                            Text(stringResource(R.string.add_photo), color = ColoresTorque.OnSurfaceVariant)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .padding(top = 8.dp)
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(ColoresTorque.SurfaceDark)
+                            .clickable { selectorImagen.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val imagenAMostrar = uriImagen ?: fotoActual
+                        if (imagenAMostrar != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(imagenAMostrar),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
+                                Text(stringResource(R.string.add_photo), color = ColoresTorque.OnSurfaceVariant)
+                            }
                         }
                     }
-                }
 
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SelectorMarca(
-                        marca = marca,
-                        onMarcaChange = { marca = it; errorMarca = false },
-                        onMarcaSeleccionada = { modelo = "" },
-                        label = stringResource(R.string.field_brand_required),
-                        error = errorMarca
-                    )
-                    Box(modifier = Modifier.height(16.dp).fillMaxWidth()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        SelectorMarca(
+                            marca = marca,
+                            onMarcaChange = { marca = it; errorMarca = false },
+                            onMarcaSeleccionada = { modelo = "" },
+                            label = stringResource(R.string.field_brand_required),
+                            error = errorMarca
+                        )
                         if (errorMarca) {
                             Text(stringResource(R.string.error_brand_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                         }
-                    }
-                    SelectorModelo(
-                        modelo = modelo,
-                        onModeloChange = { modelo = it; errorModelo = false },
-                        marca = marca,
-                        label = stringResource(R.string.field_model_required),
-                        error = errorModelo
-                    )
-                    Box(modifier = Modifier.height(16.dp).fillMaxWidth()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        SelectorModelo(
+                            modelo = modelo,
+                            onModeloChange = { modelo = it; errorModelo = false },
+                            marca = marca,
+                            label = stringResource(R.string.field_model_required),
+                            error = errorModelo
+                        )
                         if (errorModelo) {
                             Text(stringResource(R.string.error_model_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                         }
-                    }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        SelectorAnio(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
-                        Column(modifier = Modifier.weight(1f)) {
-                            CampoTextoTorque(
-                                value = matricula,
-                                onValueChange = {
-                                    matricula = it
-                                    errorMatricula = false
-                                },
-                                label = stringResource(R.string.label_plate)
-                            )
-                            Box(modifier = Modifier.height(16.dp).fillMaxWidth()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            SelectorAnio(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
+                            Column(modifier = Modifier.weight(1f)) {
+                                CampoTextoTorque(
+                                    value = matricula,
+                                    onValueChange = {
+                                        matricula = it
+                                        errorMatricula = false
+                                    },
+                                    label = stringResource(R.string.label_plate)
+                                )
                                 if (errorMatricula) {
                                     Text(stringResource(R.string.error_plate_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                                 }
                             }
                         }
-                    }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CampoTextoTorque(kilometros, { kilometros = it }, stringResource(R.string.field_current_kms_short), modifier = Modifier.weight(1f))
-                        CampoTextoTorque(cilindrada, { cilindrada = it }, stringResource(R.string.label_displacement), modifier = Modifier.weight(1f))
-                    }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            CampoTextoTorque(kilometros, { kilometros = it }, stringResource(R.string.field_current_kms_short), modifier = Modifier.weight(1f))
+                            CampoTextoTorque(cilindrada, { cilindrada = it }, stringResource(R.string.label_displacement), modifier = Modifier.weight(1f))
+                        }
 
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.label_set_as_primary), color = Color.White, modifier = Modifier.weight(1f))
-                        Switch(
-                            checked = esPrincipal,
-                            onCheckedChange = { esPrincipal = it },
-                            colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.label_set_as_primary), color = Color.White, modifier = Modifier.weight(1f))
+                            Switch(
+                                checked = esPrincipal,
+                                onCheckedChange = { esPrincipal = it },
+                                colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+                        CampoTextoTorque(
+                            value = estilo,
+                            onValueChange = { estilo = it },
+                            label = stringResource(R.string.field_notes),
+                            singleLine = false,
+                            modifier = Modifier.height(80.dp)
                         )
                     }
-
-                    CampoTextoTorque(
-                        value = estilo,
-                        onValueChange = { estilo = it },
-                        label = stringResource(R.string.field_notes),
-                        singleLine = false,
-                        modifier = Modifier.height(100.dp)
-                    )
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
         }
         }
 
