@@ -126,9 +126,13 @@ Torque.v2/
 │       │   ├── DialogoNotificaciones.kt      # Diálogo de notificaciones pendientes
 │       │   └── DialogoAjusteDesgaste.kt      # Sliders de desgaste
 │       ├── garage/
-│       │   ├── ListaGaraje.kt    # Lista de motos con búsqueda/filtro
-│       │   ├── MotoDetalle.kt    # Detalle de moto + galería + acciones
-│       │   └── AnadirMotoActivity.kt  # Alta/edición de moto
+│       │   ├── ListaGaraje.kt          # Lista de motos con búsqueda/filtro
+│       │   ├── MotoDetalle.kt          # Detalle de moto + galería + acciones
+│       │   ├── AnadirMotoActivity.kt   # Alta/edición de moto
+│       │   ├── MarcasModelos.kt        # ~50 marcas + modelos, selectores dropdown
+│       │   ├── DialogoActualizarKm.kt  # Diálogo edición de km (extraído de MotoDetalle)
+│       │   ├── DialogoEliminarMoto.kt  # Diálogo confirmación eliminar moto
+│       │   └── DialogoEliminarFoto.kt  # Diálogo confirmación eliminar foto
 │       ├── maintenance/
 │       │   ├── RegistroMantenimiento.kt     # Selección de tareas
 │       │   ├── FormularioMantenimiento.kt   # Formulario (km, precio, notas)
@@ -147,8 +151,8 @@ Torque.v2/
 │
 ├── app/src/test/.../
 │   ├── ExampleUnitTest.kt
-│   ├── SaludMotoCalculatorTest.kt        # 30 unit tests
-│   └── SaludMotoCalculatorPerformanceTest.kt # 6 performance tests
+│   ├── SaludMotoCalculatorTest.kt        # 61 unit tests
+│   └── SaludMotoCalculatorPerformanceTest.kt # 9 performance tests
 │
 └── app/src/androidTest/.../
     └── DashboardUITest.kt
@@ -249,6 +253,7 @@ abstract class BaseDeDatosApp : RoomDatabase() { ... }
 - `obtenerUltimoPorTipo(idMoto, tipoId)` → último por kms DESC
 - `actualizarPorcentajeVida(id, porcentaje)`
 - `obtenerUltimoPorMoto(idMoto)` → último por fecha DESC (único)
+- *Nota: `obtenerUltimosPorTipos` fue eliminado — los datos de desgaste ahora vienen del ViewModel*
 
 **`FotoDao`** — `data/src/main/java/.../room/entity/dao/FotoDao.kt`
 - `insertar`, `eliminar`
@@ -269,7 +274,7 @@ Métodos principales:
 - `obtenerFotosPorMoto()` (Flow), `insertarFoto()`, `eliminarFoto()`
 - `cerrarBaseDeDatos()` — usado en backup restore
 
-**Manejo de errores**: La mayoría de métodos tragan excepciones con `Log.e()`. Los métodos críticos de escritura (`actualizarMoto`, `eliminarMoto`, `insertarMantenimiento`) relanzan la excepción tras loguearla para que el llamante pueda reaccionar.
+**Manejo de errores**: Métodos de solo lectura tragan excepciones con `Log.e()`. Métodos críticos de escritura (`actualizarMoto`, `eliminarMoto`, `insertarMantenimiento`, `insertarFoto`, `eliminarFoto`) relanzan la excepción tras loguearla para que el llamante pueda reaccionar.
 
 ### AjustesRepository — `data/src/main/java/.../ajustes/AjustesRepository.kt`
 
@@ -344,18 +349,23 @@ El NavHost renderiza `TorqueDashboardScreen` y maneja la navegación hacia otras
 
 (~550 líneas, refactorizado) Es el **corazón de la UI**. Usa `TorqueDashboardViewModel` con `StateFlow<DashboardUiState>` para todos los datos reactivos.
 
+Incluye un **carrusel de motos** con `HorizontalPager` + indicador de puntos: permite deslizar entre todas las motos del garaje (la principal primero). Solo la moto visible tiene datos de salud en vivo. La cabecera usa `ColoresTorque.ALTURA_CABECERA = 56.dp`.
+
 **DashboardUiState**:
-- `motoActual: MotoEntity?` — moto principal
+- `motos: List<MotoEntity>` — todas las motos ordenadas (principal primero)
+- `selectedIndex: Int` — índice en el carrusel
+- `motoActual: MotoEntity?` — moto visible actualmente
 - `nombreUsuario: String` — nombre del perfil
 - `kmActuales: Int` — kilómetros actuales
 - `resultadoSalud: ResultadoSalud?` — salud calculada
 - `motivosProximosVencidos: List<DetalleSalud>` — notificaciones pendientes
+- `porcentajesDesgaste: Map<Long, Int>` — desgaste de consumibles (key = tipoMantenimientoId)
 - `cargando: Boolean` — estado inicial
 
 **ViewModel** (`TorqueDashboardViewModel.kt`):
 - Factory propia para `AndroidViewModel` (sin Koin)
-- Observa `obtenerMotoPrincipalFlow()` y `perfilRepositorio.nombreFlow`
-- Expone `actualizarKilometros(km)` y `guardarAjustesDesgaste(idMoto, porcentajes, onComplete)`
+- Observa `obtenerTodasFlow()` y `perfilRepositorio.nombreFlow`
+- Expone `actualizarKilometros(km)`, `seleccionarMoto(indice)`, y `guardarAjustesDesgaste(idMoto, porcentajes, onComplete)`
 
 **Composables en pantalla**:
 - `CabeceraDashboard` — top bar + menús
@@ -363,9 +373,9 @@ El NavHost renderiza `TorqueDashboardScreen` y maneja la navegación hacia otras
 - `TarjetaAccionRapida` — botones de acción rápida
 
 **Diálogos extraídos a archivos separados**:
-- `DialogoKm.kt` — edición de km
-- `DialogoNotificaciones.kt` — notificaciones pendientes
-- `DialogoAjusteDesgaste.kt` — sliders de desgaste (6 wear types)
+- `DialogoKm.kt` — edición de km (usa `DialogoTorque`)
+- `DialogoNotificaciones.kt` — notificaciones pendientes (usa `DialogoTorque` con `showDismiss = false`)
+- `DialogoAjusteDesgaste.kt` — sliders de desgaste (6 wear types, recibe `initialPorcentajes` del ViewModel, sin queries DB, usa `DialogoTorque`)
 
 ### ColoresTorque.kt — `app/src/main/java/.../components/ui/dashboard/ColoresTorque.kt`
 
@@ -382,6 +392,8 @@ Objeto que re-exporta los colores del tema + componentes reutilizables:
 | `FiltroChip` | Chip seleccionable (usado en listas) |
 | `ChipDeSeleccionRapida` | Chip con icono |
 | `ElementoCheckMotoKeep` | Fila checkeable con icono, título y descripción |
+| `DialogoTorque` | Diálogo reutilizable sobre `AlertDialog` con `confirmColor` (rojo para eliminar), `showDismiss`, `title`, `icon`, `onConfirm`, `confirmText`, `dismissText`, `content` |
+| `ALTURA_CABECERA` | Constante `56.dp` para altura unificada de cabeceras en 10 pantallas |
 | `navegarA`, `lanzarActividad`, `mostrarToast` | Helpers de navegación |
 
 ### Pantallas de Garage
@@ -398,7 +410,10 @@ Objeto que re-exporta los colores del tema + componentes reutilizables:
 - Especificaciones: marca, año, matrícula, cilindrada, potencia, km, estilo
 - Galería de fotos (LazyRow)
 - Dropdown menu: marcar principal, registrar mantenimiento, ver historial, editar, eliminar
-- Diálogos: editar km, confirmar eliminación, eliminar foto
+- Diálogos extraídos a archivos separados (usando `DialogoTorque`):
+  - `DialogoActualizarKm.kt` — edición de km
+  - `DialogoEliminarMoto.kt` — confirmación de eliminación (botón rojo via `confirmColor`)
+  - `DialogoEliminarFoto.kt` — confirmación de eliminar foto (botón rojo)
 
 **`AnadirMotoActivity.kt`** — Formulario de alta/edición:
 - Campos: marca (req, dropdown), modelo (req, dropdown filtrado por marca), año (dropdown), matrícula, cilindrada, caballos, estilo, km, foto
@@ -733,7 +748,7 @@ val appModule = module {
 
 **`ExampleUnitTest.kt`** — Placeholder.
 
-**`SaludMotoCalculatorTest.kt`** — 30 tests del algoritmo de salud:
+**`SaludMotoCalculatorTest.kt`** — 61 tests del algoritmo de salud:
 
 | # | Test | Verifica |
 |---|------|----------|
@@ -751,16 +766,20 @@ val appModule = module {
 | 13 | `desdeId` lookup | Correcto, null |
 | 14 | `WEAR_TIPOS` contenido | 6 tipos esperados |
 | 15 | Sin intervalo → cumplimiento 100% | Borde |
-| 16-28 | Varios bordes y combinaciones | Robustez |
-| 29 | Sin nombres duplicados | Data integrity |
-| 30 | Pesos > 0 | Data integrity |
+| 16-33 | Varios bordes y combinaciones | Robustez |
+| 34-38 | Data integrity (IDs 1-25 sin saltos, pesos > 0, wear consistency) | Consistencia datos |
+| 39 | Salud ponderada con diferentes pesos | Weighted average |
+| 40-45 | Wear types — todos al 0%, todos al 100%, wear + intervalo | Casos desgaste |
+| 46-49 | `proximosVencidos` — max 5, orden, incluye wear, vacío | Notificaciones |
+| 50-55 | Matching — multi-tarea commas, espacios, null, nombre fallback, ID exacto | Coincidencia |
+| 56-61 | Boundary — km < último, legacy matching, relevancia 0, IDs duplicados | Robustez |
 
 Para ejecutar:
 ```bash
 ./gradlew testDebugUnitTest
 ```
 
-**`SaludMotoCalculatorPerformanceTest.kt`** — 6 tests de performance:
+**`SaludMotoCalculatorPerformanceTest.kt`** — 9 tests de performance:
 
 | Test | Condición | Límite |
 |------|-----------|--------|
@@ -770,6 +789,9 @@ Para ejecutar:
 | Sin degradación | 100 llamadas | Máx < 10x mediana |
 | 50 llamadas vacío | Sin datos | < 50ms total |
 | Memoria | 500 llamadas | < 2MB leak |
+| Wear types mixtos | 6 wear + 17 normales, 100 iteraciones | < 10ms media |
+| Datos mixtos grandes | 500 wear + 2000 normales, 10 iteraciones | < 100ms |
+| 2500 registros | 5 iteraciones | < 200ms |
 
 ### Tests Instrumentados
 

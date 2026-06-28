@@ -88,6 +88,49 @@ class SaludMotoCalculatorPerformanceTest {
     }
 
     @Test
+    fun `todos los wear tipos en menos de 5ms`() {
+        val lista = TiposMantenimiento.WEAR_TIPOS.map { tipo ->
+            mant(tipo.nombre, tipoId = tipo.id, porcentajeVida = 50)
+        }
+        val time = measureNanoTime {
+            repeat(100) { SaludMotoCalculator.calcular(lista, kmActuales = 10_000) }
+        }
+        val mediaMs = time / 100_000_000.0
+        assertTrue("Media wear: ${"%.3f".format(mediaMs)}ms", mediaMs < 5)
+    }
+
+    @Test
+    fun `datos mixtos con legacy y wear no degrada rendimiento`() {
+        val lista = TiposMantenimiento.TODOS.map { tipo ->
+            if (tipo.esDesgaste) {
+                mant(tipo.nombre, tipoId = tipo.id, porcentajeVida = 50)
+            } else {
+                mant(tipo.nombre, kms = 5000, tipoId = tipo.id)
+            }
+        }
+        val time = measureNanoTime {
+            repeat(50) { SaludMotoCalculator.calcular(lista, kmActuales = 10_000) }
+        }
+        val mediaMs = time / 50_000_000.0
+        assertTrue("Media mixto: ${"%.3f".format(mediaMs)}ms", mediaMs < 5)
+    }
+
+    @Test
+    fun `sin tipos repetidos rendimiento constante`() {
+        val unicos = (1..100).flatMap { i ->
+            TiposMantenimiento.TODOS.map { tipo ->
+                mant(tipo.nombre, kms = i * 100, tipoId = tipo.id)
+            }
+        }
+        val time = measureNanoTime {
+            repeat(10) { SaludMotoCalculator.calcular(unicos, kmActuales = 500_000) }
+        }
+        val mediaMs = time / 10_000_000.0
+        // Debe ser rápido incluso con 2500 registros (25 tipos × 100 repeticiones)
+        assertTrue("Media 2500 reg: ${"%.3f".format(mediaMs)}ms", mediaMs < 100)
+    }
+
+    @Test
     @Suppress("ExplicitGarbageCollectionCall")
     fun `carga constante de memoria tras warmup`() {
         val mantenimientos = tipos.map { mant(it.nombre, kms = 5000, tipoId = it.id) }

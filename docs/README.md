@@ -29,8 +29,8 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 
 | Funcionalidad | Descripción |
 |---|---|
-| **Panel de control** | Vista general con moto principal, salud global, kilometraje, próximo servicio y acciones rápidas — impulsado por ViewModel + StateFlow |
-| **Gestión de garaje** | Añade, edita y elimina motos con foto, marca, modelo, año, matrícula, cilindrada y potencia |
+| **Panel de control** | Carrusel de motos con swipe, salud global, kilometraje, próximo servicio y acciones rápidas — impulsado por ViewModel + StateFlow |
+| **Gestión de garaje** | Añade, edita y elimina motos con foto, marca, modelo (~50 marcas con dropdown), año, matrícula, cilindrada y potencia |
 | **Registro de mantenimiento** | 23 tipos predefinidos en 6 categorías (Motor, Transmisión, Frenos, Neumáticos, Eléctrico, Suspensión) |
 | **Historial** | Búsqueda, filtros por categoría y detalle completo de cada registro |
 | **Control de desgaste** | Sliders para neumáticos, pastillas de freno y discos |
@@ -169,7 +169,7 @@ Torque.v2/
 # (incluidos en testDebugUnitTest)
 ```
 
-**Cobertura**: 30 tests unitarios + 6 tests de performance + 2 tests instrumentados.
+**Cobertura**: 61 tests unitarios + 9 tests de performance + 1 test instrumentado (71 en total).
 
 ---
 
