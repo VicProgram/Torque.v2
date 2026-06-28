@@ -123,7 +123,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
+                    .height(56.dp)
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -159,13 +159,13 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                     .padding(horizontal = 16.dp)
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(16f / 9f)
-                        .padding(top = 16.dp)
+                        .height(140.dp)
+                        .padding(top = 8.dp)
                         .clip(RoundedCornerShape(24.dp))
                         .background(ColoresTorque.SurfaceDark)
                         .clickable { selectorImagen.launch("image/*") },
@@ -187,7 +187,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                     }
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     SelectorMarca(
                         marca = marca,
                         onMarcaChange = { marca = it; errorMarca = false },
@@ -195,8 +195,10 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         label = stringResource(R.string.field_brand_required),
                         error = errorMarca
                     )
-                    if (errorMarca) {
-                        Text(stringResource(R.string.error_brand_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                    Box(modifier = Modifier.height(16.dp).fillMaxWidth()) {
+                        if (errorMarca) {
+                            Text(stringResource(R.string.error_brand_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                        }
                     }
                     SelectorModelo(
                         modelo = modelo,
@@ -205,11 +207,13 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         label = stringResource(R.string.field_model_required),
                         error = errorModelo
                     )
-                    if (errorModelo) {
-                        Text(stringResource(R.string.error_model_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                    Box(modifier = Modifier.height(16.dp).fillMaxWidth()) {
+                        if (errorModelo) {
+                            Text(stringResource(R.string.error_model_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                        }
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         SelectorAnio(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
                         Column(modifier = Modifier.weight(1f)) {
                             CampoTextoTorque(
@@ -220,18 +224,15 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                                 },
                                 label = stringResource(R.string.label_plate)
                             )
-                            if (errorMatricula) {
-                                Text(
-                                    text = stringResource(R.string.error_plate_required),
-                                    color = ColoresTorque.RojoError,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(start = 4.dp)
-                                )
+                            Box(modifier = Modifier.height(16.dp).fillMaxWidth()) {
+                                if (errorMatricula) {
+                                    Text(stringResource(R.string.error_plate_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                                }
                             }
                         }
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         CampoTextoTorque(kilometros, { kilometros = it }, stringResource(R.string.field_current_kms_short), modifier = Modifier.weight(1f))
                         CampoTextoTorque(cilindrada, { cilindrada = it }, stringResource(R.string.label_displacement), modifier = Modifier.weight(1f))
                     }
@@ -253,7 +254,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         modifier = Modifier.height(100.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(120.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
         }
