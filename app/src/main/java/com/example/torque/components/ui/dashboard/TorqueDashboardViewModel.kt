@@ -27,8 +27,9 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 data class DashboardUiState(
-    val motoPrincipal: MotoEntity? = null,
-    val fotosPrincipales: List<FotoEntity> = emptyList(),
+    val motos: List<MotoEntity> = emptyList(),
+    val selectedIndex: Int = 0,
+    val fotos: List<FotoEntity> = emptyList(),
     val ultimoMantenimiento: MantenimientoEntity? = null,
     val resultadoSalud: ResultadoSalud? = null,
     val nombrePerfil: String? = null,
@@ -48,13 +49,17 @@ class TorqueDashboardViewModel(
     private var dataJob: Job? = null
 
     init {
-        viewModelScope.launch { observeMotoPrincipal() }
+        viewModelScope.launch { observeAllMotos() }
         viewModelScope.launch { observeNombrePerfil() }
     }
 
-    private suspend fun observeMotoPrincipal() {
-        repositorio.obtenerMotoPrincipalFlow().collect { moto ->
-            _uiState.update { it.copy(motoPrincipal = moto) }
+    private suspend fun observeAllMotos() {
+        repositorio.obtenerMotosFlow().collect { motos ->
+            val sorted = motos.sortedByDescending { it.esPrincipal }
+            val currentIndex = _uiState.value.selectedIndex
+            val clampedIndex = if (currentIndex < sorted.size) currentIndex else 0
+            _uiState.update { it.copy(motos = sorted, selectedIndex = clampedIndex) }
+            val moto = sorted.getOrNull(clampedIndex)
             if (moto != null) {
                 startObservingData(moto.idMoto)
             } else {
@@ -62,6 +67,12 @@ class TorqueDashboardViewModel(
                 _uiState.value = DashboardUiState(nombrePerfil = _uiState.value.nombrePerfil)
             }
         }
+    }
+
+    fun selectMoto(index: Int) {
+        val moto = _uiState.value.motos.getOrNull(index) ?: return
+        _uiState.update { it.copy(selectedIndex = index) }
+        startObservingData(moto.idMoto)
     }
 
     private suspend fun observeNombrePerfil() {
@@ -78,13 +89,13 @@ class TorqueDashboardViewModel(
 
             launch {
                 repositorio.obtenerFotosPorMoto(idMoto).collect { fotos ->
-                    _uiState.update { it.copy(fotosPrincipales = fotos) }
+                    _uiState.update { it.copy(fotos = fotos) }
                 }
             }
 
             launch {
                 repositorio.obtenerMantenimientosPorMoto(idMoto).collect { mantenimientos ->
-                    val moto = _uiState.value.motoPrincipal
+                    val moto = _uiState.value.motos.getOrNull(_uiState.value.selectedIndex)
                     if (moto != null) {
                         val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros)
                         val pendientes = salud.desglose.count {
@@ -101,7 +112,7 @@ class TorqueDashboardViewModel(
     }
 
     private fun updateDerivedState(ultimo: MantenimientoEntity?) {
-        val moto = _uiState.value.motoPrincipal ?: return
+        val moto = _uiState.value.motos.getOrNull(_uiState.value.selectedIndex) ?: return
         _uiState.update { it.copy(ultimoMantenimiento = ultimo) }
 
         val kmRestantes = if (ultimo != null && ultimo.intervaloKms > 0) {
@@ -120,7 +131,7 @@ class TorqueDashboardViewModel(
 
     fun actualizarKilometros(km: Int) {
         viewModelScope.launch {
-            val moto = _uiState.value.motoPrincipal ?: return@launch
+            val moto = _uiState.value.motos.getOrNull(_uiState.value.selectedIndex) ?: return@launch
             repositorio.actualizarKilometros(moto.idMoto, km)
         }
     }
