@@ -8,7 +8,6 @@
 
 ## 🟡 Media prioridad
 
-- [ ] **Galería de fotos por moto** — Añadir soporte para múltiples fotos por moto y visualización tipo galería en el detalle.
 - [ ] **Unificar altura de cabeceras** — Mezcla 56dp y 64dp entre pantallas.
 - [ ] **Crear `DialogoTorque` reutilizable** — El patrón `AlertDialog` se repite ~10 veces.
 - [ ] **Extraer diálogos de `MotoDetalle.kt`** (~490 líneas) — Mismo patrón que se usó en dashboard.
@@ -19,9 +18,6 @@
 
 ## ✅ Completadas recientemente
 
-- [x] **Carrusel dashboard** — HorizontalPager con indicadores de página; la moto principal siempre primero.
-- [x] **Selector año** — Desplegable de años (1970–2027) al añadir/editar moto.
-- [x] **Selector marca/modelo** — Desplegables con filtrado por escritura para marca y modelo.
 - [x] **`SaludMotoCalculator.kt`** — Bucle cuadrático O(N×T) → O(N+23) con pre-agrupación por ID.
 - [x] **`AppRepository.kt`** — Excepciones en escrituras críticas ahora se relanzan tras loguear.
 - [x] **`SaludMotoCalculator.kt`** — `SimpleDateFormat` movido a `companion object`.

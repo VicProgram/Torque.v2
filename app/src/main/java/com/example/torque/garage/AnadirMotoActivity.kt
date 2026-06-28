@@ -210,7 +210,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        SelectorAnio(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
+                        CampoTextoTorque(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
                         Column(modifier = Modifier.weight(1f)) {
                             CampoTextoTorque(
                                 value = matricula,
