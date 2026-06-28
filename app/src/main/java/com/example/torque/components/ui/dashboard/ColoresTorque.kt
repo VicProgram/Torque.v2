@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -35,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -145,6 +147,40 @@ fun ImagenDeFondo(resourceId: Int, alpha: Float = 1f) {
                 .background(Color.Black.copy(alpha = 1f - alpha))
         )
     }
+}
+
+@Composable
+fun DialogoTorque(
+    onDismiss: () -> Unit,
+    showDismiss: Boolean = true,
+    title: String,
+    icon: (@Composable () -> Unit)? = null,
+    onConfirm: (() -> Unit)? = null,
+    confirmText: String = "Guardar",
+    dismissText: String = "Cancelar",
+    content: @Composable () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = ColoresTorque.SurfaceDark,
+        icon = icon,
+        title = { Text(title, color = Color.White, fontWeight = FontWeight.Bold) },
+        text = content,
+        confirmButton = {
+            if (onConfirm != null) {
+                TextButton(onClick = onConfirm) {
+                    Text(confirmText, color = ColoresTorque.Primary)
+                }
+            }
+        },
+        dismissButton = {
+            if (showDismiss) {
+                TextButton(onClick = onDismiss) {
+                    Text(dismissText, color = ColoresTorque.OnSurfaceVariant)
+                }
+            }
+        }
+    )
 }
 
 @Composable
