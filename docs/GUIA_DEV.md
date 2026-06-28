@@ -401,11 +401,19 @@ Objeto que re-exporta los colores del tema + componentes reutilizables:
 - Diálogos: editar km, confirmar eliminación, eliminar foto
 
 **`AnadirMotoActivity.kt`** — Formulario de alta/edición:
-- Campos: marca (req), modelo (req), año, matrícula, cilindrada, caballos, estilo, km, foto
+- Campos: marca (req, dropdown), modelo (req, dropdown filtrado por marca), año (dropdown), matrícula, cilindrada, caballos, estilo, km, foto
+- Los dropdowns de marca y modelo usan `ExposedDropdownMenuBox` con datos de `MarcasModelos` (~50 marcas, cientos de modelos)
+- Se puede escribir directamente si la marca/modelo no está en la lista
 - Switch "moto principal"
 - Edición: recibe `idMoto` y `editando=true` via Intent extras
 - Validación: marca y modelo obligatorios
 - Diálogo de descarte si hay cambios sin guardar
+
+**`MarcasModelos.kt`** — Datos de marcas y modelos de motos (~50 marcas):
+- `MarcasModelos.TODAS`: `Map<String, List<String>>` con todas las marcas y sus modelos
+- `MarcasModelos.MARCAS`: lista ordenada de nombres de marca
+- `Anios.RANGO`: `List<Int>` de 1990 a 2027
+- `SelectorMarca`, `SelectorModelo`, `SelectorAnio`: composables `ExposedDropdownMenuBox` reutilizables con filtrado por escritura y tema oscuro
 
 ### Pantallas de Mantenimiento
 
