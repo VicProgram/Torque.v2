@@ -544,6 +544,10 @@ object MarcasModelos {
     fun modelosDe(marca: String): List<String> = TODAS[marca] ?: emptyList()
 }
 
+object Anios {
+    val RANGO = (1970..2027).toList()
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectorMarca(
@@ -668,6 +672,68 @@ fun SelectorModelo(
                     text = { Text(item, color = Color.White) },
                     onClick = {
                         onModeloChange(item)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelectorAnio(
+    anio: String,
+    onAnioChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val aniosFiltrados = remember(anio) {
+        Anios.RANGO
+            .map { it.toString() }
+            .filter { it.contains(anio) }
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded && aniosFiltrados.isNotEmpty(),
+        onExpandedChange = { expanded = it }
+    ) {
+        OutlinedTextField(
+            value = anio,
+            onValueChange = {
+                onAnioChange(it)
+                expanded = true
+            },
+            label = { Text(label, color = ColoresTorque.OnSurfaceVariant) },
+            singleLine = true,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+            textStyle = TextStyle(color = Color.White),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedBorderColor = ColoresTorque.Primary,
+                unfocusedBorderColor = ColoresTorque.Outline,
+                cursorColor = ColoresTorque.Primary,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent
+            )
+        )
+        ExposedDropdownMenu(
+            expanded = expanded && aniosFiltrados.isNotEmpty(),
+            onDismissRequest = { expanded = false },
+            containerColor = ColoresTorque.SurfaceDark
+        ) {
+            aniosFiltrados.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item, color = Color.White) },
+                    onClick = {
+                        onAnioChange(item)
                         expanded = false
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding

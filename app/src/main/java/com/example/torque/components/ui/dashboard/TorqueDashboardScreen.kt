@@ -14,6 +14,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -59,6 +61,25 @@ fun TorqueDashboardScreen(
     var mostrarDialogoKm by remember { mutableStateOf(false) }
     var mostrarDialogoNotificaciones by remember { mutableStateOf(false) }
 
+    val motoActual = uiState.motos.getOrNull(uiState.selectedIndex)
+
+    val pagerState = rememberPagerState(
+        initialPage = uiState.selectedIndex,
+        pageCount = { maxOf(uiState.motos.size, 1) }
+    )
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != uiState.selectedIndex) {
+            viewModel.selectMoto(pagerState.currentPage)
+        }
+    }
+
+    LaunchedEffect(uiState.selectedIndex) {
+        if (pagerState.currentPage != uiState.selectedIndex) {
+            pagerState.animateScrollToPage(uiState.selectedIndex)
+        }
+    }
+
     val launcherPermisoNotificaciones = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { _ -> Unit }
@@ -75,10 +96,9 @@ fun TorqueDashboardScreen(
 
     LaunchedEffect(uiState.resultadoSalud) {
         val salud = uiState.resultadoSalud
-        val moto = uiState.motoPrincipal
-        if (salud != null && moto != null) {
-            val nombreMoto = moto.modelo.ifBlank { "Tu moto" }
-            NotificacionSalud.verificarYNotificar(contexto, salud, moto.kilometros, nombreMoto)
+        if (salud != null && motoActual != null) {
+            val nombreMoto = motoActual.modelo.ifBlank { "Tu moto" }
+            NotificacionSalud.verificarYNotificar(contexto, salud, motoActual.kilometros, nombreMoto)
         }
     }
 
@@ -127,7 +147,7 @@ fun TorqueDashboardScreen(
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(ColoresTorque.SurfaceContainer)
                                 .clickable {
-                                    uiState.motoPrincipal?.let {
+                                    if (motoActual != null) {
                                         mostrarDialogoKm = true
                                     }
                                 }
@@ -144,7 +164,7 @@ fun TorqueDashboardScreen(
                                     letterSpacing = 1.5.sp
                                 )
                                 Text(
-                                    text = uiState.motoPrincipal?.kilometros?.toString() ?: "—",
+                                    text = motoActual?.kilometros?.toString() ?: "—",
                                     color = Color.White,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Black
@@ -169,19 +189,73 @@ fun TorqueDashboardScreen(
                 }
 
                 item {
-                    val fotoPortada = if (uiState.fotosPrincipales.isNotEmpty()) {
-                        uiState.fotosPrincipales.last().ruta
+                    if (uiState.motos.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(ColoresTorque.SurfaceContainerHigh),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    Icons.Default.Motorcycle,
+                                    contentDescription = null,
+                                    tint = ColoresTorque.OnSurfaceVariant,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = stringResource(R.string.no_bike),
+                                    color = ColoresTorque.OnSurfaceVariant
+                                )
+                            }
+                        }
                     } else {
-                        uiState.motoPrincipal?.uriFoto
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 300.dp)
+                        ) { page ->
+                            val moto = uiState.motos[page]
+                            val fotoPortada = if (uiState.fotos.isNotEmpty() && page == uiState.selectedIndex) {
+                                uiState.fotos.last().ruta
+                            } else {
+                                moto.uriFoto
+                            }
+                            TarjetaProximoServicio(
+                                moto = moto,
+                                fotoPortada = fotoPortada,
+                                kmRestantes = if (page == uiState.selectedIndex) uiState.kmRestantes else null,
+                                progreso = if (page == uiState.selectedIndex) uiState.progreso else 0f,
+                                resultadoSalud = if (page == uiState.selectedIndex) uiState.resultadoSalud else null,
+                                onClick = { onIrMantenimientos(moto.idMoto) }
+                            )
+                        }
+
+                        if (uiState.motos.size > 1) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                repeat(uiState.motos.size) { i ->
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 3.dp)
+                                            .size(if (i == pagerState.currentPage) 10.dp else 6.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (i == pagerState.currentPage) ColoresTorque.Primary
+                                                else ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f)
+                                            )
+                                    )
+                                }
+                            }
+                        }
                     }
-                    TarjetaProximoServicio(
-                        moto = uiState.motoPrincipal,
-                        fotoPortada = fotoPortada,
-                        kmRestantes = uiState.kmRestantes,
-                        progreso = uiState.progreso,
-                        resultadoSalud = uiState.resultadoSalud,
-                        onClick = { onIrMantenimientos(uiState.motoPrincipal?.idMoto) }
-                    )
                 }
 
                 item {
@@ -236,9 +310,9 @@ fun TorqueDashboardScreen(
             Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add))
         }
 
-        if (mostrarDialogoDesgaste && uiState.motoPrincipal != null) {
+        if (mostrarDialogoDesgaste && motoActual != null) {
             DialogoAjusteDesgaste(
-                idMoto = uiState.motoPrincipal!!.idMoto,
+                idMoto = motoActual.idMoto,
                 onDismiss = { mostrarDialogoDesgaste = false },
                 onGuardar = { idMoto, porcentajes ->
                     viewModel.guardarAjustesDesgaste(idMoto, porcentajes) {
@@ -248,9 +322,9 @@ fun TorqueDashboardScreen(
             )
         }
 
-        if (mostrarDialogoKm && uiState.motoPrincipal != null) {
+        if (mostrarDialogoKm && motoActual != null) {
             DialogoKm(
-                initialKm = uiState.motoPrincipal!!.kilometros,
+                initialKm = motoActual.kilometros,
                 onSave = { km -> viewModel.actualizarKilometros(km) },
                 onDismiss = { mostrarDialogoKm = false }
             )
@@ -564,7 +638,9 @@ fun TarjetaProximoServicio(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (moto != null) stringResource(R.string.your_main_bike) else stringResource(R.string.add_a_bike),
+                            text = if (moto != null) {
+                                "${moto.marca} · ${moto.anio}"
+                            } else stringResource(R.string.add_a_bike),
                             color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
