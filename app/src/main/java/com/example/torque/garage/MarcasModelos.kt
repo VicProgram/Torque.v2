@@ -545,7 +545,7 @@ object MarcasModelos {
 }
 
 object Anios {
-    val RANGO = (1970..2027).toList()
+    val RANGO = (1990..2027).toList()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
