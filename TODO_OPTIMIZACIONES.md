@@ -32,3 +32,8 @@
 
 - **`MantenimientoDao.kt:28` vs `SaludMotoCalculator`** — DAO ordena por fecha (para "último registro"), Calculator por kms (para cumplimiento de intervalos). Cada uno sirve a su propósito.
 - **`obtenerUltimoPorTipo` (kms) vs `obtenerUltimoMantenimiento` (fecha)** — Ídem, intencional.
+
+
+
+hacer que las fotos de la moto que esta como principal vayan cambiando cada x tiempo
+mejorar la galeria de fotos de la moto

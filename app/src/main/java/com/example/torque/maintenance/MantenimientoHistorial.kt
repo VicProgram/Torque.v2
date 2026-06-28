@@ -126,7 +126,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Cabecera
             Row(
-                modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 8.dp),
+                modifier = Modifier.fillMaxWidth().height(ColoresTorque.ALTURA_CABECERA).padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { (contexto as? Activity)?.terminar() }) {

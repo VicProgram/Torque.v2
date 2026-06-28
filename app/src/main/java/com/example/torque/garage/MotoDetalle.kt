@@ -124,7 +124,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
+                        .height(ColoresTorque.ALTURA_CABECERA)
                         .padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {

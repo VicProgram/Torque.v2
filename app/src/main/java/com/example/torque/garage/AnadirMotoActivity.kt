@@ -123,7 +123,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
+                    .height(ColoresTorque.ALTURA_CABECERA)
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
