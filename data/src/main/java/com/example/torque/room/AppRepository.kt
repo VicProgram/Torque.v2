@@ -8,7 +8,7 @@ import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.FotoEntity
 import kotlinx.coroutines.flow.Flow
 
-class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
+open class RepositorioApp(private val db: BaseDeDatosApp) {
 
     companion object {
         private const val TAG = "RepositorioApp"
@@ -23,7 +23,7 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
             }
     }
 
-    fun obtenerMotosFlow(): Flow<List<MotoEntity>> = db.motoDao().obtenerTodasFlow()
+    open fun obtenerMotosFlow(): Flow<List<MotoEntity>> = db.motoDao().obtenerTodasFlow()
 
     suspend fun insertarMoto(moto: MotoEntity): Long = try {
         db.motoDao().insertar(moto)
@@ -58,7 +58,7 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
         0
     }
 
-    fun obtenerMotoPrincipalFlow(): Flow<MotoEntity?> = db.motoDao().obtenerPrincipalFlow()
+    open fun obtenerMotoPrincipalFlow(): Flow<MotoEntity?> = db.motoDao().obtenerPrincipalFlow()
 
     suspend fun establecerMotoPrincipal(idMoto: Long) = try {
         db.withTransaction {
@@ -69,7 +69,7 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
         Log.e(TAG, "Error al establecer moto principal", e)
     }
 
-    fun obtenerMantenimientosPorMoto(idMoto: Long) = db.mantenimientoDao().obtenerPorMotoFlow(idMoto)
+    open fun obtenerMantenimientosPorMoto(idMoto: Long) = db.mantenimientoDao().obtenerPorMotoFlow(idMoto)
 
     suspend fun obtenerTodosMantenimientosPorMoto(idMoto: Long): List<MantenimientoEntity> = try {
         db.mantenimientoDao().obtenerPorMoto(idMoto)
@@ -78,7 +78,7 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
         emptyList()
     }
 
-    suspend fun insertarMantenimiento(mantenimiento: MantenimientoEntity): Long = try {
+    open suspend fun insertarMantenimiento(mantenimiento: MantenimientoEntity): Long = try {
         db.mantenimientoDao().insertar(mantenimiento)
     } catch (e: Exception) {
         Log.e(TAG, "Error al insertar mantenimiento", e)
@@ -91,33 +91,33 @@ class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
         Log.e(TAG, "Error al eliminar mantenimiento", e)
     }
 
-    suspend fun actualizarKilometros(idMoto: Long, kilometros: Int) = try {
+    open suspend fun actualizarKilometros(idMoto: Long, kilometros: Int) = try {
         db.motoDao().actualizarKilometros(idMoto, kilometros)
     } catch (e: Exception) {
         Log.e(TAG, "Error al actualizar kilómetros", e)
     }
 
-    suspend fun obtenerUltimoMantenimiento(idMoto: Long) = try {
+    open suspend fun obtenerUltimoMantenimiento(idMoto: Long) = try {
         db.mantenimientoDao().obtenerUltimoPorMoto(idMoto)
     } catch (e: Exception) {
         Log.e(TAG, "Error al obtener último mantenimiento", e)
         null
     }
 
-    suspend fun obtenerUltimoMantenimientoPorTipo(idMoto: Long, tipoId: Long) = try {
+    open suspend fun obtenerUltimoMantenimientoPorTipo(idMoto: Long, tipoId: Long) = try {
         db.mantenimientoDao().obtenerUltimoPorTipo(idMoto, tipoId)
     } catch (e: Exception) {
         Log.e(TAG, "Error al obtener mantenimiento por tipo", e)
         null
     }
 
-    suspend fun actualizarPorcentajeVida(id: Long, porcentaje: Int) = try {
+    open suspend fun actualizarPorcentajeVida(id: Long, porcentaje: Int) = try {
         db.mantenimientoDao().actualizarPorcentajeVida(id, porcentaje)
     } catch (e: Exception) {
         Log.e(TAG, "Error al actualizar porcentaje de vida", e)
     }
 
-    fun obtenerFotosPorMoto(idMoto: Long) = db.fotoDao().obtenerPorMotoFlow(idMoto)
+    open fun obtenerFotosPorMoto(idMoto: Long) = db.fotoDao().obtenerPorMotoFlow(idMoto)
 
     suspend fun insertarFoto(foto: FotoEntity) = try {
         db.fotoDao().insertar(foto)
