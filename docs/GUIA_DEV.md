@@ -119,8 +119,12 @@ Torque.v2/
 │       ├── menuprincipal/
 │       │   └── MenuPrincipal.kt  # Entry point, NavHost, splash screen
 │       ├── components/ui/dashboard/
-│       │   ├── ColoresTorque.kt  # Objeto de colores + componentes reutilizables
-│       │   └── TorqueDashboardScreen.kt  # Dashboard principal (~1006 líneas)
+│       │   ├── ColoresTorque.kt              # Objeto de colores + componentes reutilizables
+│       │   ├── TorqueDashboardScreen.kt      # Dashboard (~550 líneas, usa ViewModel)
+│       │   ├── TorqueDashboardViewModel.kt   # ViewModel con StateFlow<DashboardUiState>
+│       │   ├── DialogoKm.kt                  # Diálogo edición de km
+│       │   ├── DialogoNotificaciones.kt      # Diálogo de notificaciones pendientes
+│       │   └── DialogoAjusteDesgaste.kt      # Sliders de desgaste
 │       ├── garage/
 │       │   ├── ListaGaraje.kt    # Lista de motos con búsqueda/filtro
 │       │   ├── MotoDetalle.kt    # Detalle de moto + galería + acciones
@@ -336,20 +340,30 @@ El NavHost renderiza `TorqueDashboardScreen` y maneja la navegación hacia otras
 
 ### TorqueDashboardScreen.kt — `app/src/main/java/.../components/ui/dashboard/TorqueDashboardScreen.kt`
 
-(~1006 líneas) Es el **corazón de la UI**. Contiene:
+(~550 líneas, refactorizado) Es el **corazón de la UI**. Usa `TorqueDashboardViewModel` con `StateFlow<DashboardUiState>` para todos los datos reactivos.
 
-- **Cabecera** con logo seleccionable (6 logos), menú hamburguesa (garaje, añadir moto, ajustes, exportar, acerca de), notificaciones (badge), settings dropdown (perfil, ajustes)
-- **Tarjeta de próximo servicio**: foto de la moto, km restantes, barra de salud con color dinámico (verde ≥70%, amarillo ≥40%, rojo <40%)
-- **Acciones rápidas**: Garaje, Ajuste de desgaste
-- **FAB** para añadir moto
-- **Diálogos**: ajuste de desgaste (sliders para 6 wear types), edición de km, notificaciones pendientes
+**DashboardUiState**:
+- `motoActual: MotoEntity?` — moto principal
+- `nombreUsuario: String` — nombre del perfil
+- `kmActuales: Int` — kilómetros actuales
+- `resultadoSalud: ResultadoSalud?` — salud calculada
+- `motivosProximosVencidos: List<DetalleSalud>` — notificaciones pendientes
+- `cargando: Boolean` — estado inicial
 
-Composables internos:
+**ViewModel** (`TorqueDashboardViewModel.kt`):
+- Factory propia para `AndroidViewModel` (sin Koin)
+- Observa `obtenerMotoPrincipalFlow()` y `perfilRepositorio.nombreFlow`
+- Expone `actualizarKilometros(km)` y `guardarAjustesDesgaste(idMoto, porcentajes, onComplete)`
+
+**Composables en pantalla**:
 - `CabeceraDashboard` — top bar + menús
 - `TarjetaProximoServicio` — tarjeta principal con foto, km, salud
 - `TarjetaAccionRapida` — botones de acción rápida
-- `TarjetaEstadisticas` — km totales (no usado actualmente)
-- `DialogoAjusteDesgaste` — sliders de desgaste
+
+**Diálogos extraídos a archivos separados**:
+- `DialogoKm.kt` — edición de km
+- `DialogoNotificaciones.kt` — notificaciones pendientes
+- `DialogoAjusteDesgaste.kt` — sliders de desgaste (6 wear types)
 
 ### ColoresTorque.kt — `app/src/main/java/.../components/ui/dashboard/ColoresTorque.kt`
 
@@ -695,6 +709,7 @@ val appModule = module {
 - `RepositorioApp` se obtiene en los composables con `remember { RepositorioApp.obtenerInstancia(contexto) }` (no vía Koin injection directamente en UI, aunque el singleton está en Koin)
 - `AjustesRepositorio` igualmente se instancia en composables con `remember { AjustesRepositorio(contexto.dataStore) }`
 - `PerfilRepositorio` no está en Koin — se instancia directamente donde se necesita
+- `TorqueDashboardViewModel` usa su propio `Factory` (patrón `viewModel { }`) en lugar de `koinViewModel()` para evitar añadir `koin-androidx-viewmodel` como dependencia
 
 **Nota**: Aunque Koin está configurado, muchos repositorios se instancian manualmente en los composables. Esto es un área potencial de refactor para centralizar en Koin.
 
@@ -839,7 +854,7 @@ Pipeline:
 ### Patrones
 - **Singleton**: para DB, Repository, Calculator, BackupManager
 - **Flow**: para datos reactivos desde Room y DataStore
-- **StateFlow**: en ViewModel (solo en MantenimientoHistorial)
+- **StateFlow**: en ViewModel (MantenimientoHistorial, TorqueDashboardViewModel)
 - **LaunchedEffect/remember**: para lifecycle y estado en composables
 - **rememberCoroutineScope**: para lanzar corrutinas desde callbacks de UI
 

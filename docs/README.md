@@ -54,6 +54,7 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 | **DataStore Preferences** | 1.1.2 |
 | **Coil** | 2.7.0 |
 | **Koin** | 3.5.6 |
+| **Lifecycle ViewModel Compose** | 2.8.7 |
 | **Sentry** | 7.22.1 |
 | **KSP** | 2.1.20-1.0.32 |
 | **Gradle AGP** | 8.9.2 |
