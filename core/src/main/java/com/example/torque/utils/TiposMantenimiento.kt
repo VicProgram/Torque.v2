@@ -35,6 +35,8 @@ object TiposMantenimiento {
         TipoMantenimiento(21, "Neumático Delantero", "Neumáticos", 0, peso = 8, esDesgaste = true),
         TipoMantenimiento(22, "Neumático Trasero", "Neumáticos", 0, peso = 8, esDesgaste = true),
         TipoMantenimiento(23, "Discos de Freno Traseros", "Frenos", 10000, peso = 8, esDesgaste = true),
+        TipoMantenimiento(24, "Revisión de Retenes Horquilla", "Suspensión", 5000, peso = 5),
+        TipoMantenimiento(25, "Cambio de Retenes Horquilla", "Suspensión", 10000, peso = 6),
     )
 
     val WEAR_TIPOS = listOf(

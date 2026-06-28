@@ -188,13 +188,25 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CampoTextoTorque(marca, { marca = it; errorMarca = false }, stringResource(R.string.field_brand_required))
+                    SelectorMarca(
+                        marca = marca,
+                        onMarcaChange = { marca = it; errorMarca = false },
+                        onMarcaSeleccionada = { modelo = "" },
+                        label = stringResource(R.string.field_brand_required),
+                        error = errorMarca
+                    )
                     if (errorMarca) {
-                        Text(stringResource(R.string.error_brand_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                        Text(stringResource(R.string.error_brand_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                     }
-                    CampoTextoTorque(modelo, { modelo = it; errorModelo = false }, stringResource(R.string.field_model_required))
+                    SelectorModelo(
+                        modelo = modelo,
+                        onModeloChange = { modelo = it; errorModelo = false },
+                        marca = marca,
+                        label = stringResource(R.string.field_model_required),
+                        error = errorModelo
+                    )
                     if (errorModelo) {
-                        Text(stringResource(R.string.error_model_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                        Text(stringResource(R.string.error_model_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -211,7 +223,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                             if (errorMatricula) {
                                 Text(
                                     text = stringResource(R.string.error_plate_required),
-                                    color = Color(0xFFEF4444),
+                                    color = ColoresTorque.RojoError,
                                     fontSize = 12.sp,
                                     modifier = Modifier.padding(start = 4.dp)
                                 )
@@ -257,7 +269,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         mostrarDialogoDescartar = false
                         (contexto as? Activity)?.terminar()
                     }) {
-                        Text(stringResource(R.string.btn_discard), color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_discard), color = ColoresTorque.RojoError)
                     }
                 },
                 dismissButton = {

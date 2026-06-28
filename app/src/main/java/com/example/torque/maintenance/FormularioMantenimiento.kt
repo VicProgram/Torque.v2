@@ -34,8 +34,6 @@ import com.example.torque.utils.DateUtils
 import com.example.torque.utils.TiposMantenimiento
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -86,14 +84,10 @@ private suspend fun guardarMantenimiento(
             porcentajeVida = porcentajeVida
         )
         repositorio.insertarMantenimiento(mantenimiento)
-        withContext(Dispatchers.Main) {
-            Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
-            (contexto as? Activity)?.terminar()
-        }
+        Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
+        (contexto as? Activity)?.terminar()
     } catch (e: Exception) {
-        withContext(Dispatchers.Main) {
-            Toast.makeText(contexto, "Error al guardar: ${e.message}", Toast.LENGTH_LONG).show()
-        }
+        Toast.makeText(contexto, "Error al guardar: ${e.message}", Toast.LENGTH_LONG).show()
     }
 }
 
@@ -240,7 +234,7 @@ private fun FormularioCampos(
                 CampoTextoTorque(intervalo, { onIntervaloChange(it) }, stringResource(R.string.field_every_x_kms), modifier = Modifier.weight(1f))
             }
             if (errorKms) {
-                Text(stringResource(R.string.error_kms_required), color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                Text(stringResource(R.string.error_kms_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
             }
         }
 
@@ -272,9 +266,9 @@ private fun SeccionDesgaste(
     onPorcentajeVidaChange: (Int) -> Unit
 ) {
     val colorBarra = when {
-        porcentajeVida >= 70 -> Color(0xFF22C55E)
-        porcentajeVida >= 40 -> Color(0xFFEAB308)
-        else -> Color(0xFFEF4444)
+        porcentajeVida >= 70 -> ColoresTorque.VerdeExito
+        porcentajeVida >= 40 -> ColoresTorque.AmarilloAdvertencia
+        else -> ColoresTorque.RojoError
     }
     Card(
         colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
@@ -315,7 +309,7 @@ private fun DialogoDescartar(
                     onDismiss()
                     (contexto as? Activity)?.terminar()
                 }) {
-                    Text(stringResource(R.string.btn_discard), color = Color(0xFFEF4444))
+                    Text(stringResource(R.string.btn_discard), color = ColoresTorque.RojoError)
                 }
             },
             dismissButton = {

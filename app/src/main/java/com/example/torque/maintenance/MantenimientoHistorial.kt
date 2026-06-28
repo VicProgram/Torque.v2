@@ -152,7 +152,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val filtros = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos")
+                        val filtros = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos", "Suspensión")
                         items(filtros) { filtro ->
                             FiltroChip(
                                 texto = filtro,
@@ -228,7 +228,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                         viewModel.eliminarMantenimiento(itemAEliminar!!)
                         itemAEliminar = null
                     }) {
-                        Text(stringResource(R.string.btn_delete), color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
                     }
                 },
                 dismissButton = {
@@ -258,6 +258,9 @@ fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit, onEliminar:
         (item.tareas?.contains("eléctrico", ignoreCase = true) ?: false) -> Icons.Default.Bolt
         item.nombreMantenimiento.contains("freno", ignoreCase = true) ||
         (item.tareas?.contains("freno", ignoreCase = true) ?: false) -> Icons.Default.BackHand
+        item.nombreMantenimiento.contains("retenes", ignoreCase = true) ||
+        item.nombreMantenimiento.contains("horquilla", ignoreCase = true) ||
+        (item.tareas?.contains("suspensión", ignoreCase = true) ?: false) -> Icons.Default.Construction
         else -> Icons.Default.Build
     }
 
@@ -286,7 +289,7 @@ fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit, onEliminar:
             Text("${item.kms} km", color = ColoresTorque.Outline, fontSize = 11.sp)
         }
         IconButton(onClick = onEliminar, modifier = Modifier.size(32.dp)) {
-            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_desc_delete), tint = Color(0xFFEF4444).copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_desc_delete), tint = ColoresTorque.RojoError.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
         }
     }
 }

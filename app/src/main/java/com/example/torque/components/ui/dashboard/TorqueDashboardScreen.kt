@@ -14,6 +14,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.core.content.ContextCompat
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -34,26 +35,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
-import com.example.torque.ajustes.AjustesRepositorio
-import com.example.torque.ajustes.dataStore
 import com.example.torque.garage.AnadirMotoActivity
-import com.example.torque.perfil.PerfilRepositorio
-import com.example.torque.room.RepositorioApp
-import com.example.torque.room.entity.FotoEntity
-import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.utils.BackupManager
 import com.example.torque.utils.NotificacionSalud
 import com.example.torque.utils.ResultadoSalud
-import com.example.torque.utils.SaludMotoCalculator
-import com.example.torque.utils.TiposMantenimiento
-import com.example.torque.utils.DateUtils
-import com.example.torque.utils.TipoMantenimiento
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @Composable
 fun TorqueDashboardScreen(
@@ -62,20 +54,31 @@ fun TorqueDashboardScreen(
     onIrPerfil: () -> Unit = {}
 ) {
     val contexto = LocalContext.current
-    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
-    val motoPrincipal by repositorio.obtenerMotoPrincipalFlow().collectAsState(initial = null)
-    var fotosPrincipales by remember { mutableStateOf<List<FotoEntity>>(emptyList()) }
-    var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
-    var resultadoSalud by remember { mutableStateOf<ResultadoSalud?>(null) }
+    val viewModel: TorqueDashboardViewModel = viewModel(factory = TorqueDashboardViewModel.Factory)
+    val uiState by viewModel.uiState.collectAsState()
+
+    val motoActual = uiState.motos.getOrNull(uiState.selectedIndex)
+
+    val pagerState = rememberPagerState(
+        initialPage = uiState.selectedIndex,
+        pageCount = { maxOf(uiState.motos.size, 1) }
+    )
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != uiState.selectedIndex) {
+            viewModel.selectMoto(pagerState.currentPage)
+        }
+    }
+
+    LaunchedEffect(uiState.selectedIndex) {
+        if (pagerState.currentPage != uiState.selectedIndex) {
+            pagerState.animateScrollToPage(uiState.selectedIndex)
+        }
+    }
+
     var mostrarDialogoDesgaste by remember { mutableStateOf(false) }
     var mostrarDialogoKm by remember { mutableStateOf(false) }
-    var kmEditText by remember { mutableStateOf("") }
     var mostrarDialogoNotificaciones by remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
-
-    val perfilRepositorio = remember { PerfilRepositorio(contexto.dataStore) }
-    val nombrePerfil by perfilRepositorio.nombreFlow.collectAsState(initial = null)
 
     val launcherPermisoNotificaciones = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -91,50 +94,13 @@ fun TorqueDashboardScreen(
         }
     }
 
-    LaunchedEffect(motoPrincipal?.idMoto) {
-        if (motoPrincipal != null) {
-            ultimoMantenimiento = repositorio.obtenerUltimoMantenimiento(motoPrincipal!!.idMoto)
-            repositorio.obtenerFotosPorMoto(motoPrincipal!!.idMoto).collect { fotosPrincipales = it }
-        } else {
-            ultimoMantenimiento = null
-            fotosPrincipales = emptyList()
-            resultadoSalud = null
+    LaunchedEffect(uiState.resultadoSalud) {
+        val salud = uiState.resultadoSalud
+        val moto = motoActual
+        if (salud != null && moto != null) {
+            val nombreMoto = moto.modelo.ifBlank { "Tu moto" }
+            NotificacionSalud.verificarYNotificar(contexto, salud, moto.kilometros, nombreMoto)
         }
-    }
-
-    LaunchedEffect(motoPrincipal?.idMoto) {
-        if (motoPrincipal != null) {
-            repositorio.obtenerMantenimientosPorMoto(motoPrincipal!!.idMoto).collect { mantenimientos ->
-                val salud = SaludMotoCalculator.calcular(mantenimientos, motoPrincipal!!.kilometros)
-                resultadoSalud = salud
-                val nombreMoto = motoPrincipal?.modelo ?: "Tu moto"
-                NotificacionSalud.verificarYNotificar(contexto, salud, motoPrincipal!!.kilometros, nombreMoto)
-            }
-        } else {
-            resultadoSalud = null
-        }
-    }
-
-    val kmRestantes = remember(motoPrincipal, ultimoMantenimiento) {
-        if (motoPrincipal != null && ultimoMantenimiento != null && ultimoMantenimiento!!.intervaloKms > 0) {
-            val proxServicio = ultimoMantenimiento!!.kms + ultimoMantenimiento!!.intervaloKms
-            val restante = proxServicio - motoPrincipal!!.kilometros
-            if (restante < 0) -1 else restante
-        } else null
-    }
-
-    val progreso = remember(motoPrincipal, ultimoMantenimiento, kmRestantes) {
-        val tieneMotoYMantenimiento = motoPrincipal != null && ultimoMantenimiento != null
-        val tieneIntervalo = ultimoMantenimiento?.intervaloKms ?: 0 > 0
-        if (tieneMotoYMantenimiento && tieneIntervalo && kmRestantes != null) {
-            val transcurrido = motoPrincipal!!.kilometros - ultimoMantenimiento!!.kms
-            val total = ultimoMantenimiento!!.intervaloKms
-            if (total > 0) (transcurrido.toFloat() / total).coerceIn(0f, 1f) else 0f
-        } else 0f
-    }
-
-    val notificacionesPendientes = remember(resultadoSalud) {
-        resultadoSalud?.desglose?.count { it.cumplimiento <= 20 && !it.tipo.esDesgaste } ?: 0
     }
 
     Box(
@@ -150,7 +116,7 @@ fun TorqueDashboardScreen(
         ) {
             CabeceraDashboard(
                 onIrPerfil = onIrPerfil,
-                notificacionesPendientes = notificacionesPendientes,
+                notificacionesPendientes = uiState.notificacionesPendientes,
                 onNotificacionesClick = { mostrarDialogoNotificaciones = true }
             )
 
@@ -158,7 +124,7 @@ fun TorqueDashboardScreen(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp), // Reducido el espacio entre tarjetas
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 item {
@@ -170,7 +136,7 @@ fun TorqueDashboardScreen(
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = if (nombrePerfil.isNullOrBlank()) stringResource(id = R.string.welcome_name) else nombrePerfil!!,
+                            text = uiState.nombrePerfil ?: stringResource(id = R.string.welcome_name),
                             color = Color.White,
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold
@@ -182,8 +148,7 @@ fun TorqueDashboardScreen(
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(ColoresTorque.SurfaceContainer)
                                 .clickable {
-                                    if (motoPrincipal != null) {
-                                        kmEditText = motoPrincipal!!.kilometros.toString()
+                                    if (motoActual != null) {
                                         mostrarDialogoKm = true
                                     }
                                 }
@@ -200,7 +165,7 @@ fun TorqueDashboardScreen(
                                     letterSpacing = 1.5.sp
                                 )
                                 Text(
-                                    text = if (motoPrincipal != null) "${motoPrincipal!!.kilometros}" else "—",
+                                    text = motoActual?.kilometros?.toString() ?: "—",
                                     color = Color.White,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Black
@@ -225,8 +190,63 @@ fun TorqueDashboardScreen(
                 }
 
                 item {
-                    val fotoPortada = if (fotosPrincipales.isNotEmpty()) fotosPrincipales.last().ruta else motoPrincipal?.uriFoto
-                    TarjetaProximoServicio(moto = motoPrincipal, fotoPortada = fotoPortada, kmRestantes = kmRestantes, progreso = progreso, resultadoSalud = resultadoSalud, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
+                    if (uiState.motos.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(ColoresTorque.SurfaceContainerHigh),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Default.Motorcycle, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(stringResource(R.string.no_bike), color = ColoresTorque.OnSurfaceVariant)
+                            }
+                        }
+                    } else {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { page ->
+                            val moto = uiState.motos[page]
+                            val fotoPortada = if (uiState.fotos.isNotEmpty() && page == uiState.selectedIndex) {
+                                uiState.fotos.last().ruta
+                            } else {
+                                moto.uriFoto
+                            }
+                            TarjetaProximoServicio(
+                                moto = moto,
+                                fotoPortada = fotoPortada,
+                                kmRestantes = if (page == uiState.selectedIndex) uiState.kmRestantes else null,
+                                progreso = if (page == uiState.selectedIndex) uiState.progreso else 0f,
+                                resultadoSalud = if (page == uiState.selectedIndex) uiState.resultadoSalud else null,
+                                onClick = { onIrMantenimientos(moto.idMoto) }
+                            )
+                        }
+
+                        if (uiState.motos.size > 1) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                repeat(uiState.motos.size) { i ->
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 3.dp)
+                                            .size(if (i == pagerState.currentPage) 10.dp else 6.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (i == pagerState.currentPage) ColoresTorque.Primary
+                                                else ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f)
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 item {
@@ -234,7 +254,7 @@ fun TorqueDashboardScreen(
                         Text(
                             text = stringResource(id = R.string.quick_actions_title),
                             color = ColoresTorque.OnSurfaceVariant,
-                            fontSize = 10.sp, // Reducido
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.5.sp,
                             modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)
@@ -264,7 +284,6 @@ fun TorqueDashboardScreen(
                         }
                     }
                 }
-
             }
         }
 
@@ -274,7 +293,7 @@ fun TorqueDashboardScreen(
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 80.dp), // Ajustada la posición del FAB
+                .padding(end = 16.dp, bottom = 80.dp),
             containerColor = ColoresTorque.PrimaryContainer,
             contentColor = ColoresTorque.OnPrimaryContainer,
             shape = RoundedCornerShape(16.dp)
@@ -282,136 +301,32 @@ fun TorqueDashboardScreen(
             Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add))
         }
 
-        if (mostrarDialogoDesgaste && motoPrincipal != null) {
+        if (mostrarDialogoDesgaste && motoActual != null) {
             DialogoAjusteDesgaste(
-                idMoto = motoPrincipal!!.idMoto,
-                onDismiss = { mostrarDialogoDesgaste = false }
+                idMoto = motoActual.idMoto,
+                onDismiss = { mostrarDialogoDesgaste = false },
+                onGuardar = { idMoto, porcentajes ->
+                    viewModel.guardarAjustesDesgaste(idMoto, porcentajes) {
+                        mostrarDialogoDesgaste = false
+                    }
+                }
             )
         }
 
-        if (mostrarDialogoKm && motoPrincipal != null) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoKm = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                title = { Text(stringResource(R.string.km_edit_title), color = Color.White, fontWeight = FontWeight.Bold) },
-                text = {
-                    OutlinedTextField(
-                        value = kmEditText,
-                        onValueChange = { kmEditText = it.filter { c -> c.isDigit() } },
-                        label = { Text(stringResource(R.string.field_kilometers), color = ColoresTorque.OnSurfaceVariant) },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedBorderColor = ColoresTorque.Primary,
-                            unfocusedBorderColor = ColoresTorque.Outline,
-                            cursorColor = ColoresTorque.Primary,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedLabelColor = ColoresTorque.Primary,
-                            unfocusedLabelColor = ColoresTorque.OnSurfaceVariant
-                        )
-                    )
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val km = kmEditText.toIntOrNull()
-                        if (km != null && km >= 0) {
-                            scope.launch {
-                                repositorio.actualizarKilometros(motoPrincipal!!.idMoto, km)
-                            }
-                        }
-                        mostrarDialogoKm = false
-                    }) {
-                        Text(stringResource(R.string.save), color = ColoresTorque.Primary)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { mostrarDialogoKm = false }) {
-                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
-                    }
-                }
+        if (mostrarDialogoKm && motoActual != null) {
+            DialogoKm(
+                initialKm = motoActual.kilometros,
+                onSave = { km -> viewModel.actualizarKilometros(km) },
+                onDismiss = { mostrarDialogoKm = false }
             )
         }
 
         if (mostrarDialogoNotificaciones) {
-            val saludActual = resultadoSalud
-            val itemsNotificacion = remember(saludActual) {
-                saludActual?.desglose
-                    ?.filter { it.cumplimiento <= 20 && !it.tipo.esDesgaste }
-                    ?.sortedBy { it.cumplimiento }
-                    ?: emptyList()
-            }
-
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoNotificaciones = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                icon = {
-                    Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.Primary)
-                },
-                title = {
-                    Text(stringResource(R.string.notifications_title), color = Color.White, fontWeight = FontWeight.Bold)
-                },
-                text = {
-                    if (itemsNotificacion.isEmpty()) {
-                        Text(
-                            stringResource(R.string.no_notifications_pending),
-                            color = ColoresTorque.OnSurfaceVariant,
-                            modifier = Modifier.padding(vertical = 16.dp)
-                        )
-                    } else {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            itemsNotificacion.forEach { detalle ->
-                                val vencido = detalle.cumplimiento == 0
-                                val colorEstado = if (vencido) Color(0xFFEF4444) else Color(0xFFEAB308)
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(ColoresTorque.SurfaceContainer)
-                                        .padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = if (vencido) Icons.Default.Warning else Icons.Default.Info,
-                                        contentDescription = null,
-                                        tint = colorEstado,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = detalle.tipo.nombre,
-                                            color = Color.White,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = if (vencido) stringResource(R.string.notification_expired)
-                                                   else stringResource(R.string.notification_soon),
-                                            color = colorEstado,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                    Text(
-                                        text = "${detalle.cumplimiento}%",
-                                        color = colorEstado,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Black
-                                    )
-                                }
-                            }
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { mostrarDialogoNotificaciones = false }) {
-                        Text(stringResource(R.string.btn_close), color = ColoresTorque.Primary)
-                    }
-                }
+            DialogoNotificaciones(
+                resultadoSalud = uiState.resultadoSalud,
+                onDismiss = { mostrarDialogoNotificaciones = false }
             )
         }
-
     }
 }
 
@@ -511,7 +426,7 @@ fun CabeceraDashboard(
                     badge = {
                         if (notificacionesPendientes > 0) {
                             Badge(
-                                containerColor = Color(0xFFEF4444),
+                                containerColor = ColoresTorque.RojoError,
                                 contentColor = Color.White
                             ) {
                                 Text(
@@ -640,11 +555,18 @@ private suspend fun exportarBaseDeDatos(contexto: Context) {
 }
 
 @Composable
-fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRestantes: Int? = null, @Suppress("UNUSED_PARAMETER") progreso: Float = 0f, resultadoSalud: ResultadoSalud? = null, onClick: () -> Unit) {
+fun TarjetaProximoServicio(
+    moto: MotoEntity?,
+    fotoPortada: String? = null,
+    kmRestantes: Int? = null,
+    progreso: Float = 0f,
+    resultadoSalud: ResultadoSalud? = null,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp)) // Reducido de 28.dp
+            .clip(RoundedCornerShape(24.dp))
             .background(ColoresTorque.SurfaceContainerHigh)
             .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(24.dp))
             .clickable { onClick() }
@@ -652,7 +574,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
         Column {
             Box(
                 modifier = Modifier
-                    .height(140.dp) // Reducido de 160.dp
+                    .height(140.dp)
                     .background(ColoresTorque.SurfaceVariant)
             ) {
                 if (fotoPortada != null) {
@@ -679,7 +601,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
 
                 Box(
                     modifier = Modifier
-                        .padding(12.dp) // Reducido de 16.dp
+                        .padding(12.dp)
                         .clip(CircleShape)
                         .background(ColoresTorque.Primary)
                         .padding(horizontal = 10.dp, vertical = 2.dp)
@@ -687,13 +609,13 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                     Text(
                         text = stringResource(R.string.next_service_badge),
                         color = ColoresTorque.OnPrimary,
-                        fontSize = 10.sp, // Reducido de 11.sp
+                        fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     )
                 }
             }
-            Column(modifier = Modifier.padding(20.dp)) { // Reducido de 24.dp
+            Column(modifier = Modifier.padding(20.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -703,13 +625,13 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                         Text(
                             text = moto?.modelo ?: stringResource(R.string.no_bike),
                             color = Color.White,
-                            fontSize = 20.sp, // Reducido de 24.sp
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = if (moto != null) stringResource(R.string.your_main_bike) else stringResource(R.string.add_a_bike),
                             color = ColoresTorque.OnSurfaceVariant,
-                            fontSize = 12.sp, // Reducido de 14.sp
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -717,7 +639,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                         if (kmRestantes != null) {
                             Text(
                                 text = if (kmRestantes < 0) stringResource(R.string.overdue) else kmRestantes.toString(),
-                                color = if (kmRestantes < 0) Color(0xFFEF4444) else ColoresTorque.Primary,
+                                color = if (kmRestantes < 0) ColoresTorque.RojoError else ColoresTorque.Primary,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Black
                             )
@@ -747,9 +669,9 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                 }
                 val salud = resultadoSalud?.saludGlobal ?: 0
                 val colorSalud = when {
-                    salud >= 70 -> Color(0xFF22C55E)
-                    salud >= 40 -> Color(0xFFEAB308)
-                    else -> Color(0xFFEF4444)
+                    salud >= 70 -> ColoresTorque.VerdeExito
+                    salud >= 40 -> ColoresTorque.AmarilloAdvertencia
+                    else -> ColoresTorque.RojoError
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -782,7 +704,6 @@ fun TarjetaProximoServicio(moto: MotoEntity?, fotoPortada: String? = null, kmRes
                         color = colorSalud,
                         trackColor = Color.White.copy(alpha = 0.1f)
                     )
-
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 BotonTorque(
@@ -840,153 +761,3 @@ fun TarjetaAccionRapida(
         }
     }
 }
-
-@Composable
-fun TarjetaEstadisticas(moto: MotoEntity?) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(ColoresTorque.SurfaceContainer)
-            .padding(24.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.total_mileage),
-                color = ColoresTorque.Tertiary,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp
-            )
-            Icon(Icons.Default.TrendingUp, contentDescription = null, tint = ColoresTorque.Outline)
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(
-                text = if (moto != null) moto.kilometros.toString() else "—",
-                color = Color.White,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = (-1).sp
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.kilometers_label),
-                color = ColoresTorque.OnSurfaceVariant,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun DialogoAjusteDesgaste(idMoto: Long, onDismiss: () -> Unit) {
-    val contexto = LocalContext.current
-    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
-    val scope = rememberCoroutineScope()
-
-    val wearTipos = remember { TiposMantenimiento.WEAR_TIPOS }
-    var porcentajes by remember { mutableStateOf<Map<Long, Int>>(emptyMap()) }
-    var cargando by remember { mutableStateOf(true) }
-
-    LaunchedEffect(idMoto) {
-        val mapa = mutableMapOf<Long, Int>()
-        for (tipo in wearTipos) {
-            val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipo.id)
-            mapa[tipo.id] = ultimo?.porcentajeVida ?: 100
-        }
-        porcentajes = mapa
-        cargando = false
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = ColoresTorque.SurfaceDark,
-        title = { Text(stringResource(R.string.wear_status_title), color = Color.White, fontWeight = FontWeight.Bold) },
-        text = {
-            if (cargando) {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = ColoresTorque.Primary)
-                }
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    wearTipos.forEach { tipo ->
-                        val pct = porcentajes[tipo.id] ?: 100
-                        val colorBarra = when {
-                            pct >= 70 -> Color(0xFF22C55E)
-                            pct >= 40 -> Color(0xFFEAB308)
-                            else -> Color(0xFFEF4444)
-                        }
-                        Column {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(tipo.nombre, color = Color.White, fontSize = 13.sp)
-                                Text("$pct%", color = colorBarra, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                            }
-                            Slider(
-                                value = (porcentajes[tipo.id] ?: 100).toFloat(),
-                                onValueChange = { nuevo ->
-                                    val redondeado = (nuevo / 5f).roundToInt() * 5
-                                    porcentajes = porcentajes + (tipo.id to redondeado.coerceIn(0, 100))
-                                },
-                                valueRange = 0f..100f,
-                                steps = 19,
-                                colors = SliderDefaults.colors(
-                                    thumbColor = colorBarra,
-                                    activeTrackColor = colorBarra,
-                                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                scope.launch {
-                    for (tipo in wearTipos) {
-                        val pct = porcentajes[tipo.id] ?: 100
-                        val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipo.id)
-                        if (ultimo != null) {
-                            repositorio.actualizarPorcentajeVida(ultimo.id, pct)
-                        } else {
-                            val nuevo = MantenimientoEntity(
-                                idMoto = idMoto,
-                                nombreMantenimiento = tipo.nombre,
-                                fecha = java.text.SimpleDateFormat(DateUtils.FORMATO_FECHA_VISUAL, java.util.Locale.getDefault()).format(java.util.Date()),
-                                kms = 0,
-                                intervaloKms = 0,
-                                precio = "",
-                                tiempo = "",
-                                notas = "Ajuste de desgaste",
-                                tareas = tipo.nombre,
-                                creadoEn = java.text.SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, java.util.Locale.getDefault()).format(java.util.Date()),
-                                tipoMantenimientoId = tipo.id,
-                                porcentajeVida = pct
-                            )
-                            repositorio.insertarMantenimiento(nuevo)
-                        }
-                    }
-                    onDismiss()
-                }
-            }) {
-                Text(stringResource(R.string.save), color = ColoresTorque.Primary)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
-            }
-        }
-    )
-}
-

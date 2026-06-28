@@ -109,6 +109,7 @@ dependencies {
     // --- Componentes Base de Android ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
     // --- Persistencia de Datos (DataStore y Room) ---

@@ -16,9 +16,9 @@ object ClavesPerfil {
     val CARNETS = stringPreferencesKey("perfil_carnets")
 }
 
-class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
+open class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
 
-    val nombreFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.NOMBRE] }
+    open val nombreFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.NOMBRE] }
     val emailFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.EMAIL] }
     val telefonoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.TELEFONO] }
     val fotoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.FOTO_PERFIL] }
@@ -27,7 +27,7 @@ class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
         prefs[ClavesPerfil.CARNETS]?.split(",")?.filter { it.isNotBlank() }?.toSet() ?: emptySet()
     }
 
-    suspend fun establecerNombre(nombre: String) {
+    open suspend fun establecerNombre(nombre: String) {
         dataStore.edit { prefs -> prefs[ClavesPerfil.NOMBRE] = nombre }
     }
 
