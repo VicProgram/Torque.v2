@@ -25,6 +25,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.torque.ui.theme.AmarilloAdvertencia
+import com.example.torque.ui.theme.RojoError
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -79,7 +81,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
     )
 
     val tareasFrenos = listOf(
-        Tarea("Pastillas de Freno Delantero", "Revisar cada 5,000 km", Icons.Default.CarRepair, Color(0xFFEF4444), "Frenos"),
+        Tarea("Pastillas de Freno Delantero", "Revisar cada 5,000 km", Icons.Default.CarRepair, RojoError, "Frenos"),
         Tarea("Pastillas de Freno Trasero", "Revisar cada 5,000 km", Icons.Default.CarRepair, Color(0xFFDC2626), "Frenos"),
         Tarea("Líquido de Frenos", "Cambio cada 20,000 km", Icons.Default.Dangerous, Color(0xFFB91C1C), "Frenos"),
         Tarea("Discos de Freno", "Inspeccionar desgaste cada 10,000 km", Icons.Default.DiscFull, Color(0xFF991B1B), "Frenos")
@@ -92,7 +94,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
 
     val tareasElectrico = listOf(
         Tarea("Batería", "Revisar cada 6 meses", Icons.Default.BatteryStd, Color(0xFF84CC16), "Eléctrico"),
-        Tarea("Luces y Señalización", "Revisión mensual", Icons.Default.Lightbulb, Color(0xFFEAB308), "Eléctrico"),
+        Tarea("Luces y Señalización", "Revisión mensual", Icons.Default.Lightbulb, AmarilloAdvertencia, "Eléctrico"),
         Tarea("Centralita / ECU", "Diagnóstico anual", Icons.Default.Memory, Color(0xFFA3E635), "Eléctrico")
     )
 

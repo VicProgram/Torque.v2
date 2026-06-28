@@ -24,9 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 data class DashboardUiState(
     val motoPrincipal: MotoEntity? = null,
@@ -135,11 +133,11 @@ class TorqueDashboardViewModel(
                     repositorio.actualizarPorcentajeVida(ultimo.id, pct)
                 } else {
                     val tipo = TiposMantenimiento.desdeId(tipoId) ?: continue
-                    val now = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
+                    val now = FORMATO_COMPLETO.format(Date())
                     val nuevo = MantenimientoEntity(
                         idMoto = idMoto,
                         nombreMantenimiento = tipo.nombre,
-                        fecha = SimpleDateFormat(DateUtils.FORMATO_FECHA_VISUAL, Locale.getDefault()).format(Date()),
+                        fecha = FORMATO_VISUAL.format(Date()),
                         kms = 0,
                         intervaloKms = 0,
                         precio = "",
@@ -158,6 +156,9 @@ class TorqueDashboardViewModel(
     }
 
     companion object {
+        private val FORMATO_COMPLETO = java.text.SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, java.util.Locale.getDefault())
+        private val FORMATO_VISUAL = java.text.SimpleDateFormat(DateUtils.FORMATO_FECHA_VISUAL, java.util.Locale.getDefault())
+
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app = this[AndroidViewModelFactory.APPLICATION_KEY] as Application

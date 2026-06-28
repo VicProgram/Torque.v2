@@ -409,7 +409,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                 containerColor = ColoresTorque.SurfaceDark,
                 titleContentColor = Color.White,
                 textContentColor = Color.White,
-                icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFEF4444)) },
+                icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = ColoresTorque.RojoError) },
                 title = { Text(stringResource(R.string.dialog_delete_bike_title)) },
                 text = { Text(stringResource(R.string.dialog_delete_bike_message)) },
                 confirmButton = {
@@ -421,7 +421,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         }
                         mostrarDialogoEliminar = false
                     }) {
-                        Text(stringResource(R.string.btn_delete), color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
                     }
                 },
                 dismissButton = {
@@ -438,7 +438,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                 containerColor = ColoresTorque.SurfaceDark,
                 titleContentColor = Color.White,
                 textContentColor = Color.White,
-                icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFEF4444)) },
+                icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = ColoresTorque.RojoError) },
                 title = { Text(stringResource(R.string.dialog_delete_photo_title)) },
                 text = { Text(stringResource(R.string.action_irreversible)) },
                 confirmButton = {
@@ -450,7 +450,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         }
                         mostrarDialogoEliminarFoto = null
                     }) {
-                        Text(stringResource(R.string.btn_delete), color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
                     }
                 },
                 dismissButton = {

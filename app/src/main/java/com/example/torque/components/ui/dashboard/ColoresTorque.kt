@@ -100,6 +100,9 @@ object ColoresTorque {
     val SurfaceContainerLow = TorqueSurfaceContainerLow
     val Slate500 = TorqueSlate500
     val Slate900 = TorqueSlate900
+    val RojoError = com.example.torque.ui.theme.RojoError
+    val VerdeExito = com.example.torque.ui.theme.VerdeExito
+    val AmarilloAdvertencia = com.example.torque.ui.theme.AmarilloAdvertencia
 }
 
 // --- Navegación y Utilidad ---
@@ -238,39 +241,6 @@ fun BotonTorque(
     }
 }
 
-@Composable
-fun FiltroChip(
-    texto: String,
-    estaSeleccionado: Boolean,
-    onClick: () -> Unit = {},
-    forma: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp),
-    colorSeleccionado: Color = ColoresTorque.PrimaryContainer,
-    colorSeleccionadoContenido: Color = ColoresTorque.OnPrimaryContainer,
-    colorNoSeleccionadoFondo: Color = Color.Transparent,
-    colorNoSeleccionadoBorde: Color = ColoresTorque.Outline,
-    mostrarCheck: Boolean = false
-) {
-    val colorFondo = if (estaSeleccionado) colorSeleccionado else colorNoSeleccionadoFondo
-    val colorContenido = if (estaSeleccionado) colorSeleccionadoContenido else ColoresTorque.OnSurfaceVariant
-    val colorBorde = if (estaSeleccionado) Color.Transparent else colorNoSeleccionadoBorde
-
-    Box(
-        modifier = Modifier
-            .clip(forma)
-            .background(colorFondo)
-            .border(if (estaSeleccionado) 0.dp else 1.dp, colorBorde, forma)
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (estaSeleccionado && mostrarCheck) {
-                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = colorContenido)
-                Spacer(modifier = Modifier.width(6.dp))
-            }
-            Text(texto, color = colorContenido, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-        }
-    }
-}
 }
 
 @Composable

@@ -69,9 +69,9 @@ fun DialogoAjusteDesgaste(
                     wearTipos.forEach { tipo ->
                         val pct = porcentajes[tipo.id] ?: 100
                         val colorBarra = when {
-                            pct >= 70 -> Color(0xFF22C55E)
-                            pct >= 40 -> Color(0xFFEAB308)
-                            else -> Color(0xFFEF4444)
+                            pct >= 70 -> ColoresTorque.VerdeExito
+                            pct >= 40 -> ColoresTorque.AmarilloAdvertencia
+                            else -> ColoresTorque.RojoError
                         }
                         Column {
                             Row(

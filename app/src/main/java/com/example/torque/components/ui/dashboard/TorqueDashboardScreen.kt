@@ -361,7 +361,7 @@ fun CabeceraDashboard(
                     badge = {
                         if (notificacionesPendientes > 0) {
                             Badge(
-                                containerColor = Color(0xFFEF4444),
+                                containerColor = ColoresTorque.RojoError,
                                 contentColor = Color.White
                             ) {
                                 Text(
@@ -574,7 +574,7 @@ fun TarjetaProximoServicio(
                         if (kmRestantes != null) {
                             Text(
                                 text = if (kmRestantes < 0) stringResource(R.string.overdue) else kmRestantes.toString(),
-                                color = if (kmRestantes < 0) Color(0xFFEF4444) else ColoresTorque.Primary,
+                                color = if (kmRestantes < 0) ColoresTorque.RojoError else ColoresTorque.Primary,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Black
                             )
@@ -604,9 +604,9 @@ fun TarjetaProximoServicio(
                 }
                 val salud = resultadoSalud?.saludGlobal ?: 0
                 val colorSalud = when {
-                    salud >= 70 -> Color(0xFF22C55E)
-                    salud >= 40 -> Color(0xFFEAB308)
-                    else -> Color(0xFFEF4444)
+                    salud >= 70 -> ColoresTorque.VerdeExito
+                    salud >= 40 -> ColoresTorque.AmarilloAdvertencia
+                    else -> ColoresTorque.RojoError
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

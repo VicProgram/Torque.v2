@@ -63,7 +63,7 @@ fun DialogoNotificaciones(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     itemsNotificacion.forEach { detalle ->
                         val vencido = detalle.cumplimiento == 0
-                        val colorEstado = if (vencido) Color(0xFFEF4444) else Color(0xFFEAB308)
+                        val colorEstado = if (vencido) ColoresTorque.RojoError else ColoresTorque.AmarilloAdvertencia
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

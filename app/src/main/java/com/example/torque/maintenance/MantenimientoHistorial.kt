@@ -228,7 +228,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                         viewModel.eliminarMantenimiento(itemAEliminar!!)
                         itemAEliminar = null
                     }) {
-                        Text(stringResource(R.string.btn_delete), color = Color(0xFFEF4444))
+                        Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
                     }
                 },
                 dismissButton = {
@@ -289,7 +289,7 @@ fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit, onEliminar:
             Text("${item.kms} km", color = ColoresTorque.Outline, fontSize = 11.sp)
         }
         IconButton(onClick = onEliminar, modifier = Modifier.size(32.dp)) {
-            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_desc_delete), tint = Color(0xFFEF4444).copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_desc_delete), tint = ColoresTorque.RojoError.copy(alpha = 0.7f), modifier = Modifier.size(18.dp))
         }
     }
 }
