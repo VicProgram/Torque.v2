@@ -76,6 +76,8 @@ import com.example.torque.ui.theme.TorqueTertiary
 
 // Objeto para acceder a los colores desde otros archivos
 object ColoresTorque {
+    val ALTURA_CABECERA = 56.dp
+
     val Primary = TorquePrimary
     val Accent = TorqueAccent
     val OnPrimary = TorqueOnPrimary

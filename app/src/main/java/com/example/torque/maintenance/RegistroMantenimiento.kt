@@ -117,7 +117,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
+                    .height(ColoresTorque.ALTURA_CABECERA)
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

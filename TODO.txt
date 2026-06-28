@@ -1,2 +1,0 @@
-hacer que las fotos de la moto que esta como principal vayan cambiando cada x tiempo
-mejorar la galeria de fotos de la moto

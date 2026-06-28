@@ -234,7 +234,7 @@ fun CabeceraGaraje(onSearchToggle: () -> Unit = {}, mostrandoBusqueda: Boolean =
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(ColoresTorque.ALTURA_CABECERA)
             .background(ColoresTorque.Background.copy(alpha = 0.95f))
             .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
