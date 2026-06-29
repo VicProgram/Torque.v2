@@ -62,9 +62,14 @@ private suspend fun guardarMantenimiento(
     fechaActual: String,
     repositorio: RepositorioApp,
     contexto: android.content.Context,
-    porcentajeVida: Int = 100
+    porcentajeVida: Int = 100,
+    actualizarKmMoto: Boolean = false
 ) {
     try {
+        if (actualizarKmMoto) {
+            repositorio.actualizarKilometros(idMoto, kmNuevos)
+        }
+
         val tipoId = if (tareasSeleccionadas.size == 1)
             TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.id ?: 0L
         else 0L
@@ -145,13 +150,18 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
         }
 
         DialogoDescartar(mostrarDialogoDescartar, contexto) { mostrarDialogoDescartar = false }
-        DialogoActualizarKm(mostrarDialogoActualizarKm, kms, kmMotoActual) {
-            mostrarDialogoActualizarKm = false
-            scope.launch {
-                val kmNuevos = kms.toIntOrNull() ?: 0
-                guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
+        DialogoActualizarKm(
+            mostrar = mostrarDialogoActualizarKm,
+            kms = kms,
+            kmMotoActual = kmMotoActual,
+            onConfirm = { actualizarKm ->
+                mostrarDialogoActualizarKm = false
+                scope.launch {
+                    val kmNuevos = kms.toIntOrNull() ?: 0
+                    guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, actualizarKmMoto = actualizarKm)
+                }
             }
-        }
+        )
         BotonGuardarFormulario(idMoto, kms, contexto, repositorio) {
             errorKms = it.errorKms
             kmMotoActual = it.kmMotoActual
@@ -324,21 +334,21 @@ private fun DialogoDescartar(
 @Composable
 private fun DialogoActualizarKm(
     mostrar: Boolean, kms: String, kmMotoActual: Int,
-    onConfirm: () -> Unit
+    onConfirm: (actualizarKm: Boolean) -> Unit
 ) {
     if (mostrar) {
         AlertDialog(
-            onDismissRequest = onConfirm,
+            onDismissRequest = { onConfirm(false) },
             containerColor = ColoresTorque.SurfaceDark,
             title = { Text(stringResource(R.string.dialog_update_km_title)) },
             text = { Text(stringResource(R.string.dialog_update_km_message, kms, kmMotoActual)) },
             confirmButton = {
-                TextButton(onClick = onConfirm) {
+                TextButton(onClick = { onConfirm(true) }) {
                     Text(stringResource(R.string.btn_yes_update), color = ColoresTorque.Primary)
                 }
             },
             dismissButton = {
-                TextButton(onClick = onConfirm) {
+                TextButton(onClick = { onConfirm(false) }) {
                     Text(stringResource(R.string.btn_no), color = ColoresTorque.OnSurfaceVariant)
                 }
             }

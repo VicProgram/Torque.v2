@@ -98,6 +98,9 @@ class TorqueDashboardViewModel(
                 repositorio.obtenerMantenimientosPorMoto(idMoto).collect { mantenimientos ->
                     val moto = _uiState.value.motos.getOrNull(_uiState.value.selectedIndex)
                     if (moto != null) {
+                        val ultimo = mantenimientos.firstOrNull()
+                        updateDerivedState(ultimo)
+
                         val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros)
                         val pendientes = salud.desglose.count {
                             it.cumplimiento <= 20 && !it.tipo.esDesgaste

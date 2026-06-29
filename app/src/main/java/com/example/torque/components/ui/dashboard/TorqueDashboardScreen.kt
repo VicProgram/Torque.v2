@@ -696,13 +696,13 @@ fun TarjetaProximoServicio(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
-                        progress = { salud / 100f },
+                        progress = { if (salud <= 0) 0f else salud / 100f },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(8.dp)
                             .clip(CircleShape),
                         color = colorSalud,
-                        trackColor = Color.White.copy(alpha = 0.1f)
+                        trackColor = Color.Transparent
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
