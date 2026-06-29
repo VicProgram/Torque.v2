@@ -695,15 +695,21 @@ fun TarjetaProximoServicio(
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    LinearProgressIndicator(
-                        progress = { if (salud <= 0) 0f else salud / 100f },
+                    val progresoSalud = (salud.toFloat() / 100f).coerceIn(0f, 1f)
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(8.dp)
-                            .clip(CircleShape),
-                        color = colorSalud,
-                        trackColor = Color.Transparent
-                    )
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.1f))
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .fillMaxWidth(fraction = progresoSalud)
+                                .background(colorSalud)
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 BotonTorque(
