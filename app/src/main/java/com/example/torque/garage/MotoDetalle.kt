@@ -425,28 +425,4 @@ fun VistaMotoDetalle(idMoto: Long) {
     }
 }
 
-@Composable
-fun FilaDetalle(etiqueta: String, valor: String?, editable: Boolean = false, onClick: () -> Unit = {}) {
-    Row(
-        modifier = if (editable) Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-        else Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = etiqueta, color = ColoresTorque.OnSurfaceVariant, fontSize = 14.sp)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = valor ?: stringResource(R.string.not_available),
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
-            )
-            if (editable) {
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(Icons.Default.Edit, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(14.dp))
-            }
-        }
-    }
-}
 
