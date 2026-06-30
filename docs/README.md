@@ -10,18 +10,22 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 - Lleva el control del **cambio de aceite**, **filtros**, **cadena**, **neumáticos** y más
 - Recibe notificaciones cuando un mantenimiento está **próximo a vencer** o **vencido**
 - Consulta de un vistazo la **salud global** de tu moto (0–100%)
+- **Plan de mantenimiento** con todas las tareas recomendadas, su estado y próximos vencimientos
+- **Recordatorios de ITV y seguro** con avisos visuales en el panel
 
 ### 🏪 Para el taller
 - Gestiona el **garaje completo** con múltiples motos
-- Registra mantenimientos con **kilometraje**, **precio**, **tiempo** y **notas**
+- Registra mantenimientos con **kilometraje**, **precio**, **tiempo**, **notas** y **fotos/facturas adjuntas**
 - Ajusta el **desgaste de consumibles** con sliders intuitivos
 - Exporta e importa **copias de seguridad** completas (DB + fotos + preferencias)
+- **Exporta el historial a PDF** para entregar al cliente
 
 ### 👤 Para el propietario
 - Perfil con foto, nombre, email, teléfono y fecha de nacimiento
 - Carnets de conducir (AM, A1, A2, A)
 - **Modo oscuro** optimizado para uso en taller y carretera
 - **6 logos** seleccionables para personalizar la app
+- **Fechas ITV y Seguro** registradas por moto
 
 ---
 
@@ -36,6 +40,9 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 | **Control de desgaste** | Sliders para neumáticos, pastillas de freno y discos |
 | **Algoritmo de salud** | Cálculo ponderado (0–100%) basado en intervalos, peso y cumplimiento |
 | **Notificaciones** | Alertas locales cuando un mantenimiento está al 1–20% o vencido al 0% |
+| **Plan de Mantenimiento** | Vista completa de todas las tareas recomendadas con estado, cumplimiento y próximo vencimiento |
+| **ITV y Seguro** | Registro de fechas con indicadores visuales de vencimiento en el dashboard |
+| **Exportación a PDF** | Generación de PDF del historial de mantenimiento para entregar al cliente |
 | **Perfil de usuario** | Foto, nombre, email, teléfono, fecha de nacimiento y carnets |
 | **Backup completo** | Exportación/importación ZIP con DB + fotos + preferencias |
 | **Modo oscuro** | Tema oscuro nativo optimizado para taller |
@@ -107,22 +114,30 @@ Torque.v2/
 │       │       ├── MotoEntity.kt
 │       │       ├── MantenimientoEntity.kt
 │       │       ├── FotoEntity.kt
+│       │       ├── MantenimientoPlanEntity.kt
+│       │       ├── MotoItvEntity.kt
+│       │       ├── MotoSeguroEntity.kt
 │       │       └── dao/
 │       │           ├── MotoDao.kt
 │       │           ├── MantenimientoDao.kt
-│       │           └── FotoDao.kt
+│       │           ├── FotoDao.kt
+│       │           ├── MantenimientoPlanDao.kt
+│       │           └── DatosAnualesDao.kt
 │       ├── ajustes/
 │       │   └── AjustesRepository.kt
 │       └── utils/
 │           ├── SaludMotoCalculator.kt
 │           ├── BackupManager.kt
 │           ├── FileUtils.kt
-│           └── ContextUtils.kt
+│           ├── ContextUtils.kt
+│           └── PdfExporter.kt
 ├── app/                      # Módulo de UI
 │   └── src/main/java/.../
 │       ├── TorqueApp.kt
 │       ├── menuprincipal/
-│       ├── components/ui/dashboard/     # DashboardScreen + ViewModel + diálogos extraídos
+│       ├── pdf/                           # Exportación a PDF
+│       ├── plan/                          # Plan de mantenimiento
+│       ├── components/ui/dashboard/       # DashboardScreen + ViewModel + diálogos
 │       ├── garage/
 │       ├── maintenance/
 │       ├── perfil/
@@ -169,7 +184,7 @@ Torque.v2/
 # (incluidos en testDebugUnitTest)
 ```
 
-**Cobertura**: 61 tests unitarios + 9 tests de performance + 1 test instrumentado (71 en total).
+**Cobertura**: 78 tests de algoritmo de salud + 19 tests de plan de mantenimiento + 7 tests de exportación PDF + 9 tests de performance + 1 test de humo (114 unitarios) + 1 test instrumentado (115 en total).
 
 ---
 

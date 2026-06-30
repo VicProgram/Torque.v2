@@ -18,9 +18,13 @@
 14. [Testing](#14-testing)
 15. [Configuración del Build](#15-configuración-del-build)
 16. [CI/CD](#16-cicd)
-17. [Cómo Añadir un Nuevo Tipo de Mantenimiento](#17-cómo-añadir-un-nuevo-tipo-de-mantenimiento)
-18. [Cómo Añadir una Nueva Pantalla](#18-cómo-añadir-una-nueva-pantalla)
-19. [Convenciones de Código](#19-convenciones-de-código)
+17. [Plan de Mantenimiento](#17-plan-de-mantenimiento)
+18. [ITV y Seguro](#18-itv-y-seguro)
+19. [Exportación a PDF](#19-exportación-a-pdf)
+20. [Cómo Añadir un Nuevo Tipo de Mantenimiento](#20-cómo-añadir-un-nuevo-tipo-de-mantenimiento)
+21. [Cómo Añadir un Nuevo Elemento al Plan](#21-cómo-añadir-un-nuevo-elemento-al-plan)
+22. [Cómo Añadir una Nueva Pantalla](#22-cómo-añadir-una-nueva-pantalla)
+23. [Convenciones de Código](#23-convenciones-de-código)
 
 ---
 
@@ -93,21 +97,27 @@ Torque.v2/
 ├── data/                         # ← MÓDULO DATA
 │   └── src/main/java/com/example/torque/
 │       ├── room/
-│       │   ├── AppDatabase.kt    # Room DB v3, migrations, singleton
+│   │           ├── AppDatabase.kt    # Room DB v4, migrations, singleton
 │       │   ├── AppRepository.kt  # RepositorioApp: CRUD + flows
 │       │   └── entity/
-│       │       ├── MotoEntity.kt         # tabla: motos
-│       │       ├── MantenimientoEntity.kt # tabla: mantenimientos
-│       │       ├── FotoEntity.kt         # tabla: fotos_moto
+│       │       ├── MotoEntity.kt               # tabla: motos
+│       │       ├── MantenimientoEntity.kt       # tabla: mantenimientos
+│       │       ├── FotoEntity.kt               # tabla: fotos_moto
+│       │       ├── MantenimientoPlanEntity.kt   # tabla: plan_mantenimiento
+│       │       ├── MotoItvEntity.kt            # tabla: moto_itv
+│       │       ├── MotoSeguroEntity.kt         # tabla: moto_seguro
 │       │       └── dao/
 │       │           ├── MotoDao.kt
 │       │           ├── MantenimientoDao.kt
-│       │           └── FotoDao.kt
+│       │           ├── FotoDao.kt
+│       │           ├── MantenimientoPlanDao.kt
+│       │           └── DatosAnualesDao.kt      # ITV + Seguro
 │       ├── ajustes/
 │       │   └── AjustesRepository.kt # DataStore: notificaciones, dark mode, logo
 │       └── utils/
 │           ├── SaludMotoCalculator.kt # Algoritmo de salud
 │           ├── BackupManager.kt       # Export/import ZIP
+│           ├── PdfExporter.kt         # Exportación a PDF (iText 5)
 │           ├── FileUtils.kt           # Copia/compresión de imágenes
 │           └── ContextUtils.kt        # Extension: Activity.finish()
 │
@@ -118,6 +128,11 @@ Torque.v2/
 │       ├── TorqueApp.kt          # Application class (Sentry + Koin init)
 │       ├── menuprincipal/
 │       │   └── MenuPrincipal.kt  # Entry point, NavHost, splash screen
+│       ├── pdf/                           # Exportación a PDF
+│       │   └── PdfExportActivity.kt
+│       ├── plan/                          # Plan de mantenimiento
+│       │   ├── PlanMantenimientoScreen.kt
+│       │   └── PlanMantenimientoViewModel.kt
 │       ├── components/ui/dashboard/
 │       │   ├── ColoresTorque.kt              # Objeto de colores + componentes reutilizables
 │       │   ├── TorqueDashboardScreen.kt      # Dashboard (~550 líneas, usa ViewModel)
@@ -151,7 +166,7 @@ Torque.v2/
 │
 ├── app/src/test/.../
 │   ├── ExampleUnitTest.kt
-│   ├── SaludMotoCalculatorTest.kt        # 61 unit tests
+│   ├── SaludMotoCalculatorTest.kt        # 78 unit tests
 │   └── SaludMotoCalculatorPerformanceTest.kt # 9 performance tests
 │
 └── app/src/androidTest/.../
@@ -213,8 +228,9 @@ Constantes de formato:
 
 ```kotlin
 @Database(
-    entities = [MotoEntity::class, MantenimientoEntity::class, FotoEntity::class],
-    version = 3,
+    entities = [MotoEntity::class, MantenimientoEntity::class, FotoEntity::class,
+                MantenimientoPlanEntity::class, MotoItvEntity::class, MotoSeguroEntity::class],
+    version = 4,
     exportSchema = false
 )
 abstract class BaseDeDatosApp : RoomDatabase() { ... }
@@ -223,6 +239,7 @@ abstract class BaseDeDatosApp : RoomDatabase() { ... }
 **Migraciones**:
 - `MIGRACION_1_2`: Añade `tipoMantenimientoId` a `mantenimientos`
 - `MIGRACION_2_3`: Añade `porcentajeVida` a `mantenimientos`
+- `MIGRACION_3_4`: Crea `plan_mantenimiento`, `moto_itv`, `moto_seguro`
 
 **Singleton**: `obtenerInstancia(context)` con doble-check locking.
 **Reset**: `cerrarYReiniciar()` cierra la instancia y la setea a null (usado en restore).
@@ -234,6 +251,9 @@ abstract class BaseDeDatosApp : RoomDatabase() { ... }
 | `MotoEntity.kt` | `motos` | idMoto (PK), marca, modelo, anio, matricula, color, cilindrada, caballos, estilo, kilometros, fechaCompra, esPrincipal (0/1), uriFoto, creadoEn, actualizadoEn |
 | `MantenimientoEntity.kt` | `mantenimientos` | id (PK), idMoto, nombreMantenimiento, fecha, kms, intervaloKms, precio, tiempo, notas, tareas, creadoEn, tipoMantenimientoId, porcentajeVida (100 = nuevo) |
 | `FotoEntity.kt` | `fotos_moto` | id (PK), idMoto, ruta, creadoEn |
+| `MantenimientoPlanEntity.kt` | `plan_mantenimiento` | id (PK), idMoto, nombreTarea, categoria, intervaloKms, intervaloDias, ultimoCumplimientoKm, realizado (0/1) |
+| `MotoItvEntity.kt` | `moto_itv` | idMoto (PK, FK → motos), fechaItv, fechaRecordatorio |
+| `MotoSeguroEntity.kt` | `moto_seguro` | idMoto (PK, FK → motos), fechaSeguro, fechaRecordatorio |
 
 ### DAOs
 
@@ -260,6 +280,19 @@ abstract class BaseDeDatosApp : RoomDatabase() { ... }
 - `obtenerPorMotoFlow(idMoto)` → Flow por creadoEn DESC
 - `obtenerPorIdMoto(idMoto)` → List suspenso
 
+**`MantenimientoPlanDao`** — `data/src/main/java/.../room/entity/dao/MantenimientoPlanDao.kt`
+- `insertar`, `actualizar`, `eliminar`
+- `obtenerPorMotoFlow(idMoto)` → Flow<List<MantenimientoPlanEntity>>
+- `obtenerPorId(id)` → suspenso
+
+**`DatosAnualesDao`** — `data/src/main/java/.../room/entity/dao/DatosAnualesDao.kt`
+- `insertarOActualizarItv(idMoto, fechaItv, fechaRecordatorio)` — UPSERT
+- `obtenerItv(idMoto)` → MotoItvEntity?
+- `obtenerItvFlow(idMoto)` → Flow<MotoItvEntity?>
+- `insertarOActualizarSeguro(idMoto, fechaSeguro, fechaRecordatorio)` — UPSERT
+- `obtenerSeguro(idMoto)` → MotoSeguroEntity?
+- `obtenerSeguroFlow(idMoto)` → Flow<MotoSeguroEntity?>
+
 ### RepositorioApp — `data/src/main/java/.../room/AppRepository.kt`
 
 Singleton que encapsula todos los DAOs. Es la **única puerta de entrada** a datos desde la capa UI.
@@ -272,6 +305,9 @@ Métodos principales:
 - `actualizarKilometros()`, `obtenerUltimoMantenimiento()`, `obtenerUltimoMantenimientoPorTipo()`
 - `actualizarPorcentajeVida()`
 - `obtenerFotosPorMoto()` (Flow), `insertarFoto()`, `eliminarFoto()`
+- `obtenerPlanPorMotoFlow()` (Flow), `insertarTareaPlan()`, `actualizarTareaPlan()`, `eliminarTareaPlan()`
+- `obtenerItv()`, `obtenerItvFlow()`, `guardarItv()`
+- `obtenerSeguro()`, `obtenerSeguroFlow()`, `guardarSeguro()`
 - `cerrarBaseDeDatos()` — usado en backup restore
 
 **Manejo de errores**: Métodos de solo lectura tragan excepciones con `Log.e()`. Métodos críticos de escritura (`actualizarMoto`, `eliminarMoto`, `insertarMantenimiento`, `insertarFoto`, `eliminarFoto`) relanzan la excepción tras loguearla para que el llamante pueda reaccionar.
@@ -360,6 +396,8 @@ Incluye un **carrusel de motos** con `HorizontalPager` + indicador de puntos: pe
 - `resultadoSalud: ResultadoSalud?` — salud calculada
 - `motivosProximosVencidos: List<DetalleSalud>` — notificaciones pendientes
 - `porcentajesDesgaste: Map<Long, Int>` — desgaste de consumibles (key = tipoMantenimientoId)
+- `itv: MotoItvEntity?` — datos ITV de la moto actual
+- `seguro: MotoSeguroEntity?` — datos seguro de la moto actual
 - `cargando: Boolean` — estado inicial
 
 **ViewModel** (`TorqueDashboardViewModel.kt`):
@@ -447,7 +485,7 @@ Objeto que re-exporta los colores del tema + componentes reutilizables:
 
 **`OpcionesMantenimiento.kt`** — Menú intermedio:
 - Muestra la moto seleccionada
-- Dos opciones: "Nuevo Registro" → `RegistroMantenimiento`, "Ver Historial" → `MantenimientoHistorial`
+- Opciones: "Nuevo Registro" → `RegistroMantenimiento`, "Ver Historial" → `MantenimientoHistorial`, "Plan de Mantenimiento" → `PlanMantenimiento`
 
 **`MantenimientoHistorial.kt`** — Historial con ViewModel:
 - `MantenimientoHistorialViewModel`: AndroidViewModel con StateFlow
@@ -477,6 +515,13 @@ Objeto que re-exporta los colores del tema + componentes reutilizables:
 - Exportar copia de seguridad (`BackupManager.exportar` via `CreateDocument`)
 - Restaurar copia de seguridad (`BackupManager.restaurar` via `OpenDocument` + confirmación)
 - Post-restore: `finishAffinity()` para reiniciar la app
+- Exportar historial a PDF (lanzador hacia `PdfExportActivity`; ver [§19](#19-exportación-a-pdf))
+
+**Plan de Mantenimiento**: pantalla [`PlanMantenimiento`] (`app/src/main/java/.../plan/`) con ViewModel que itera `TiposMantenimiento.TODOS` y muestra estado de cada tarea (ver [§17](#17-plan-de-mantenimiento)).
+
+**ITV y Seguro**: se editan desde `MotoDetalle.kt` con DatePicker y se persisten en `moto_itv`/`moto_seguro` mediante `DatosAnualesDao`. El dashboard muestra indicadores de vencimiento visual (ver [§18](#18-itv-y-seguro)).
+
+**PDF Export**: `PdfExporter.kt` con `android.graphics.pdf.PdfDocument` (API nativa), lanzado desde `PdfExportActivity` via `CreateDocument` (ver [§19](#19-exportación-a-pdf)).
 
 ---
 
@@ -528,6 +573,34 @@ CREATE TABLE fotos_moto (
     ruta TEXT NOT NULL,
     creadoEn TEXT
 );
+
+-- Tabla: plan_mantenimiento
+CREATE TABLE plan_mantenimiento (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idMoto INTEGER NOT NULL,
+    nombreTarea TEXT NOT NULL,
+    categoria TEXT NOT NULL,
+    intervaloKms INTEGER NOT NULL DEFAULT 0,
+    intervaloDias INTEGER NOT NULL DEFAULT 0,
+    ultimoCumplimientoKm INTEGER NOT NULL DEFAULT 0,
+    realizado INTEGER NOT NULL DEFAULT 0
+);
+
+-- Tabla: moto_itv
+CREATE TABLE moto_itv (
+    idMoto INTEGER PRIMARY KEY,
+    fechaItv TEXT,
+    fechaRecordatorio TEXT,
+    FOREIGN KEY (idMoto) REFERENCES motos(idMoto) ON DELETE CASCADE
+);
+
+-- Tabla: moto_seguro
+CREATE TABLE moto_seguro (
+    idMoto INTEGER PRIMARY KEY,
+    fechaSeguro TEXT,
+    fechaRecordatorio TEXT,
+    FOREIGN KEY (idMoto) REFERENCES motos(idMoto) ON DELETE CASCADE
+);
 ```
 
 ### Singleton Pattern
@@ -547,6 +620,42 @@ companion object {
 
 - **v1 → v2**: `ALTER TABLE mantenimientos ADD COLUMN tipoMantenimientoId INTEGER NOT NULL DEFAULT 0`
 - **v2 → v3**: `ALTER TABLE mantenimientos ADD COLUMN porcentajeVida INTEGER NOT NULL DEFAULT 100`
+- **v3 → v4**: Creación de `plan_mantenimiento`, `moto_itv`, `moto_seguro`
+
+```kotlin
+val MIGRACION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE plan_mantenimiento (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                idMoto INTEGER NOT NULL,
+                nombreTarea TEXT NOT NULL,
+                categoria TEXT NOT NULL,
+                intervaloKms INTEGER NOT NULL DEFAULT 0,
+                intervaloDias INTEGER NOT NULL DEFAULT 0,
+                ultimoCumplimientoKm INTEGER NOT NULL DEFAULT 0,
+                realizado INTEGER NOT NULL DEFAULT 0
+            )
+        """)
+        db.execSQL("""
+            CREATE TABLE moto_itv (
+                idMoto INTEGER PRIMARY KEY,
+                fechaItv TEXT,
+                fechaRecordatorio TEXT,
+                FOREIGN KEY (idMoto) REFERENCES motos(idMoto) ON DELETE CASCADE
+            )
+        """)
+        db.execSQL("""
+            CREATE TABLE moto_seguro (
+                idMoto INTEGER PRIMARY KEY,
+                fechaSeguro TEXT,
+                fechaRecordatorio TEXT,
+                FOREIGN KEY (idMoto) REFERENCES motos(idMoto) ON DELETE CASCADE
+            )
+        """)
+    }
+}
+```
 
 ---
 
@@ -705,7 +814,9 @@ MenuPrincipal (Activity + NavHost)
 │   │   ├── → MotoDetalle (idMoto)
 │   │   │   ├── → AnadirMotoActivity (idMoto, editando=true)
 │   │   │   ├── → RegistroMantenimiento (idMoto)
-│   │   │   └── → MantenimientoHistorial (idMoto)
+│   │   │   ├── → MantenimientoHistorial (idMoto)
+│   │   │   ├── → PlanMantenimientoScreen (idMoto)
+│   │   │   └── → [Diálogo ITV/Seguro] (inline)
 │   │   └── → AnadirMotoActivity (nueva)
 │   ├── → OpcionesMantenimiento (idMoto opcional)
 │   │   ├── → RegistroMantenimiento (idMoto)
@@ -748,7 +859,7 @@ val appModule = module {
 
 **`ExampleUnitTest.kt`** — Placeholder.
 
-**`SaludMotoCalculatorTest.kt`** — 61 tests del algoritmo de salud:
+**`SaludMotoCalculatorTest.kt`** — 78 tests del algoritmo de salud:
 
 | # | Test | Verifica |
 |---|------|----------|
@@ -780,6 +891,48 @@ Para ejecutar:
 ```
 
 **`SaludMotoCalculatorPerformanceTest.kt`** — 9 tests de performance:
+
+### Tests de Plan de Mantenimiento
+
+**`PlanMantenimientoLogicTest.kt`** — 19 tests de lógica del plan de mantenimiento:
+
+| Test | Verifica |
+|------|----------|
+| Tarea sin registro | Estado SIN_DATOS, cumplimiento 100 |
+| Tarea recién hecha | Estado OK, cumplimiento 100 |
+| Tarea al 50% | Estado OK, cumplimiento 50 |
+| Tarea al 15% (próximo) | Estado PROXIMO |
+| Tarea al 5% (próximo) | Estado PROXIMO |
+| Tarea al 1% (próximo) | Estado PROXIMO |
+| Tarea vencida al 0% | Estado VENCIDO |
+| Tarea muy vencida | Estado VENCIDO |
+| Desgaste con 30% | Cumplimiento 30, OK |
+| Desgaste al 15% | Estado PROXIMO |
+| Desgaste al 0% | Estado VENCIDO |
+| Múltiples registros | Usa el de mayor kms |
+| Próximo km calculado | 5000 + 5000 = 10000 |
+| Sin intervalo km | No tiene próximoKm |
+| Desgaste sin próximoKm | Null |
+| Km actual menor que último | 100% cumplimiento |
+| Todos los tipos producen resultado válido | Cumplimiento 0-100 |
+| Tipo sin intervalo ni desgaste sin registro | SIN_DATOS |
+| Tipo sin intervalo con registro | OK, 100% |
+
+### Tests de Exportación PDF
+
+**`PdfExporterDataTest.kt`** — 7 tests de datos de exportación PDF:
+
+| Test | Verifica |
+|------|----------|
+| Próximo servicio con intervalo | Muestra km futuro (10000) |
+| Próximo servicio sin intervalo | Muestra "—" |
+| Fila con datos completos | Fecha, nombre, km, precio, próximo, notas |
+| Fila con nulos | Precio "—", notas vacío |
+| Fecha larga truncada | Solo 10 caracteres |
+| Resumen registros y gasto | 3 registros, 60.0€ |
+| Precios en diferentes formatos | "45€", "120,50€" → 165.5€ |
+
+### Tests Instrumentados
 
 | Test | Condición | Límite |
 |------|-----------|--------|
@@ -847,7 +1000,122 @@ Pipeline:
 
 ---
 
-## 17. Cómo Añadir un Nuevo Tipo de Mantenimiento
+## 17. Plan de Mantenimiento
+
+**Archivo UI**: `app/src/main/java/.../plan/PlanMantenimientoScreen.kt`
+**ViewModel**: `app/src/main/java/.../plan/PlanMantenimientoViewModel.kt`
+**Entidad**: `data/src/main/java/.../room/entity/MantenimientoPlanEntity.kt`
+**DAO**: `data/src/main/java/.../room/entity/dao/MantenimientoPlanDao.kt`
+
+### Entidad
+
+```kotlin
+@Entity(tableName = "plan_mantenimiento")
+data class MantenimientoPlanEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val idMoto: Long,
+    val nombreTarea: String,
+    val categoria: String,
+    val intervaloKms: Int = 0,
+    val intervaloDias: Int = 0,
+    val ultimoCumplimientoKm: Int = 0,
+    val realizado: Boolean = false
+)
+```
+
+### Funcionamiento
+
+- Cada moto tiene su propio plan con tareas predefinidas (insertadas al crear la moto)
+- Categorías: "Motor", "Transmisión", "Frenos", "Neumáticos", "Eléctrico", "Suspensión"
+- El usuario marca tareas como realizadas; al hacerlo se actualiza `ultimoCumplimientoKm` con los km actuales de la moto
+- El ViewModel filtra por categoría usando chips y expone `StateFlow<PlanUiState>`
+- El cómputo del próximo vencimiento se hace en UI: `proximoKm = ultimoCumplimientoKm + intervaloKms`
+
+### PlanUiState
+
+```kotlin
+data class PlanUiState(
+    val tareas: List<MantenimientoPlanEntity> = emptyList(),
+    val filtro: String = "Todo",
+    val kmActuales: Int = 0
+)
+```
+
+---
+
+## 18. ITV y Seguro
+
+**Entidades**: `data/src/main/java/.../room/entity/MotoItvEntity.kt`, `MotoSeguroEntity.kt`
+**DAO**: `data/src/main/java/.../room/entity/dao/DatosAnualesDao.kt`
+
+### Entidades
+
+```kotlin
+@Entity(tableName = "moto_itv")
+data class MotoItvEntity(
+    @PrimaryKey val idMoto: Long,
+    val fechaItv: String?,
+    val fechaRecordatorio: String?
+)
+
+@Entity(tableName = "moto_seguro")
+data class MotoSeguroEntity(
+    @PrimaryKey val idMoto: Long,
+    val fechaSeguro: String?,
+    val fechaRecordatorio: String?
+)
+```
+
+### Funcionamiento
+
+- Cada moto tiene **una fila** en cada tabla (PK = idMoto)
+- Las fechas se editan desde `MotoDetalle.kt` mediante un diálogo con `DatePicker`
+- `DatosAnualesDao` usa `INSERT OR REPLACE` (UPSERT) para guardar
+- El dashboard obtiene `MotoItvEntity` y `MotoSeguroEntity` vía Flow y muestra indicadores:
+  - Verde: al día (faltan +30 días)
+  - Amarillo: próximo a vencer (1-30 días)
+  - Rojo: vencido
+- `fechaRecordatorio` es un campo reservado para futuras notificaciones automáticas
+
+---
+
+## 19. Exportación a PDF
+
+**Archivo**: `data/src/main/java/.../utils/PdfExporter.kt`
+**Activity**: `app/src/main/java/.../pdf/PdfExportActivity.kt`
+
+### PdfExporter
+
+Usa la API nativa de Android `android.graphics.pdf.PdfDocument` (sin dependencias externas).
+
+```kotlin
+object PdfExporter {
+    fun exportarHistorial(
+        context: Context,
+        moto: MotoEntity,
+        mantenimientos: List<MantenimientoEntity>,
+        uri: Uri
+    )
+}
+```
+
+Genera un documento PDF con:
+1. **Cabecera**: texto "Torque - Historial de Mantenimiento" con la fecha de generación
+2. **Datos de la moto**: marca, modelo, año, matrícula, km actuales
+3. **Tabla de mantenimientos**: columnas Fecha, Tarea, Km, Intervalo, Precio, Tiempo, Notas
+4. **Resumen**: total de registros y total gastado (suma de precios)
+
+### PdfExportActivity
+
+- Recibe `idMoto` por Intent
+- Recupera la moto y sus mantenimientos del repositorio
+- Lanza `CreateDocument("application/pdf")` para que el usuario elija dónde guardar
+- Exporta usando `PdfExporter.exportarHistorial`
+- Muestra toast de éxito o error y finaliza
+
+---
+
+## 20. Cómo Añadir un Nuevo Tipo de Mantenimiento
 
 1. **Añadir a `TiposMantenimiento.kt`** — `core/src/main/java/.../utils/TiposMantenimiento.kt`
    - Agregar un nuevo `TipoMantenimiento(id, nombre, categoria, intervaloKms, intervaloDias, peso, esDesgaste)` a la lista `TODOS`
@@ -860,7 +1128,19 @@ Pipeline:
 
 ---
 
-## 18. Cómo Añadir una Nueva Pantalla
+## 21. Cómo Añadir un Nuevo Elemento al Plan
+
+1. **Añadir tarea por defecto** — en `PlanMantenimientoScreen.kt`, localiza la lista de tareas por defecto (función `tareasPorDefecto`) y agrega una nueva entrada:
+   ```kotlin
+   Triple("Nombre Tarea", "Categoría", intervaloKms)
+   ```
+2. **La categoría debe coincidir** con una existente ("Motor", "Transmisión", "Frenos", "Neumáticos", "Eléctrico", "Suspensión") para que el filtro funcione
+3. **No requiere migración DB** — las nuevas tareas se insertan al crear la moto
+4. Si se necesita añadir la tarea a motos existentes, agregar lógica en la migración o en un `OnCreate` callback
+
+---
+
+## 22. Cómo Añadir una Nueva Pantalla
 
 1. Crear el archivo en el paquete correspondiente dentro de `app/src/main/java/.../`
 2. Crear la clase `ComponentActivity` con `setContent { TorqueTheme { MiPantalla() } }`
@@ -875,7 +1155,7 @@ Pipeline:
 
 ---
 
-## 19. Convenciones de Código
+## 23. Convenciones de Código
 
 ### Estilo
 - Kotlin con nombres en español (el proyecto fue desarrollado para un público hispanohablante)

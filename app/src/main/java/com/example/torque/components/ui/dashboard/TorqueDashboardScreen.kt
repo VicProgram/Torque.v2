@@ -99,7 +99,7 @@ fun TorqueDashboardScreen(
         val moto = motoActual
         if (salud != null && moto != null) {
             val nombreMoto = moto.modelo.ifBlank { "Tu moto" }
-            NotificacionSalud.verificarYNotificar(contexto, salud, moto.kilometros, nombreMoto)
+            NotificacionSalud.verificarYNotificar(contexto, salud, nombreMoto)
         }
     }
 

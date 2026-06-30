@@ -55,27 +55,28 @@ object PdfExporter {
                 isFakeBoldText = true
             }
 
-            val paginaInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
-            val pagina = documento.startPage(paginaInfo)
-            val canvas: Canvas = pagina.canvas
+            var numeroPagina = 1
+            val paginaInfo = PdfDocument.PageInfo.Builder(595, 842, numeroPagina).create()
+            var paginaActual = documento.startPage(paginaInfo)
+            var canvasActual: Canvas = paginaActual.canvas
 
             var y = 40f
             val margen = 40f
             val anchoPagina = 515f
 
-            canvas.drawText("Historial de Mantenimiento", margen, y, pinturaTitulo)
+            canvasActual.drawText("Historial de Mantenimiento", margen, y, pinturaTitulo)
             y += 30f
-            canvas.drawText("${moto.marca} ${moto.modelo} · ${moto.kilometros} km", margen, y, pinturaSubtitulo)
+            canvasActual.drawText("${moto.marca} ${moto.modelo} · ${moto.kilometros} km", margen, y, pinturaSubtitulo)
             y += 20f
-            canvas.drawText("Matrícula: ${moto.matricula}", margen, y, pinturaSubtitulo)
+            canvasActual.drawText("Matrícula: ${moto.matricula}", margen, y, pinturaSubtitulo)
             y += 25f
 
             if (resultadoSalud != null) {
-                canvas.drawText("Salud de la moto: ${resultadoSalud.saludGlobal}%", margen, y, pinturaSalud)
+                canvasActual.drawText("Salud de la moto: ${resultadoSalud.saludGlobal}%", margen, y, pinturaSalud)
                 y += 30f
             }
 
-            canvas.drawLine(margen, y, margen + anchoPagina, y, pinturaLinea)
+            canvasActual.drawLine(margen, y, margen + anchoPagina, y, pinturaLinea)
             y += 15f
 
             val columnas = listOf(
@@ -87,15 +88,24 @@ object PdfExporter {
                 Columna("Notas", 115f)
             )
 
-            canvas.drawRect(margen, y - 5f, margen + anchoPagina, y + 18f, pinturaFondoEncabezado)
+            canvasActual.drawRect(margen, y - 5f, margen + anchoPagina, y + 18f, pinturaFondoEncabezado)
             var x = margen
             for (col in columnas) {
-                canvas.drawText(col.nombre, x + 4f, y + 12f, pinturaEncabezado)
+                canvasActual.drawText(col.nombre, x + 4f, y + 12f, pinturaEncabezado)
                 x += col.ancho
             }
             y += 28f
 
             for (m in mantenimientos) {
+                if (y > 800f) {
+                    documento.finishPage(paginaActual)
+                    numeroPagina++
+                    val nuevaPaginaInfo = PdfDocument.PageInfo.Builder(595, 842, numeroPagina).create()
+                    paginaActual = documento.startPage(nuevaPaginaInfo)
+                    canvasActual = paginaActual.canvas
+                    y = 40f
+                }
+
                 val proxServicio = if (m.intervaloKms > 0) "${m.kms + m.intervaloKms}" else "—"
                 val fila = listOf(
                     m.fecha.take(10),
@@ -112,21 +122,13 @@ object PdfExporter {
                     val textoRecortado = if (pinturaTexto.measureText(texto) > anchoCol - 4f)
                         texto.take(15) + "…"
                     else texto
-                    canvas.drawText(textoRecortado, x + 4f, y + 10f, pinturaTexto)
+                    canvasActual.drawText(textoRecortado, x + 4f, y + 10f, pinturaTexto)
                     x += anchoCol
                 }
                 y += 20f
-
-                if (y > 800f) {
-                    documento.finishPage(pagina)
-                    val pagina2Info = PdfDocument.PageInfo.Builder(595, 842, 2).create()
-                    val pagina2 = documento.startPage(pagina2Info)
-                    val canvas2: Canvas = pagina2.canvas
-                    y = 40f
-                }
             }
 
-            documento.finishPage(pagina)
+            documento.finishPage(paginaActual)
 
             val cacheDir = File(contexto.cacheDir, "pdf_temp")
             cacheDir.mkdirs()

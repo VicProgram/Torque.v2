@@ -202,17 +202,17 @@ fun PerfilScreen(onBack: () -> Unit) {
                         CampoTextoTorque(value = editFecha, onValueChange = { editFecha = it }, label = "Fecha nacimiento (YYYY-MM-DD)")
                     } else {
                         if (nombre.isNullOrBlank().not()) {
-                            Text(text = nombre!!, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                            Text(text = nombre ?: "", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                         if (email.isNullOrBlank().not()) {
-                            FilaPerfil(Icons.Default.Email, email!!)
+                            FilaPerfil(Icons.Default.Email, email ?: "")
                         }
                         if (telefono.isNullOrBlank().not()) {
-                            FilaPerfil(Icons.Default.Phone, telefono!!)
+                            FilaPerfil(Icons.Default.Phone, telefono ?: "")
                         }
                         if (fechaNacimiento.isNullOrBlank().not()) {
-                            FilaPerfil(Icons.Default.CalendarMonth, fechaNacimiento!!)
+                            FilaPerfil(Icons.Default.CalendarMonth, fechaNacimiento ?: "")
                         }
                     }
                 }

@@ -19,6 +19,9 @@ interface FotoMantenimientoDao {
     @Query("SELECT * FROM fotos_mantenimiento WHERE idMantenimiento = :idMantenimiento")
     suspend fun obtenerPorMantenimiento(idMantenimiento: Long): List<FotoMantenimientoEntity>
 
+    @Query("SELECT * FROM fotos_mantenimiento WHERE idMantenimiento IN (:ids) ORDER BY idMantenimiento, creadoEn DESC")
+    suspend fun obtenerPorIdsMantenimiento(ids: List<Long>): List<FotoMantenimientoEntity>
+
     @Delete
     suspend fun eliminar(foto: FotoMantenimientoEntity)
 }

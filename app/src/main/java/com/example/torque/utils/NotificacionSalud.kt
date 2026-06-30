@@ -37,7 +37,6 @@ object NotificacionSalud {
     suspend fun verificarYNotificar(
         contexto: Context,
         resultadoSalud: ResultadoSalud,
-        @Suppress("UNUSED_PARAMETER") kmActuales: Int,
         motoNombre: String
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

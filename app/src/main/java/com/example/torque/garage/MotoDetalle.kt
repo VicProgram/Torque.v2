@@ -42,7 +42,9 @@ import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
 import com.example.torque.utils.DateUtils
 import com.example.torque.utils.terminar
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -119,6 +121,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                 CircularProgressIndicator(color = ColoresTorque.Primary)
             }
         } else {
+            val m = requireNotNull(moto)
             Column(modifier = Modifier.fillMaxSize()) {
                 // --- Cabecera (Compacta) ---
                 Row(
@@ -137,12 +140,12 @@ fun VistaMotoDetalle(idMoto: Long) {
                     )
                 }
                 Text(
-                    text = moto!!.modelo,
+                    text = m.modelo,
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    if (moto!!.esPrincipal == 1) {
+                    if (m.esPrincipal == 1) {
                         Spacer(modifier = Modifier.width(6.dp))
                         Icon(
                             Icons.Default.Star,
@@ -333,17 +336,18 @@ fun VistaMotoDetalle(idMoto: Long) {
                             letterSpacing = 1.sp
                         )
 
-                        FilaDetalle(stringResource(R.string.label_brand), moto!!.marca)
-                        FilaDetalle(stringResource(R.string.label_year), moto!!.anio.toString())
-                        FilaDetalle(stringResource(R.string.label_plate), moto!!.matricula ?: stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_displacement), moto!!.cilindrada ?: stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_power), if (moto!!.caballos != null) stringResource(R.string.power_cv_format, moto!!.caballos!!) else stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_kilometers), "${moto!!.kilometros} km", editable = true, onClick = {
+                        FilaDetalle(stringResource(R.string.label_brand), m.marca)
+                        FilaDetalle(stringResource(R.string.label_year), m.anio.toString())
+                        FilaDetalle(stringResource(R.string.label_plate), m.matricula ?: stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_displacement), m.cilindrada ?: stringResource(R.string.not_available))
+                        val caballos = m.caballos
+                        FilaDetalle(stringResource(R.string.label_power), if (caballos != null) stringResource(R.string.power_cv_format, caballos) else stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_kilometers), "${m.kilometros} km", editable = true, onClick = {
                             mostrarDialogoKm = true
                         })
-                        FilaDetalle("ITV", moto!!.fechaItv ?: stringResource(R.string.not_available))
-                        FilaDetalle("Seguro", moto!!.fechaSeguro ?: stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_style), moto!!.estilo ?: stringResource(R.string.not_available))
+                        FilaDetalle("ITV", m.fechaItv ?: stringResource(R.string.not_available))
+                        FilaDetalle("Seguro", m.fechaSeguro ?: stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_style), m.estilo ?: stringResource(R.string.not_available))
                     }
 
                     // --- Fila de Fotos ---
@@ -376,31 +380,33 @@ fun VistaMotoDetalle(idMoto: Long) {
             }
         }
 
-        if (mostrarDialogoKm) {
-            DialogoActualizarKm(
-                kmInicial = moto!!.kilometros,
-                onGuardar = { km ->
-                    scope.launch {
-                        repositorio.actualizarKilometros(idMoto, km)
-                        moto = repositorio.obtenerMotoPorId(idMoto)
-                    }
-                },
-                onDismiss = { mostrarDialogoKm = false }
-            )
-        }
+        moto?.let { m2 ->
+            if (mostrarDialogoKm) {
+                DialogoActualizarKm(
+                    kmInicial = m2.kilometros,
+                    onGuardar = { km ->
+                        scope.launch {
+                            repositorio.actualizarKilometros(idMoto, km)
+                            moto = repositorio.obtenerMotoPorId(idMoto)
+                        }
+                    },
+                    onDismiss = { mostrarDialogoKm = false }
+                )
+            }
 
-        if (mostrarDialogoEliminar) {
-            DialogoEliminarMoto(
-                onConfirmar = {
-                    scope.launch {
-                        repositorio.eliminarMoto(moto!!)
-                        (contexto as? Activity)?.setResult(Activity.RESULT_OK)
-                        (contexto as? Activity)?.terminar()
-                    }
-                    mostrarDialogoEliminar = false
-                },
-                onDismiss = { mostrarDialogoEliminar = false }
-            )
+            if (mostrarDialogoEliminar) {
+                DialogoEliminarMoto(
+                    onConfirmar = {
+                        scope.launch {
+                            repositorio.eliminarMoto(m2)
+                            (contexto as? Activity)?.setResult(Activity.RESULT_OK)
+                            (contexto as? Activity)?.terminar()
+                        }
+                        mostrarDialogoEliminar = false
+                    },
+                    onDismiss = { mostrarDialogoEliminar = false }
+                )
+            }
         }
 
         mostrarDialogoEliminarFoto?.let { foto ->
@@ -408,7 +414,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                 onConfirmar = {
                     scope.launch {
                         repositorio.eliminarFoto(foto)
-                        File(foto.ruta).delete()
+                        withContext(Dispatchers.IO) { File(foto.ruta).delete() }
                         Toast.makeText(contexto, contexto.getString(R.string.toast_photo_deleted), Toast.LENGTH_SHORT).show()
                     }
                     mostrarDialogoEliminarFoto = null

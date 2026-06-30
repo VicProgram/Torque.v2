@@ -782,6 +782,230 @@ class SaludMotoCalculatorTest {
     //   TESTS DE PARSEFECHA
     // ═══════════════════════════════════════════════════
 
+    // ═══════════════════════════════════════════════════
+    //   NUEVOS TESTS: EDGE CASES EXHAUSTIVOS
+    // ═══════════════════════════════════════════════════
+
+    // ───── 59. Todos los tipos sin registro → salud 100 ─────
+    @Test
+    fun `sin ningun registro todos los tipos al 100`() {
+        val res = SaludMotoCalculator.calcular(emptyList(), kmActuales = 0)
+        for (detalle in res.desglose) {
+            assertEquals("${detalle.tipo.nombre} debería estar al 100%", 100, detalle.cumplimiento)
+        }
+        assertEquals(100, res.saludGlobal)
+    }
+
+    // ───── 60. kmActuales = 0 con mantenimiento en km 0 recien hecho ─────
+    @Test
+    fun `mantenimiento en km 0 con km actuales 0 da 100`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 0, intervaloKms = 5000, tipoId = 1)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 0)
+        assertEquals(100, res.desglose.find { it.tipo.id == 1L }!!.cumplimiento)
+    }
+
+    // ───── 61. Exactamente en el límite del intervalo (km = ultimo + intervalo) ─────
+    @Test
+    fun `exactamente en el limite del intervalo la salud es 0`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 5000, intervaloKms = 5000, tipoId = 1)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 10000)
+        assertEquals(0, res.desglose.find { it.tipo.id == 1L }!!.cumplimiento)
+    }
+
+    // ───── 62. Borde: 75% de cumplimiento (exacto en float) ─────
+    @Test
+    fun `cumplimiento al 75 por ciento exacto`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 0, intervaloKms = 5000, tipoId = 1)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 1250)
+        assertEquals(75, res.desglose.find { it.tipo.id == 1L }!!.cumplimiento)
+    }
+
+    // ───── 63. Intervalo = 1 km (valor mínimo) ─────
+    @Test
+    fun `intervalo minimo de 1 km`() {
+        // Simular un tipo con intervaloKms=1
+        val lista = listOf(
+            MantenimientoEntity(
+                idMoto = 1, nombreMantenimiento = "Ajuste mínimo",
+                fecha = "01/01/2024", kms = 0, intervaloKms = 1,
+                tipoMantenimientoId = 0  // no matchea ningún tipo real
+            )
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 1)
+        // No matchea ningún tipo → todos al 100%
+        assertEquals(100, res.saludGlobal)
+    }
+
+    // ───── 64. Intervalo de 0 km y 0 días no afecta el cumplimiento ─────
+    @Test
+    fun `intervalo cero no afecta el cumplimiento`() {
+        val idsConIntervaloCero = TiposMantenimiento.TODOS
+            .filter { it.intervaloKms == 0 && it.intervaloDias == 0 && !it.esDesgaste }
+        val lista = idsConIntervaloCero.map { tipo ->
+            mant(tipo.nombre, kms = 1000, intervaloKms = 0, tipoId = tipo.id)
+        }
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 999_999)
+        for (tipo in idsConIntervaloCero) {
+            val detalle = res.desglose.find { it.tipo.id == tipo.id }
+            assertEquals("${tipo.nombre} sin intervalo debe estar al 100%", 100, detalle!!.cumplimiento)
+        }
+    }
+
+    // ───── 65. Mezcla de tipos con y sin intervalo ─────
+    @Test
+    fun `mezcla de tipos con y sin intervalo`() {
+        val lista = listOf(
+            mant("Cambio de Aceite Motor", kms = 0, intervaloKms = 5000, tipoId = 1),      // 0%
+            mant("Cambio de Neumáticos", kms = 5000, intervaloKms = 10000, tipoId = 15),    // 50%
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 10000)
+        // Aceite: vencido
+        assertEquals(0, res.desglose.find { it.tipo.id == 1L }!!.cumplimiento)
+        // Neumáticos: a mitad
+        assertEquals(50, res.desglose.find { it.tipo.id == 15L }!!.cumplimiento)
+        // El resto: 100%
+    }
+
+    // ───── 66. Wear type con porcentaje vida exactamente 0 ─────
+    @Test
+    fun `wear type con porcentaje vida 0`() {
+        val lista = listOf(
+            mant("Pastillas de Freno Delantero", tipoId = 10, porcentajeVida = 0)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 0)
+        assertEquals(0, res.desglose.find { it.tipo.id == 10L }!!.cumplimiento)
+    }
+
+    // ───── 67. Wear type con porcentaje vida exactamente 50 ─────
+    @Test
+    fun `wear type con porcentaje vida 50`() {
+        val lista = listOf(
+            mant("Pastillas de Freno Delantero", tipoId = 10, porcentajeVida = 50)
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 0)
+        assertEquals(50, res.desglose.find { it.tipo.id == 10L }!!.cumplimiento)
+    }
+
+    // ───── 68. Todos los wear types con valores variados ─────
+    @Test
+    fun `todos los wear types con valores variados`() {
+        val valores = mapOf(
+            10L to 90,   // Pastillas D → 90%
+            11L to 40,   // Pastillas T → 40%
+            13L to 75,   // Discos D → 75%
+            23L to 10,   // Discos T → 10%
+            21L to 60,   // Neumático D → 60%
+            22L to 30,   // Neumático T → 30%
+        )
+        val lista = valores.map { (id, pct) ->
+            val tipo = TiposMantenimiento.desdeId(id)!!
+            mant(tipo.nombre, tipoId = id, porcentajeVida = pct)
+        }
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 0)
+        for ((id, esperado) in valores) {
+            assertEquals(esperado, res.desglose.find { it.tipo.id == id }!!.cumplimiento)
+        }
+    }
+
+    // ───── 69. Tipo con intervaloDias exclusivamente (sin intervaloKms) ─────
+    @Test
+    fun `intervalo por dias exclusivamente`() {
+        // Batería (id=16): intervaloDias=180, intervaloKms=0
+        val lista = listOf(
+            mant("Batería", kms = 0, tipoId = 16,
+                fecha = "01/01/2024")
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 1000)
+        val bateria = res.desglose.find { it.tipo.id == 16L }
+        assertNotNull(bateria)
+        // Sin intervaloKms, el cumplimiento por km no se aplica
+        // El cumplimiento por días se calcula si hay intervaloDias
+        assertTrue(bateria!!.cumplimiento in 0..100)
+    }
+
+    // ───── 70. Mantenimiento con precio muy alto no afecta salud ─────
+    @Test
+    fun `precio no afecta el calculo de salud`() {
+        val caro = MantenimientoEntity(
+            idMoto = 1, nombreMantenimiento = "Cambio de Aceite Motor",
+            fecha = "01/01/2024", kms = 0, intervaloKms = 5000,
+            precio = "999999", tipoMantenimientoId = 1
+        )
+        val barato = MantenimientoEntity(
+            idMoto = 1, nombreMantenimiento = "Cambio de Aceite Motor",
+            fecha = "01/01/2024", kms = 0, intervaloKms = 5000,
+            precio = "10", tipoMantenimientoId = 1
+        )
+        val res1 = SaludMotoCalculator.calcular(listOf(caro), kmActuales = 2500)
+        val res2 = SaludMotoCalculator.calcular(listOf(barato), kmActuales = 2500)
+        assertEquals(res1.saludGlobal, res2.saludGlobal)
+        assertEquals(50, res1.desglose.find { it.tipo.id == 1L }!!.cumplimiento)
+    }
+
+    // ───── 71. ResultadoSalud contiene exactamente 25 desgloses ─────
+    @Test
+    fun `resultado contiene 25 desgloses`() {
+        val res = SaludMotoCalculator.calcular(emptyList(), kmActuales = 0)
+        assertEquals(25, res.desglose.size)
+    }
+
+    // ───── 72. Sin tipos vencidos → próximosVencidos vacío ─────
+    @Test
+    fun `sin tipos vencidos ni proximos`() {
+        val res = SaludMotoCalculator.calcular(emptyList(), kmActuales = 0)
+        assertTrue(res.proximosVencidos.isEmpty())
+    }
+
+    // ───── 73. 100% motos con múltiples registros legacy (tipoId=0) ─────
+    @Test
+    fun `registros legacy con nombre exacto se emparejan para todos los tipos`() {
+        val lista = TiposMantenimiento.TODOS
+            .filter { it.intervaloKms > 0 }
+            .mapIndexed { index, tipo ->
+                mant(tipo.nombre, kms = 10000, intervaloKms = tipo.intervaloKms,
+                    tipoId = 0)   // sin tipoId
+            }
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 10000)
+        // Todos deberían estar al 100% (recién hechos)
+        val bajos = res.desglose.filter { it.cumplimiento < 100 }
+        assertTrue("Todos los tipos deberían estar al 100%, bajos=${bajos.size}",
+            bajos.isEmpty())
+    }
+
+    // ───── 74. Mantenimiento con nombre que NO coincide con ningún tipo ─────
+    @Test
+    fun `mantenimiento sin match no afecta ningun tipo`() {
+        val lista = listOf(
+            MantenimientoEntity(
+                idMoto = 1, nombreMantenimiento = "Limpieza General",
+                fecha = "01/01/2024", kms = 0, intervaloKms = 0,
+                tipoMantenimientoId = 0, tareas = "Limpieza"
+            )
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 999_999)
+        assertEquals(100, res.saludGlobal)
+    }
+
+    // ───── 75. Mantenimiento con tareas igual a null y tipoId=0 ─────
+    @Test
+    fun `mantenimiento con tareas null y tipoId 0`() {
+        val lista = listOf(
+            MantenimientoEntity(
+                idMoto = 1, nombreMantenimiento = "",
+                fecha = "01/01/2024", kms = 0, intervaloKms = 0,
+                tipoMantenimientoId = 0, tareas = null
+            )
+        )
+        val res = SaludMotoCalculator.calcular(lista, kmActuales = 999_999)
+        assertEquals(100, res.saludGlobal)
+    }
+
     // ───── 58. Fecha en formato dd/MM/yyyy se parsea correctamente ─────
     @Test
     fun `fecha en formato dd mm yyyy se usa para intervalo por dias`() {

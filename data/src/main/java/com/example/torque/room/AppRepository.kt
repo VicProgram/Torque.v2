@@ -144,6 +144,8 @@ open class RepositorioApp(private val db: BaseDeDatosApp) {
 
     open suspend fun obtenerFotosPorMantenimientoList(idMantenimiento: Long) = db.fotoMantenimientoDao().obtenerPorMantenimiento(idMantenimiento)
 
+    open suspend fun obtenerFotosPorMantenimientoBatch(ids: List<Long>) = db.fotoMantenimientoDao().obtenerPorIdsMantenimiento(ids)
+
     suspend fun insertarFotoMantenimiento(foto: FotoMantenimientoEntity) = try {
         db.fotoMantenimientoDao().insertar(foto)
     } catch (e: Exception) {

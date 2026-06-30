@@ -63,9 +63,12 @@ import com.example.torque.utils.SaludMotoCalculator
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MantenimientoHistorialViewModel(application: Application) : AndroidViewModel(application) {
     private val repositorio = RepositorioApp.obtenerInstancia(application)
@@ -76,8 +79,11 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
     private val _fotosPorMantenimiento = MutableStateFlow<Map<Long, List<FotoMantenimientoEntity>>>(emptyMap())
     val fotosPorMantenimiento: StateFlow<Map<Long, List<FotoMantenimientoEntity>>> = _fotosPorMantenimiento
 
+    private var historialJob: Job? = null
+
     fun cargarHistorial(idMoto: Long? = null) {
-        viewModelScope.launch {
+        historialJob?.cancel()
+        historialJob = viewModelScope.launch {
             if (idMoto != null) {
                 repositorio.obtenerMantenimientosPorMoto(idMoto).collect { lista ->
                     _historial.value = lista
@@ -90,10 +96,13 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
     }
 
     private suspend fun cargarFotos(mantenimientos: List<MantenimientoEntity>) {
-        val mapa = mutableMapOf<Long, List<FotoMantenimientoEntity>>()
-        for (m in mantenimientos) {
-            mapa[m.id] = repositorio.obtenerFotosPorMantenimientoList(m.id)
+        if (mantenimientos.isEmpty()) {
+            _fotosPorMantenimiento.value = emptyMap()
+            return
         }
+        val ids = mantenimientos.map { it.id }
+        val todas = repositorio.obtenerFotosPorMantenimientoBatch(ids)
+        val mapa = todas.groupBy { it.idMantenimiento }
         _fotosPorMantenimiento.value = mapa
     }
 
@@ -116,21 +125,22 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
 
     suspend fun eliminarFoto(foto: FotoMantenimientoEntity) {
         repositorio.eliminarFotoMantenimiento(foto)
-        File(foto.ruta).delete()
+        withContext(Dispatchers.IO) { File(foto.ruta).delete() }
         cargarHistorial(_historial.value.firstOrNull()?.idMoto)
     }
 
     fun eliminarMantenimiento(mantenimiento: MantenimientoEntity) {
         viewModelScope.launch {
             repositorio.eliminarMantenimiento(mantenimiento)
+            cargarHistorial(_historial.value.firstOrNull()?.idMoto)
         }
     }
 
-    suspend fun exportarPdf(contexto: android.content.Context, uri: Uri, idMoto: Long) {
-        val moto = repositorio.obtenerMotoPorId(idMoto) ?: return
+    suspend fun exportarPdf(contexto: android.content.Context, uri: Uri, idMoto: Long): Result<Unit> {
+        val moto = repositorio.obtenerMotoPorId(idMoto) ?: return Result.failure(Exception("Moto no encontrada"))
         val mantenimientos = repositorio.obtenerTodosMantenimientosPorMoto(idMoto)
         val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros)
-        PdfExporter.exportarHistorial(contexto, uri, moto, mantenimientos, salud)
+        return PdfExporter.exportarHistorial(contexto, uri, moto, mantenimientos, salud)
     }
 }
 
@@ -162,7 +172,10 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
         uri?.let {
             viewModel.viewModelScope.launch {
                 exportandoPdf = true
-                idMoto?.let { id -> viewModel.exportarPdf(contexto, it, id) }
+                val resultado = idMoto?.let { id -> viewModel.exportarPdf(contexto, it, id) }
+                if (resultado?.isFailure == true) {
+                    android.widget.Toast.makeText(contexto, "Error al exportar PDF: ${resultado.exceptionOrNull()?.message}", android.widget.Toast.LENGTH_LONG).show()
+                }
                 exportandoPdf = false
             }
         }
@@ -181,8 +194,8 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
         }
     }
 
-    if (itemSeleccionado != null) {
-        val fotos = fotosPorMantenimiento[itemSeleccionado!!.id] ?: emptyList()
+    itemSeleccionado?.let { sel ->
+        val fotos = fotosPorMantenimiento[sel.id] ?: emptyList()
         Dialog(onDismissRequest = { itemSeleccionado = null }) {
             Card(
                 modifier = Modifier
@@ -192,17 +205,17 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark)
             ) {
                 DetalleMantenimientoEntityScreen(
-                    mantenimiento = itemSeleccionado!!,
+                    mantenimiento = sel,
                     fotos = fotos,
                     onBack = { itemSeleccionado = null },
                     onAddFoto = { uri ->
                         viewModel.viewModelScope.launch {
-                            viewModel.agregarFoto(itemSeleccionado!!.id, uri)
+                            viewModel.agregarFoto(sel.id, uri)
                         }
                     },
                     onAddFactura = { uri ->
                         viewModel.viewModelScope.launch {
-                            viewModel.agregarFoto(itemSeleccionado!!.id, uri, "factura")
+                            viewModel.agregarFoto(sel.id, uri, "factura")
                         }
                     },
                     onDeleteFoto = { foto ->
@@ -324,7 +337,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
             Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add))
         }
 
-        if (itemAEliminar != null) {
+        itemAEliminar?.let { elim ->
             AlertDialog(
                 onDismissRequest = { itemAEliminar = null },
                 containerColor = ColoresTorque.SurfaceDark,
@@ -332,7 +345,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 text = { Text(stringResource(R.string.action_irreversible)) },
                 confirmButton = {
                     TextButton(onClick = {
-                        viewModel.eliminarMantenimiento(itemAEliminar!!)
+                        viewModel.eliminarMantenimiento(elim)
                         itemAEliminar = null
                     }) {
                         Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
