@@ -3,7 +3,7 @@ package com.example.torque.garage
 import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
+import com.example.torque.base.BaseActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AnadirMotoActivity : ComponentActivity() {
+class AnadirMotoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

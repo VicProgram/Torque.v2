@@ -1,7 +1,7 @@
 package com.example.torque.garage
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import com.example.torque.base.BaseActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
@@ -41,7 +41,7 @@ import com.example.torque.ui.theme.TorqueTheme
 import android.content.Intent
 import com.example.torque.garage.AnadirMotoActivity
 
-class ListaGaraje : ComponentActivity() {
+class ListaGaraje : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
