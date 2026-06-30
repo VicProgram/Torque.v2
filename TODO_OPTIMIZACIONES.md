@@ -69,9 +69,15 @@
 | Archivos > 400 líneas | 4 (763, 678, 426, 400) | 🔴 Mantenibilidad |
 | `!!` en producción | 17 (11+4+2) | 🔴 Crash risk |
 | Strings hardcoded | ~50+ en 8+ archivos | 🟡 i18n |
-| Funciones > 50 líneas | ~14 composables | 🟡 Mantenibilidad |
+
+
+
 | Parámetros no usados | 1 (`kmActuales`) | 🟢 Low |
 | Unsafe casts | 2 | 🟡 Crash risk |
 | Clean arch violations | 3 archivos en módulo incorrecto | 🟡 Acoplamiento |
 | Coroutine issues | 2 | 🟡 ANR risk |
 | Package no estándar | 1 (`components.ui.dashboard`) | 🟢 Convención |
+
+
+separar las strings en español y las de inges por nombre.
+añadir selector de idioma
