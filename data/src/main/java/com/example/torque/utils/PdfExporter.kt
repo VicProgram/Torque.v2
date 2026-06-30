@@ -1,0 +1,149 @@
+package com.example.torque.utils
+
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
+import android.net.Uri
+import com.example.torque.room.entity.MantenimientoEntity
+import com.example.torque.room.entity.MotoEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+
+object PdfExporter {
+
+    suspend fun exportarHistorial(
+        contexto: Context,
+        uri: Uri,
+        moto: MotoEntity,
+        mantenimientos: List<MantenimientoEntity>,
+        resultadoSalud: ResultadoSalud?
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val documento = PdfDocument()
+            val pinturaTitulo = Paint().apply {
+                color = Color.rgb(0x3B, 0x82, 0xF6)
+                textSize = 24f
+                isFakeBoldText = true
+            }
+            val pinturaSubtitulo = Paint().apply {
+                color = Color.DKGRAY
+                textSize = 14f
+            }
+            val pinturaTexto = Paint().apply {
+                color = Color.BLACK
+                textSize = 12f
+            }
+            val pinturaEncabezado = Paint().apply {
+                color = Color.WHITE
+                textSize = 12f
+                isFakeBoldText = true
+            }
+            val pinturaFondoEncabezado = Paint().apply {
+                color = Color.rgb(0x3B, 0x82, 0xF6)
+            }
+            val pinturaLinea = Paint().apply {
+                color = Color.LTGRAY
+                strokeWidth = 0.5f
+            }
+            val pinturaSalud = Paint().apply {
+                color = Color.rgb(0x4C, 0xAF, 0x50)
+                textSize = 18f
+                isFakeBoldText = true
+            }
+
+            val paginaInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+            val pagina = documento.startPage(paginaInfo)
+            val canvas: Canvas = pagina.canvas
+
+            var y = 40f
+            val margen = 40f
+            val anchoPagina = 515f
+
+            canvas.drawText("Historial de Mantenimiento", margen, y, pinturaTitulo)
+            y += 30f
+            canvas.drawText("${moto.marca} ${moto.modelo} · ${moto.kilometros} km", margen, y, pinturaSubtitulo)
+            y += 20f
+            canvas.drawText("Matrícula: ${moto.matricula}", margen, y, pinturaSubtitulo)
+            y += 25f
+
+            if (resultadoSalud != null) {
+                canvas.drawText("Salud de la moto: ${resultadoSalud.saludGlobal}%", margen, y, pinturaSalud)
+                y += 30f
+            }
+
+            canvas.drawLine(margen, y, margen + anchoPagina, y, pinturaLinea)
+            y += 15f
+
+            val columnas = listOf(
+                Columna("Fecha", 70f),
+                Columna("Tipo", 120f),
+                Columna("KMs", 60f),
+                Columna("Precio", 70f),
+                Columna("Próx. Serv.", 80f),
+                Columna("Notas", 115f)
+            )
+
+            canvas.drawRect(margen, y - 5f, margen + anchoPagina, y + 18f, pinturaFondoEncabezado)
+            var x = margen
+            for (col in columnas) {
+                canvas.drawText(col.nombre, x + 4f, y + 12f, pinturaEncabezado)
+                x += col.ancho
+            }
+            y += 28f
+
+            for (m in mantenimientos) {
+                val proxServicio = if (m.intervaloKms > 0) "${m.kms + m.intervaloKms}" else "—"
+                val fila = listOf(
+                    m.fecha.take(10),
+                    m.nombreMantenimiento,
+                    "${m.kms}",
+                    m.precio ?: "—",
+                    proxServicio,
+                    m.notas ?: ""
+                )
+                x = margen
+                for (i in fila.indices) {
+                    val texto = fila[i]
+                    val anchoCol = columnas[i].ancho
+                    val textoRecortado = if (pinturaTexto.measureText(texto) > anchoCol - 4f)
+                        texto.take(15) + "…"
+                    else texto
+                    canvas.drawText(textoRecortado, x + 4f, y + 10f, pinturaTexto)
+                    x += anchoCol
+                }
+                y += 20f
+
+                if (y > 800f) {
+                    documento.finishPage(pagina)
+                    val pagina2Info = PdfDocument.PageInfo.Builder(595, 842, 2).create()
+                    val pagina2 = documento.startPage(pagina2Info)
+                    val canvas2: Canvas = pagina2.canvas
+                    y = 40f
+                }
+            }
+
+            documento.finishPage(pagina)
+
+            val cacheDir = File(contexto.cacheDir, "pdf_temp")
+            cacheDir.mkdirs()
+            val pdfTemp = File(cacheDir, "historial_${System.currentTimeMillis()}.pdf")
+            FileOutputStream(pdfTemp).use { documento.writeTo(it) }
+            documento.close()
+
+            contexto.contentResolver.openOutputStream(uri)?.use { salida ->
+                pdfTemp.inputStream().use { it.copyTo(salida) }
+            }
+
+            pdfTemp.delete()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private data class Columna(val nombre: String, val ancho: Float)
+}

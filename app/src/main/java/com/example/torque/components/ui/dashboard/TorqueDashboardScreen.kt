@@ -284,6 +284,55 @@ fun TorqueDashboardScreen(
                         }
                     }
                 }
+
+                if (motoActual != null && (uiState.itvProxima || uiState.seguroProximo)) {
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "RECORDATORIOS",
+                                color = ColoresTorque.AmarilloAdvertencia,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.5.sp,
+                                modifier = Modifier.padding(bottom = 4.dp, start = 4.dp)
+                            )
+                            if (uiState.itvProxima) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(ColoresTorque.AmarilloAdvertencia.copy(alpha = 0.15f))
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = ColoresTorque.AmarilloAdvertencia, modifier = Modifier.size(24.dp))
+                                    Column {
+                                        Text("ITX próximos 30 días", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                        Text("Vence: ${uiState.fechaItv ?: "—"}", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                                    }
+                                }
+                            }
+                            if (uiState.seguroProximo) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(ColoresTorque.AmarilloAdvertencia.copy(alpha = 0.15f))
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Icon(Icons.Default.Shield, contentDescription = null, tint = ColoresTorque.AmarilloAdvertencia, modifier = Modifier.size(24.dp))
+                                    Column {
+                                        Text("Seguro próximo a vencer", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                        Text("Vence: ${uiState.fechaSeguro ?: "—"}", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

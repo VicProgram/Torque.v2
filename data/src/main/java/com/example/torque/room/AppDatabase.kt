@@ -9,19 +9,22 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.torque.room.entity.dao.MotoDao
 import com.example.torque.room.entity.dao.MantenimientoDao
 import com.example.torque.room.entity.dao.FotoDao
+import com.example.torque.room.entity.dao.FotoMantenimientoDao
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.FotoEntity
+import com.example.torque.room.entity.FotoMantenimientoEntity
 
 @Database(
-    entities = [MotoEntity::class, MantenimientoEntity::class, FotoEntity::class],
-    version = 3,
+    entities = [MotoEntity::class, MantenimientoEntity::class, FotoEntity::class, FotoMantenimientoEntity::class],
+    version = 4,
     exportSchema = false
 )
 abstract class BaseDeDatosApp : RoomDatabase() {
     abstract fun motoDao(): MotoDao
     abstract fun mantenimientoDao(): MantenimientoDao
     abstract fun fotoDao(): FotoDao
+    abstract fun fotoMantenimientoDao(): FotoMantenimientoDao
 
     companion object {
         @Volatile
@@ -39,13 +42,21 @@ abstract class BaseDeDatosApp : RoomDatabase() {
             }
         }
 
+        val MIGRACION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS fotos_mantenimiento (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, idMantenimiento INTEGER NOT NULL, ruta TEXT NOT NULL, tipo TEXT NOT NULL DEFAULT 'foto', creadoEn TEXT)")
+                db.execSQL("ALTER TABLE motos ADD COLUMN fechaItv TEXT")
+                db.execSQL("ALTER TABLE motos ADD COLUMN fechaSeguro TEXT")
+            }
+        }
+
         fun obtenerInstancia(context: Context): BaseDeDatosApp =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     BaseDeDatosApp::class.java,
                     "torque_room.db"
-                ).addMigrations(MIGRACION_1_2, MIGRACION_2_3)
+                ).addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4)
                     .fallbackToDestructiveMigration()
                     .build().also { INSTANCE = it }
             }

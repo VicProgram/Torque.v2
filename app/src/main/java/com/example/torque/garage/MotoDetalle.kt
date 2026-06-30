@@ -49,6 +49,7 @@ import java.util.*
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import com.example.torque.maintenance.MantenimientoHistorial
+import com.example.torque.maintenance.PlanMantenimiento
 import com.example.torque.maintenance.RegistroMantenimiento
 
 class MotoDetalle : ComponentActivity() {
@@ -221,6 +222,23 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 }
                             )
                             DropdownMenuItem(
+                                text = { Text("Plan de Mantenimiento", color = Color.White) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Schedule,
+                                        contentDescription = null,
+                                        tint = ColoresTorque.Primary
+                                    )
+                                },
+                                onClick = {
+                                    val intent = Intent(contexto, PlanMantenimiento::class.java).apply {
+                                        putExtra("idMoto", idMoto)
+                                    }
+                                    contexto.startActivity(intent)
+                                    mostrarMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
                                 text = { Text(stringResource(R.string.menu_edit_bike), color = Color.White) },
                                 leadingIcon = {
                                     Icon(
@@ -323,6 +341,8 @@ fun VistaMotoDetalle(idMoto: Long) {
                         FilaDetalle(stringResource(R.string.label_kilometers), "${moto!!.kilometros} km", editable = true, onClick = {
                             mostrarDialogoKm = true
                         })
+                        FilaDetalle("ITV", moto!!.fechaItv ?: stringResource(R.string.not_available))
+                        FilaDetalle("Seguro", moto!!.fechaSeguro ?: stringResource(R.string.not_available))
                         FilaDetalle(stringResource(R.string.label_style), moto!!.estilo ?: stringResource(R.string.not_available))
                     }
 

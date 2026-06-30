@@ -34,7 +34,7 @@
         <activity android:name=".maintenance.FormularioMantenimiento" />
         <activity android:name=".maintenance.OpcionesMantenimiento" />
         <activity android:name=".maintenance.MantenimientoHistorial" />
-        <!-- MaintenanceDetailData is a data class, not an activity -->
+        <activity android:name=".maintenance.PlanMantenimiento" />
 
         <!-- Activities de Garage -->
         <activity android:name=".garage.MotoDetalle" />

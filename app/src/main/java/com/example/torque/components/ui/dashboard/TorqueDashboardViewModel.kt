@@ -36,7 +36,11 @@ data class DashboardUiState(
     val kmRestantes: Int? = null,
     val progreso: Float = 0f,
     val notificacionesPendientes: Int = 0,
-    val porcentajesDesgaste: Map<Long, Int> = emptyMap()
+    val porcentajesDesgaste: Map<Long, Int> = emptyMap(),
+    val itvProxima: Boolean = false,
+    val seguroProximo: Boolean = false,
+    val fechaItv: String? = null,
+    val fechaSeguro: String? = null
 )
 
 class TorqueDashboardViewModel(
@@ -111,15 +115,36 @@ class TorqueDashboardViewModel(
                         val desgaste = TiposMantenimiento.WEAR_TIPOS.associate { wear ->
                             wear.id to (agrupados[wear.id]?.maxByOrNull { it.kms }?.porcentajeVida ?: 100)
                         }
+
+                        val (itvProx, seguroProx) = verificarItvSeguro(moto)
+                        val totalPendientes = pendientes + (if (itvProx) 1 else 0) + (if (seguroProx) 1 else 0)
+
                         _uiState.update { it.copy(
                             resultadoSalud = salud,
-                            notificacionesPendientes = pendientes,
-                            porcentajesDesgaste = desgaste
+                            notificacionesPendientes = totalPendientes,
+                            porcentajesDesgaste = desgaste,
+                            itvProxima = itvProx,
+                            seguroProximo = seguroProx,
+                            fechaItv = moto.fechaItv,
+                            fechaSeguro = moto.fechaSeguro
                         )}
                     }
                 }
             }
         }
+    }
+
+    private fun verificarItvSeguro(moto: MotoEntity): Pair<Boolean, Boolean> {
+        val formato = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+        val hoy = Date()
+        val treintaDias = 30L * 24 * 60 * 60 * 1000
+        val itvProx = try {
+            moto.fechaItv?.let { formato.parse(it) }?.let { it.time - hoy.time in 0..treintaDias } ?: false
+        } catch (_: Exception) { false }
+        val seguroProx = try {
+            moto.fechaSeguro?.let { formato.parse(it) }?.let { it.time - hoy.time in 0..treintaDias } ?: false
+        } catch (_: Exception) { false }
+        return itvProx to seguroProx
     }
 
     private fun updateDerivedState(ultimo: MantenimientoEntity?) {

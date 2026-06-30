@@ -1,35 +1,48 @@
 package com.example.torque.maintenance
 
 import android.app.Activity
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.components.ui.dashboard.BotonTorque
 import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.components.ui.dashboard.CampoTextoTorque
 import com.example.torque.room.RepositorioApp
+import com.example.torque.room.entity.FotoMantenimientoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.utils.ArchivoUtils
 import com.example.torque.utils.DateUtils
 import com.example.torque.utils.TiposMantenimiento
 import com.example.torque.utils.terminar
@@ -51,6 +64,8 @@ class FormularioMantenimiento : ComponentActivity() {
     }
 }
 
+private data class Adjunto(val uri: Uri, val tipo: String = "foto", val rutaInterna: String? = null)
+
 private suspend fun guardarMantenimiento(
     tareasSeleccionadas: List<String>,
     idMoto: Long,
@@ -63,6 +78,7 @@ private suspend fun guardarMantenimiento(
     repositorio: RepositorioApp,
     contexto: android.content.Context,
     porcentajeVida: Int = 100,
+    adjuntos: List<Adjunto> = emptyList(),
     actualizarKmMoto: Boolean = false
 ) {
     try {
@@ -88,7 +104,22 @@ private suspend fun guardarMantenimiento(
             tipoMantenimientoId = tipoId,
             porcentajeVida = porcentajeVida
         )
-        repositorio.insertarMantenimiento(mantenimiento)
+        val idMantenimiento = repositorio.insertarMantenimiento(mantenimiento)
+        if (idMantenimiento > 0L) {
+            for (adjunto in adjuntos) {
+                val ruta = adjunto.rutaInterna ?: ArchivoUtils.copiarImagenAInterno(contexto, adjunto.uri)
+                if (ruta != null) {
+                    repositorio.insertarFotoMantenimiento(
+                        FotoMantenimientoEntity(
+                            idMantenimiento = idMantenimiento,
+                            ruta = ruta,
+                            tipo = adjunto.tipo,
+                            creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
+                        )
+                    )
+                }
+            }
+        }
         Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
         (contexto as? Activity)?.terminar()
     } catch (e: Exception) {
@@ -112,9 +143,10 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
     var mostrarDialogoActualizarKm by remember { mutableStateOf(false) }
     var kmMotoActual by remember { mutableStateOf(0) }
     var porcentajeVida by remember { mutableStateOf(100) }
+    var adjuntos by remember { mutableStateOf<List<Adjunto>>(emptyList()) }
 
     val hayCambios = kms.isNotBlank() || intervalo.isNotBlank() || precio.isNotBlank() ||
-        tiempo.isNotBlank() || notas.isNotBlank()
+        tiempo.isNotBlank() || notas.isNotBlank() || adjuntos.isNotEmpty()
 
     val fechaActual = SimpleDateFormat(DateUtils.FORMATO_FECHA_VISUAL, Locale.getDefault()).format(Date())
 
@@ -125,6 +157,14 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
 
     val tipoDesgaste = remember {
         if (esDesgaste) TiposMantenimiento.desdeNombre(tareasSeleccionadas[0]) else null
+    }
+
+    val launcherFoto = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { adjuntos = adjuntos + Adjunto(it, "foto") }
+    }
+
+    val launcherFactura = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { adjuntos = adjuntos + Adjunto(it, "factura") }
     }
 
     Box(
@@ -138,14 +178,17 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
 
             FormularioCampos(
                 tareasSeleccionadas, kms, intervalo, precio, tiempo, notas,
-                errorKms, esDesgaste, tipoDesgaste, porcentajeVida,
+                errorKms, esDesgaste, tipoDesgaste, porcentajeVida, adjuntos,
                 modifier = Modifier.weight(1f),
                 onKmsChange = { kms = it.filter { c -> c.isDigit() }; errorKms = false },
                 onIntervaloChange = { intervalo = it.filter { c -> c.isDigit() } },
                 onPrecioChange = { precio = it },
                 onTiempoChange = { tiempo = it },
                 onNotasChange = { notas = it },
-                onPorcentajeVidaChange = { porcentajeVida = it }
+                onPorcentajeVidaChange = { porcentajeVida = it },
+                onAddFoto = { launcherFoto.launch("image/*") },
+                onAddFactura = { launcherFactura.launch("image/*") },
+                onRemoveAdjunto = { adjuntos = adjuntos - it }
             )
         }
 
@@ -158,7 +201,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                 mostrarDialogoActualizarKm = false
                 scope.launch {
                     val kmNuevos = kms.toIntOrNull() ?: 0
-                    guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, actualizarKmMoto = actualizarKm)
+                    guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, adjuntos, actualizarKmMoto = actualizarKm)
                 }
             }
         )
@@ -168,7 +211,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             mostrarDialogoActualizarKm = it.mostrarActualizarKm
             if (it.guardarDirecto) {
                 scope.launch {
-                    guardarMantenimiento(tareasSeleccionadas, idMoto, kms.toIntOrNull() ?: 0, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida)
+                    guardarMantenimiento(tareasSeleccionadas, idMoto, kms.toIntOrNull() ?: 0, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, adjuntos)
                 }
             }
         }
@@ -212,10 +255,13 @@ private fun FormularioCampos(
     kms: String, intervalo: String, precio: String, tiempo: String, notas: String,
     errorKms: Boolean, esDesgaste: Boolean, tipoDesgaste: com.example.torque.utils.TipoMantenimiento?,
     porcentajeVida: Int,
+    adjuntos: List<Adjunto> = emptyList(),
     modifier: Modifier = Modifier,
     onKmsChange: (String) -> Unit, onIntervaloChange: (String) -> Unit,
     onPrecioChange: (String) -> Unit, onTiempoChange: (String) -> Unit,
-    onNotasChange: (String) -> Unit, onPorcentajeVidaChange: (Int) -> Unit
+    onNotasChange: (String) -> Unit, onPorcentajeVidaChange: (Int) -> Unit,
+    onAddFoto: () -> Unit = {}, onAddFactura: () -> Unit = {},
+    onRemoveAdjunto: (Adjunto) -> Unit = {}
 ) {
     Column(
         modifier = modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
@@ -225,7 +271,7 @@ private fun FormularioCampos(
 
         Card(
             colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp)
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(stringResource(R.string.label_tasks), color = ColoresTorque.Slate500, fontSize = 12.sp)
@@ -265,7 +311,65 @@ private fun FormularioCampos(
             SeccionDesgaste(tipoDesgaste, porcentajeVida, onPorcentajeVidaChange)
         }
 
+        SeccionAdjuntos(adjuntos, onAddFoto, onAddFactura, onRemoveAdjunto)
+
         Spacer(modifier = Modifier.height(100.dp))
+    }
+}
+
+@Composable
+private fun SeccionAdjuntos(
+    adjuntos: List<Adjunto>,
+    onAddFoto: () -> Unit,
+    onAddFactura: () -> Unit,
+    onRemoveAdjunto: (Adjunto) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("ADJUNTOS", color = ColoresTorque.Primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(
+                onClick = onAddFoto,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = ColoresTorque.Primary)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("Foto", fontSize = 13.sp)
+            }
+            OutlinedButton(
+                onClick = onAddFactura,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = ColoresTorque.Accent)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("Factura", fontSize = 13.sp)
+            }
+        }
+
+        if (adjuntos.isNotEmpty()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                adjuntos.forEach { adjunto ->
+                    Box(modifier = Modifier.size(72.dp)) {
+                        Image(
+                            painter = rememberAsyncImagePainter(adjunto.uri),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                        IconButton(
+                            onClick = { onRemoveAdjunto(adjunto) },
+                            modifier = Modifier.align(Alignment.TopEnd).size(24.dp)
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = ColoresTorque.RojoError, modifier = Modifier.size(16.dp))
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

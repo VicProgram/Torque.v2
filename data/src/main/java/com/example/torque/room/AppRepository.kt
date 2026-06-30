@@ -6,6 +6,7 @@ import androidx.room.withTransaction
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.FotoEntity
+import com.example.torque.room.entity.FotoMantenimientoEntity
 import kotlinx.coroutines.flow.Flow
 
 open class RepositorioApp(private val db: BaseDeDatosApp) {
@@ -137,6 +138,22 @@ open class RepositorioApp(private val db: BaseDeDatosApp) {
         db.fotoDao().eliminar(foto)
     } catch (e: Exception) {
         Log.e(TAG, "Error al eliminar foto", e)
+    }
+
+    open fun obtenerFotosPorMantenimiento(idMantenimiento: Long) = db.fotoMantenimientoDao().obtenerPorMantenimientoFlow(idMantenimiento)
+
+    open suspend fun obtenerFotosPorMantenimientoList(idMantenimiento: Long) = db.fotoMantenimientoDao().obtenerPorMantenimiento(idMantenimiento)
+
+    suspend fun insertarFotoMantenimiento(foto: FotoMantenimientoEntity) = try {
+        db.fotoMantenimientoDao().insertar(foto)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al insertar foto de mantenimiento", e)
+    }
+
+    suspend fun eliminarFotoMantenimiento(foto: FotoMantenimientoEntity) = try {
+        db.fotoMantenimientoDao().eliminar(foto)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al eliminar foto de mantenimiento", e)
     }
 
     fun cerrarBaseDeDatos() {

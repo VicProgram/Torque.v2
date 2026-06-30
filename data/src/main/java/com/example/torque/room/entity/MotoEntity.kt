@@ -19,5 +19,7 @@ data class MotoEntity(
     val esPrincipal: Int = 0,
     val uriFoto: String? = null,
     val creadoEn: String? = null,
-    val actualizadoEn: String? = null
+    val actualizadoEn: String? = null,
+    val fechaItv: String? = null,
+    val fechaSeguro: String? = null
 )

@@ -83,10 +83,13 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
     var errorMatricula by remember { mutableStateOf(false) }
     var cargando by remember { mutableStateOf(editando) }
     var mostrarDialogoDescartar by remember { mutableStateOf(false) }
+    var fechaItv by remember { mutableStateOf("") }
+    var fechaSeguro by remember { mutableStateOf("") }
 
     val hayCambios = marca.isNotBlank() || modelo.isNotBlank() || anio.isNotBlank() ||
         matricula.isNotBlank() || cilindrada.isNotBlank() || caballos.isNotBlank() ||
-        estilo.isNotBlank() || kilometros.isNotBlank() || uriImagen != null || esPrincipal
+        estilo.isNotBlank() || kilometros.isNotBlank() || uriImagen != null || esPrincipal ||
+        fechaItv.isNotBlank() || fechaSeguro.isNotBlank()
 
     LaunchedEffect(idMoto) {
         if (editando && idMoto != -1L) {
@@ -102,6 +105,8 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 kilometros = moto.kilometros.toString()
                 fotoActual = moto.uriFoto
                 esPrincipal = moto.esPrincipal == 1
+                fechaItv = moto.fechaItv ?: ""
+                fechaSeguro = moto.fechaSeguro ?: ""
             }
             cargando = false
         }
@@ -245,6 +250,11 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         )
                     }
 
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        CampoTextoTorque(fechaItv, { fechaItv = it }, "Fecha ITV (dd/mm/aaaa)", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(fechaSeguro, { fechaSeguro = it }, "Fecha Seguro (dd/mm/aaaa)", modifier = Modifier.weight(1f))
+                    }
+
                     CampoTextoTorque(
                         value = estilo,
                         onValueChange = { estilo = it },
@@ -306,19 +316,21 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         if (editando && idMoto != -1L) {
                             val motoExistente = repositorio.obtenerMotoPorId(idMoto)
                             if (motoExistente != null) {
-                                repositorio.actualizarMoto(
-                                    motoExistente.copy(
-                                        marca = marca.trim(),
-                                        modelo = modelo.trim(),
-                                        anio = anio.toIntOrNull() ?: 0,
-                                        matricula = matricula.trim(),
-                                        kilometros = kilometros.toIntOrNull() ?: 0,
-                                        cilindrada = cilindrada.trim(),
-                                        caballos = caballos.trim().ifEmpty { null },
-                                        estilo = estilo.trim(),
-                                        uriFoto = rutaFoto,
-                                        actualizadoEn = fecha
-                                    )
+                            repositorio.actualizarMoto(
+                                motoExistente.copy(
+                                    marca = marca.trim(),
+                                    modelo = modelo.trim(),
+                                    anio = anio.toIntOrNull() ?: 0,
+                                    matricula = matricula.trim(),
+                                    kilometros = kilometros.toIntOrNull() ?: 0,
+                                    cilindrada = cilindrada.trim(),
+                                    caballos = caballos.trim().ifEmpty { null },
+                                    estilo = estilo.trim(),
+                                    uriFoto = rutaFoto,
+                                    fechaItv = fechaItv.trim().ifEmpty { null },
+                                    fechaSeguro = fechaSeguro.trim().ifEmpty { null },
+                                    actualizadoEn = fecha
+                                )
                                 )
                                 if (esPrincipal && motoExistente.esPrincipal != 1) {
                                     repositorio.establecerMotoPrincipal(idMoto)
@@ -343,6 +355,8 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                                 estilo = estilo.trim(),
                                 esPrincipal = 0,
                                 uriFoto = rutaFoto,
+                                fechaItv = fechaItv.trim().ifEmpty { null },
+                                fechaSeguro = fechaSeguro.trim().ifEmpty { null },
                                 creadoEn = fecha,
                                 actualizadoEn = fecha
                             )

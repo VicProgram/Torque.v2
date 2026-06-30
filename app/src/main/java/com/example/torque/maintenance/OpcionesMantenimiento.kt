@@ -29,6 +29,7 @@ import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.maintenance.PlanMantenimiento
 import kotlinx.coroutines.launch
 
 class OpcionesMantenimiento : ComponentActivity() {
@@ -52,6 +53,12 @@ class OpcionesMantenimiento : ComponentActivity() {
                         }
                         startActivity(intent)
                     },
+                    onVerPlan = { id ->
+                        val intent = Intent(this, PlanMantenimiento::class.java).apply {
+                            putExtra("idMoto", id)
+                        }
+                        startActivity(intent)
+                    },
                     onAtras = { finish() }
                 )
             }
@@ -64,6 +71,7 @@ fun PantallaOpcionesMantenimiento(
     motoIdInicial: Long,
     onNuevoMantenimiento: (Long) -> Unit,
     onVerHistorial: (Long) -> Unit,
+    onVerPlan: (Long) -> Unit = {},
     onAtras: () -> Unit
 ) {
     val contexto = LocalContext.current
@@ -155,6 +163,14 @@ fun PantallaOpcionesMantenimiento(
                         icono = Icons.Default.History,
                         color = ColoresTorque.Accent,
                         onClick = { onVerHistorial(moto.idMoto) }
+                    )
+
+                    TarjetaOpcionMantenimiento(
+                        titulo = "Plan de Mantenimiento",
+                        subtitulo = "Calendario de tareas recomendadas",
+                        icono = Icons.Default.Schedule,
+                        color = ColoresTorque.Tertiary,
+                        onClick = { onVerPlan(moto.idMoto) }
                     )
                 } ?: run {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
