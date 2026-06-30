@@ -45,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.example.torque.R
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -156,9 +158,9 @@ fun DialogoTorque(
     title: String,
     icon: (@Composable () -> Unit)? = null,
     onConfirm: (() -> Unit)? = null,
-    confirmText: String = "Guardar",
+    confirmText: String = stringResource(R.string.btn_save),
     confirmColor: Color = ColoresTorque.Primary,
-    dismissText: String = "Cancelar",
+    dismissText: String = stringResource(R.string.btn_cancel),
     content: @Composable () -> Unit
 ) {
     AlertDialog(

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Global -->
+    <string name="app_name">Torque</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_discard">Discard</string>
+    <string name="btn_continue">Continue</string>
+    <string name="btn_export">Export</string>
+    <string name="btn_restore">Restore</string>
+    <string name="btn_yes_update">Yes, update</string>
+    <string name="btn_no">No</string>
+    <string name="btn_keep_editing">Keep editing</string>
+    <string name="content_desc_back">Back</string>
+    <string name="content_desc_close">Close</string>
+    <string name="content_desc_delete">Delete</string>
+    <string name="content_desc_save">Save</string>
+    <string name="content_desc_edit">Edit</string>
+    <string name="not_available">N/A</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="welcome_prefix">Welcome,</string>
+    <string name="welcome_name">Rider</string>
+    <string name="quick_actions_title">QUICK ACTIONS</string>
+    <string name="garage_title">Garage</string>
+    <string name="garage_subtitle">My Bikes</string>
+    <string name="maintenance_title">Maintenance</string>
+    <string name="maintenance_subtitle">Records and More</string>
+    <string name="next_service_image">Motorcycle image</string>
+    <string name="upcoming_label">UPCOMING</string>
+    <string name="your_primary_bike">Your Main Bike</string>
+    <string name="days_left">DAYS LEFT</string>
+    <string name="oil_change">OIL CHANGE</string>
+    <string name="schedule_service">Schedule Service</string>
+    <string name="stats_title">STATISTICS</string>
+    <string name="kilometers">Kilometers</string>
+    <string name="add">Add</string>
+    <string name="menu">Menu</string>
+    <string name="settings">Settings</string>
+    <string name="my_profile">My Profile</string>
+    <string name="app_settings">App settings</string>
+    <string name="logout">Log Out</string>
+    <string name="logged_out">Logged out</string>
+    <string name="menu_go_to_garage">Go to Garage</string>
+    <string name="menu_add_motorcycle">Add Motorcycle</string>
+    <string name="menu_reminders">Reminders</string>
+    <string name="menu_export_data">Export Data</string>
+    <string name="menu_about">About</string>
+    <string name="about_dialog_title">Torque v1.0</string>
+    <string name="about_dialog_description">Motorcycle maintenance management app.</string>
+    <string name="about_dialog_tech">Built with Jetpack Compose and Room.</string>
+    <string name="export_dialog_message">A ZIP with the database, photos and settings will be saved.</string>
+    <string name="toast_backup_saved">Backup saved</string>
+    <string name="next_service_badge">NEXT SERVICE</string>
+    <string name="no_bike">No Bike</string>
+    <string name="your_main_bike">Your main bike</string>
+    <string name="add_a_bike">Add a bike</string>
+    <string name="overdue">OVERDUE!</string>
+    <string name="service_km">SERVICE KM</string>
+    <string name="km_remaining">KM REMAINING</string>
+    <string name="no_data">NO DATA</string>
+    <string name="bike_health">BIKE HEALTH</string>
+    <string name="btn_view_maintenance">View Maintenance</string>
+    <string name="total_mileage">TOTAL MILEAGE</string>
+    <string name="kilometers_label">KILOMETERS</string>
+    <string name="wear_status_title">Wear Status</string>
+    <string name="menu_wear">Wear</string>
+    <string name="menu_wear_subtitle">Pads, tires</string>
+    <string name="no_notifications">No notifications</string>
+    <string name="menu_toast">Side menu not implemented</string>
+
+    <!-- Dashboard notifications -->
+    <string name="notifications_title">Maintenance Notifications</string>
+    <string name="no_notifications_pending">No pending alerts</string>
+    <string name="notification_expired">Expired</string>
+    <string name="notification_soon">Due soon</string>
+    <string name="km_edit_title">Edit Mileage</string>
+    <string name="km_current_label">CURRENT KM</string>
+    <string name="km_tap_to_edit">Tap to edit</string>
+
+    <!-- Dashboard REMINDERS section -->
+    <string name="reminders_section">REMINDERS</string>
+    <string name="itv_soon">ITV due in 30 days</string>
+    <string name="itv_expires">Expires: %s</string>
+    <string name="insurance_soon">Insurance due soon</string>
+    <string name="insurance_expires">Expires: %s</string>
+
+    <!-- Ajustes -->
+    <string name="settings_title">Settings</string>
+    <string name="preferences_header">PREFERENCES</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_subtitle">Maintenance alerts</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="dark_mode_subtitle">High contrast interface</string>
+    <string name="system_header">SYSTEM</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_subtitle">Manage your data</string>
+    <string name="backup">Backup</string>
+    <string name="backup_subtitle">Database backup</string>
+    <string name="backup_section">BACKUP</string>
+    <string name="export_backup">Export backup</string>
+    <string name="export_backup_subtitle">DB + photos + preferences</string>
+    <string name="restore_backup">Restore backup</string>
+    <string name="restore_backup_subtitle">Replaces all current data</string>
+    <string name="restoring">Restoring…</string>
+    <string name="backup_default_name">torque_backup.zip</string>
+    <string name="toast_exporting_backup">Exporting backup…</string>
+    <string name="toast_backup_saved_title">Backup saved</string>
+    <string name="toast_backup_error">Export error: %s</string>
+    <string name="toast_restore_success">Data restored. The app will close.</string>
+    <string name="toast_restore_error">Restore error: %s</string>
+    <string name="dialog_restore_title">Restore backup?</string>
+    <string name="dialog_restore_message">All current data (bikes, photos, maintenance records and preferences) will be replaced. The app will restart.</string>
+
+    <!-- Perfil -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_name">Name</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_phone">Phone</string>
+    <string name="profile_birthday_hint">Birth date (YYYY-MM-DD)</string>
+    <string name="save">Save</string>
+    <string name="happy_birthday">Happy birthday!</string>
+    <string name="my_profile_title">My Profile</string>
+    <string name="change_photo">Change photo</string>
+    <string name="my_licenses">MY LICENSES</string>
+    <string name="toast_profile_saved">Profile saved</string>
+
+    <!-- FormularioMantenimiento -->
+    <string name="maintenance_details_title">Maintenance Details</string>
+    <string name="label_tasks">Tasks</string>
+    <string name="field_current_kms">Current km *</string>
+    <string name="field_every_x_kms">Every X km</string>
+    <string name="error_kms_required">Kilometers are required</string>
+    <string name="field_price">Price (€)</string>
+    <string name="field_time">Time</string>
+    <string name="field_notes">Notes</string>
+    <string name="label_remaining_life">Remaining life</string>
+    <string name="dialog_discard_title">Discard changes?</string>
+    <string name="dialog_discard_message">Entered data will be lost.</string>
+    <string name="dialog_update_km_title">Update mileage?</string>
+    <string name="dialog_update_km_message">The maintenance records %1$s km, but the bike has %2$d km. Update the bike\'s mileage?</string>
+    <string name="btn_save_maintenance">Save Maintenance</string>
+    <string name="toast_maintenance_saved">Maintenance saved!</string>
+    <string name="toast_fill_required">Fill in required fields</string>
+    <string name="general_maintenance">General Maintenance</string>
+    <string name="toast_save_error">Save error: %s</string>
+    <string name="section_attachments">ATTACHMENTS</string>
+    <string name="btn_add_photo">Photo</string>
+    <string name="btn_add_invoice">Invoice</string>
+    <string name="toast_moto_not_found">Error: Moto not found</string>
+
+    <!-- MantenimientoHistorial -->
+    <string name="maintenance_history_title">Maintenance History</string>
+    <string name="recent_activity">RECENT ACTIVITY</string>
+    <string name="no_maintenance_records">No maintenance records</string>
+    <string name="no_results_for">No results for &quot;%s&quot;</string>
+    <string name="dialog_delete_record_title">Delete record?</string>
+    <string name="action_irreversible">This action cannot be undone.</string>
+    <string name="maintenance_detail_title">Maintenance Detail</string>
+    <string name="section_notes">NOTES</string>
+    <string name="section_tasks_done">TASKS DONE</string>
+    <string name="section_cost">COST</string>
+    <string name="no_price">No price</string>
+    <string name="export_pdf_content_desc">Export PDF</string>
+    <string name="toast_pdf_error">PDF export error: %s</string>
+    <string name="filter_all">All</string>
+    <string name="filter_oil">Oil</string>
+    <string name="filter_filter">Filter</string>
+    <string name="filter_tire">Tire</string>
+    <string name="filter_chain">Chain</string>
+    <string name="filter_brakes">Brakes</string>
+    <string name="filter_suspension">Suspension</string>
+    <string name="invoice_badge">INVOICE</string>
+
+    <!-- RegistroMantenimiento -->
+    <string name="register_maintenance_title">Register Maintenance</string>
+    <string name="search_tasks_hint">Search tasks…</string>
+    <string name="no_tasks_for">No tasks found for &quot;%s&quot;</string>
+    <string name="tasks_selected">%d tasks selected</string>
+    <string name="estimated_45_min">Estimated 45 min</string>
+
+    <!-- RegistroMantenimiento — task names and descriptions -->
+    <!-- Motor -->
+    <string name="task_oil_change">Engine Oil Change</string>
+    <string name="task_oil_change_desc">Recommended every 5,000 km</string>
+    <string name="task_oil_filter">Oil Filter</string>
+    <string name="task_oil_filter_desc">Included in standard service</string>
+    <string name="task_spark_plugs">Spark Plugs</string>
+    <string name="task_spark_plugs_desc">Replace every 10,000 km</string>
+    <string name="task_air_filter">Air Filter</string>
+    <string name="task_air_filter_desc">Clean or replace every 10,000 km</string>
+    <string name="task_coolant">Coolant</string>
+    <string name="task_coolant_desc">Change every 20,000 km</string>
+    <string name="task_valves">Valve Adjustment</string>
+    <string name="task_valves_desc">Every 12,000 km</string>
+    <!-- Transmisión -->
+    <string name="task_chain_clean">Chain Cleaning and Lubrication</string>
+    <string name="task_chain_clean_desc">Regular maintenance every 500 km</string>
+    <string name="task_chain_tension">Chain Tensioning</string>
+    <string name="task_chain_tension_desc">Check every 1,000 km</string>
+    <string name="task_chain_replace">Chain and Sprockets Replacement</string>
+    <string name="task_chain_replace_desc">Every 20,000 km</string>
+    <!-- Frenos -->
+    <string name="task_brake_pads_front">Front Brake Pads</string>
+    <string name="task_brake_pads_front_desc">Check every 5,000 km</string>
+    <string name="task_brake_pads_rear">Rear Brake Pads</string>
+    <string name="task_brake_pads_rear_desc">Check every 5,000 km</string>
+    <string name="task_brake_fluid">Brake Fluid</string>
+    <string name="task_brake_fluid_desc">Change every 20,000 km</string>
+    <string name="task_brake_discs">Brake Discs</string>
+    <string name="task_brake_discs_desc">Inspect wear every 10,000 km</string>
+    <!-- Neumáticos -->
+    <string name="task_tire_pressure">Tire Pressure</string>
+    <string name="task_tire_pressure_desc">Weekly check</string>
+    <string name="task_tire_change">Tire Change</string>
+    <string name="task_tire_change_desc">Every 10,000 km or as needed</string>
+    <!-- Eléctrico -->
+    <string name="task_battery">Battery</string>
+    <string name="task_battery_desc">Check every 6 months</string>
+    <string name="task_lights">Lights and Signals</string>
+    <string name="task_lights_desc">Monthly check</string>
+    <string name="task_ecu">ECU</string>
+    <string name="task_ecu_desc">Annual diagnostic</string>
+    <!-- Suspensión -->
+    <string name="task_suspension_front">Front Suspension</string>
+    <string name="task_suspension_front_desc">Check every 15,000 km</string>
+    <string name="task_suspension_rear">Rear Suspension</string>
+    <string name="task_suspension_rear_desc">Check every 15,000 km</string>
+    <string name="task_fork_seals_inspect">Fork Seals Inspection</string>
+    <string name="task_fork_seals_inspect_desc">Check every 5,000 km</string>
+    <string name="task_fork_seals_replace">Fork Seals Replacement</string>
+    <string name="task_fork_seals_replace_desc">Replace every 10,000 km</string>
+
+    <!-- ListaGaraje filters -->
+    <string name="filter_all_bikes">All</string>
+    <string name="filter_in_use">In Use</string>
+    <string name="filter_historical">Historical</string>
+    <string name="search_by_brand_hint">Search by brand, model or plate…</string>
+    <string name="content_desc_clear">Clear</string>
+    <string name="my_garage_title">My Garage</string>
+    <string name="content_desc_search">Search</string>
+    <string name="no_bikes_yet">No bikes yet</string>
+    <string name="add_first_bike_hint">Tap the + button to add your first bike</string>
+    <string name="no_results">No results</string>
+    <string name="try_different_filters">Try different terms or filters</string>
+    <string name="content_desc_principal">Primary</string>
+    <string name="healthy_status">Healthy</string>
+    <string name="btn_view_details">View Details</string>
+    <string name="content_desc_new_moto">New Motorcycle</string>
+
+    <!-- MotoDetalle -->
+    <string name="menu_make_primary">Set as Primary</string>
+    <string name="menu_register_maintenance">Register Maintenance</string>
+    <string name="menu_view_history">View History</string>
+    <string name="menu_edit_bike">Edit Bike</string>
+    <string name="menu_delete_bike">Delete Bike</string>
+    <string name="toast_primary_updated">Primary bike updated</string>
+    <string name="toast_photo_added">Photo added!</string>
+    <string name="no_photos_yet">No photos yet</string>
+    <string name="section_specifications">SPECIFICATIONS</string>
+    <string name="section_gallery">GALLERY</string>
+    <string name="dialog_update_mileage_title">Update Mileage</string>
+    <string name="field_kilometers">Kilometers</string>
+    <string name="dialog_delete_bike_title">Delete bike?</string>
+    <string name="dialog_delete_bike_message">This action cannot be undone. All associated data and photos will be deleted.</string>
+    <string name="dialog_delete_photo_title">Delete photo?</string>
+    <string name="toast_photo_deleted">Photo deleted</string>
+    <string name="label_brand">Brand</string>
+    <string name="label_year">Year</string>
+    <string name="label_plate">Plate*</string>
+    <string name="label_displacement">Displacement</string>
+    <string name="label_power">Power</string>
+    <string name="label_kilometers">Kilometers</string>
+    <string name="label_style">Style</string>
+    <string name="power_cv_format">%s HP</string>
+    <string name="label_itv">ITV</string>
+    <string name="label_insurance">Insurance</string>
+    <string name="menu_plan_maintenance">Maintenance Plan</string>
+
+    <!-- AnadirMotoActivity -->
+    <string name="title_edit_motorcycle">Edit Motorcycle</string>
+    <string name="title_new_motorcycle">New Motorcycle</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="field_brand_required">Brand *</string>
+    <string name="error_brand_required">Brand is required</string>
+    <string name="field_model_required">Model *</string>
+    <string name="error_model_required">Model is required</string>
+    <string name="error_plate_required">Plate is required</string>
+    <string name="field_current_kms_short">Current Kms</string>
+    <string name="label_set_as_primary">Set as primary</string>
+    <string name="btn_update_bike">Update Bike</string>
+    <string name="save_motorcycle">Save Motorcycle</string>
+    <string name="toast_bike_updated">Bike updated successfully!</string>
+    <string name="toast_bike_added">Bike added successfully!</string>
+    <string name="field_itv_date">ITV date (dd/mm/yyyy)</string>
+    <string name="field_insurance_date">Insurance date (dd/mm/yyyy)</string>
+
+    <!-- OpcionesMantenimiento -->
+    <string name="maintenance_option_title">Maintenance</string>
+    <string name="new_record">New Record</string>
+    <string name="new_record_subtitle">Register completed tasks</string>
+    <string name="view_history">View History</string>
+    <string name="view_history_subtitle">Browse past records</string>
+    <string name="plan_maintenance">Maintenance Plan</string>
+    <string name="plan_maintenance_subtitle">Recommended task schedule</string>
+    <string name="no_moto_selected">No motorcycle selected</string>
+
+    <!-- PlanMantenimiento -->
+    <string name="plan_maintenance_title">Maintenance Plan</string>
+    <string name="status_ok">OK</string>
+    <string name="status_soon">Due</string>
+    <string name="status_expired">Overdue</string>
+    <string name="status_no_data">No data</string>
+    <string name="plan_last_record">Last: %1$d km (%2$s)</string>
+    <string name="plan_no_record">No record</string>
+    <string name="plan_interval">· Every %1$d km</string>
+    <string name="plan_next_at">Next at %1$d km</string>
+
+    <!-- Notificaciones -->
+    <string name="channel_maintenance_name">Maintenance Due</string>
+    <string name="channel_maintenance_desc">Notifications for upcoming or overdue maintenance</string>
+    <string name="notif_soon_title">Maintenance due soon</string>
+    <string name="notif_soon_body">%1$s for %2$s needs attention (%3$d%% of interval covered)</string>
+    <string name="notif_expired_title">Maintenance overdue</string>
+    <string name="notif_expired_body">%1$s for %2$s — you should have done this by now</string>
+
+    <!-- PDF Export -->
+    <string name="pdf_title">Maintenance History</string>
+    <string name="pdf_subtitle">%1$s · %2$d km</string>
+    <string name="pdf_plate">Plate: %s</string>
+    <string name="pdf_health">Bike health: %1$d%%</string>
+    <string name="pdf_col_date">Date</string>
+    <string name="pdf_col_type">Type</string>
+    <string name="pdf_col_kms">KMs</string>
+    <string name="pdf_col_price">Price</string>
+    <string name="pdf_col_next_service">Next Svc.</string>
+    <string name="pdf_col_notes">Notes</string>
+    <string name="pdf_dash">—</string>
+
+    <!-- TorqueDashboardViewModel -->
+    <string name="wear_adjustment_note">Wear adjustment</string>
+
+    <!-- Category filters (RegistroMantenimiento) -->
+    <string name="category_all">All</string>
+    <string name="category_motor">Engine</string>
+    <string name="category_transmission">Transmission</string>
+    <string name="category_brakes">Brakes</string>
+    <string name="category_wheels">Wheels</string>
+    <string name="category_tires">Tires</string>
+    <string name="category_electrical">Electrical</string>
+    <string name="category_suspension">Suspension</string>
+</resources>

@@ -66,46 +66,55 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
     var filtroSeleccionado by remember { mutableStateOf("Todas") }
 
     val tareasMotor = listOf(
-        Tarea("Cambio de Aceite Motor", "Recomendado cada 5,000 km", Icons.Default.OilBarrel, Color(0xFF3B82F6), "Motor"),
-        Tarea("Filtro de Aceite", "Incluido en servicio estándar", Icons.Default.FilterAlt, Color(0xFFF97316), "Motor"),
-        Tarea("Bujías", "Reemplazo cada 10,000 km", Icons.Default.FlashOn, Color(0xFFFACC15), "Motor"),
-        Tarea("Filtro de Aire", "Limpieza o cambio cada 10,000 km", Icons.Default.Air, Color(0xFF60A5FA), "Motor"),
-        Tarea("Líquido Refrigerante", "Cambio cada 20,000 km", Icons.Default.WaterDrop, Color(0xFF06B6D4), "Motor"),
-        Tarea("Reglaje de Válvulas", "Cada 12,000 km", Icons.Default.Tune, Color(0xFF8B5CF6), "Motor")
+        Tarea(stringResource(R.string.task_oil_change), stringResource(R.string.task_oil_change_desc), Icons.Default.OilBarrel, Color(0xFF3B82F6), "Motor"),
+        Tarea(stringResource(R.string.task_oil_filter), stringResource(R.string.task_oil_filter_desc), Icons.Default.FilterAlt, Color(0xFFF97316), "Motor"),
+        Tarea(stringResource(R.string.task_spark_plugs), stringResource(R.string.task_spark_plugs_desc), Icons.Default.FlashOn, Color(0xFFFACC15), "Motor"),
+        Tarea(stringResource(R.string.task_air_filter), stringResource(R.string.task_air_filter_desc), Icons.Default.Air, Color(0xFF60A5FA), "Motor"),
+        Tarea(stringResource(R.string.task_coolant), stringResource(R.string.task_coolant_desc), Icons.Default.WaterDrop, Color(0xFF06B6D4), "Motor"),
+        Tarea(stringResource(R.string.task_valves), stringResource(R.string.task_valves_desc), Icons.Default.Tune, Color(0xFF8B5CF6), "Motor")
     )
 
     val tareasTransmision = listOf(
-        Tarea("Limpieza y Engrase de Cadena", "Mantenimiento regular cada 500 km", Icons.Default.SettingsInputComponent, Color(0xFF6366F1), "Transmisión"),
-        Tarea("Tensado de Cadena", "Revisar cada 1,000 km", Icons.Default.Link, Color(0xFFA78BFA), "Transmisión"),
-        Tarea("Cambio de Cadena y Coronas", "Cada 20,000 km", Icons.Default.Cyclone, Color(0xFF818CF8), "Transmisión")
+        Tarea(stringResource(R.string.task_chain_clean), stringResource(R.string.task_chain_clean_desc), Icons.Default.SettingsInputComponent, Color(0xFF6366F1), "Transmisión"),
+        Tarea(stringResource(R.string.task_chain_tension), stringResource(R.string.task_chain_tension_desc), Icons.Default.Link, Color(0xFFA78BFA), "Transmisión"),
+        Tarea(stringResource(R.string.task_chain_replace), stringResource(R.string.task_chain_replace_desc), Icons.Default.Cyclone, Color(0xFF818CF8), "Transmisión")
     )
 
     val tareasFrenos = listOf(
-        Tarea("Pastillas de Freno Delantero", "Revisar cada 5,000 km", Icons.Default.CarRepair, RojoError, "Frenos"),
-        Tarea("Pastillas de Freno Trasero", "Revisar cada 5,000 km", Icons.Default.CarRepair, Color(0xFFDC2626), "Frenos"),
-        Tarea("Líquido de Frenos", "Cambio cada 20,000 km", Icons.Default.Dangerous, Color(0xFFB91C1C), "Frenos"),
-        Tarea("Discos de Freno", "Inspeccionar desgaste cada 10,000 km", Icons.Default.DiscFull, Color(0xFF991B1B), "Frenos")
+        Tarea(stringResource(R.string.task_brake_pads_front), stringResource(R.string.task_brake_pads_front_desc), Icons.Default.CarRepair, RojoError, "Frenos"),
+        Tarea(stringResource(R.string.task_brake_pads_rear), stringResource(R.string.task_brake_pads_rear_desc), Icons.Default.CarRepair, Color(0xFFDC2626), "Frenos"),
+        Tarea(stringResource(R.string.task_brake_fluid), stringResource(R.string.task_brake_fluid_desc), Icons.Default.Dangerous, Color(0xFFB91C1C), "Frenos"),
+        Tarea(stringResource(R.string.task_brake_discs), stringResource(R.string.task_brake_discs_desc), Icons.Default.DiscFull, Color(0xFF991B1B), "Frenos")
     )
 
     val tareasNeumaticos = listOf(
-        Tarea("Presión de Neumáticos", "Revisión semanal", Icons.Default.TireRepair, Color(0xFF10B981), "Neumáticos"),
-        Tarea("Cambio de Neumáticos", "Cada 10,000 km o según desgaste", Icons.Default.Circle, Color(0xFF34D399), "Neumáticos")
+        Tarea(stringResource(R.string.task_tire_pressure), stringResource(R.string.task_tire_pressure_desc), Icons.Default.TireRepair, Color(0xFF10B981), "Neumáticos"),
+        Tarea(stringResource(R.string.task_tire_change), stringResource(R.string.task_tire_change_desc), Icons.Default.Circle, Color(0xFF34D399), "Neumáticos")
     )
 
     val tareasElectrico = listOf(
-        Tarea("Batería", "Revisar cada 6 meses", Icons.Default.BatteryStd, Color(0xFF84CC16), "Eléctrico"),
-        Tarea("Luces y Señalización", "Revisión mensual", Icons.Default.Lightbulb, AmarilloAdvertencia, "Eléctrico"),
-        Tarea("Centralita / ECU", "Diagnóstico anual", Icons.Default.Memory, Color(0xFFA3E635), "Eléctrico")
+        Tarea(stringResource(R.string.task_battery), stringResource(R.string.task_battery_desc), Icons.Default.BatteryStd, Color(0xFF84CC16), "Eléctrico"),
+        Tarea(stringResource(R.string.task_lights), stringResource(R.string.task_lights_desc), Icons.Default.Lightbulb, AmarilloAdvertencia, "Eléctrico"),
+        Tarea(stringResource(R.string.task_ecu), stringResource(R.string.task_ecu_desc), Icons.Default.Memory, Color(0xFFA3E635), "Eléctrico")
     )
 
     val tareasSuspension = listOf(
-        Tarea("Suspensión Delantera", "Revisión cada 15,000 km", Icons.Default.ArrowDownward, Color(0xFFE87930), "Suspensión"),
-        Tarea("Suspensión Trasera", "Revisión cada 15,000 km", Icons.Default.ArrowUpward, Color(0xFFE87930), "Suspensión"),
-        Tarea("Revisión de Retenes Horquilla", "Revisión cada 5,000 km", Icons.Default.Visibility, Color(0xFFE87930), "Suspensión"),
-        Tarea("Cambio de Retenes Horquilla", "Cambio cada 10,000 km", Icons.Default.Build, Color(0xFFE87930), "Suspensión")
+        Tarea(stringResource(R.string.task_suspension_front), stringResource(R.string.task_suspension_front_desc), Icons.Default.ArrowDownward, Color(0xFFE87930), "Suspensión"),
+        Tarea(stringResource(R.string.task_suspension_rear), stringResource(R.string.task_suspension_rear_desc), Icons.Default.ArrowUpward, Color(0xFFE87930), "Suspensión"),
+        Tarea(stringResource(R.string.task_fork_seals_inspect), stringResource(R.string.task_fork_seals_inspect_desc), Icons.Default.Visibility, Color(0xFFE87930), "Suspensión"),
+        Tarea(stringResource(R.string.task_fork_seals_replace), stringResource(R.string.task_fork_seals_replace_desc), Icons.Default.Build, Color(0xFFE87930), "Suspensión")
     )
 
 
+
+    val nombresSeccion = mapOf(
+        "Motor" to stringResource(R.string.category_motor),
+        "Transmisión" to stringResource(R.string.category_transmission),
+        "Frenos" to stringResource(R.string.category_brakes),
+        "Neumáticos" to stringResource(R.string.category_tires),
+        "Eléctrico" to stringResource(R.string.category_electrical),
+        "Suspensión" to stringResource(R.string.category_suspension)
+    )
 
     Box(
         modifier = Modifier
@@ -180,11 +189,11 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                         )
 
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            item { FiltroChip("Todas", estaSeleccionado = filtroSeleccionado == "Todas", onClick = { filtroSeleccionado = "Todas" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
-                            item { FiltroChip("Motor", estaSeleccionado = filtroSeleccionado == "Motor", onClick = { filtroSeleccionado = "Motor" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
-                            item { FiltroChip("Transmisión", estaSeleccionado = filtroSeleccionado == "Transmisión", onClick = { filtroSeleccionado = "Transmisión" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
-                            item { FiltroChip("Frenos", estaSeleccionado = filtroSeleccionado == "Frenos", onClick = { filtroSeleccionado = "Frenos" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
-                            item { FiltroChip("Ruedas", estaSeleccionado = filtroSeleccionado == "Ruedas", onClick = { filtroSeleccionado = "Ruedas" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip(stringResource(R.string.category_all), estaSeleccionado = filtroSeleccionado == "Todas", onClick = { filtroSeleccionado = "Todas" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip(stringResource(R.string.category_motor), estaSeleccionado = filtroSeleccionado == "Motor", onClick = { filtroSeleccionado = "Motor" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip(stringResource(R.string.category_transmission), estaSeleccionado = filtroSeleccionado == "Transmisión", onClick = { filtroSeleccionado = "Transmisión" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip(stringResource(R.string.category_brakes), estaSeleccionado = filtroSeleccionado == "Frenos", onClick = { filtroSeleccionado = "Frenos" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            item { FiltroChip(stringResource(R.string.category_wheels), estaSeleccionado = filtroSeleccionado == "Ruedas", onClick = { filtroSeleccionado = "Ruedas" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
                         }
                     }
                 }
@@ -220,7 +229,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     val listaFiltrada = if (consultaBusqueda.isBlank()) lista
                         else lista.filter { it.nombre.contains(consultaBusqueda, ignoreCase = true) }
                     if (listaFiltrada.isEmpty()) return@forEach
-                    item { EncabezadoDeSeccion(nombre) }
+                    item { EncabezadoDeSeccion(nombresSeccion[nombre] ?: nombre) }
                     items(listaFiltrada) { tarea ->
                         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
                             ElementoCheckMotoKeep(

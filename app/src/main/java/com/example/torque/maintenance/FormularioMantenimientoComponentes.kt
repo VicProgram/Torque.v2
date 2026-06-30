@@ -143,7 +143,7 @@ fun SeccionAdjuntos(
     onRemoveAdjunto: (Adjunto) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("ADJUNTOS", color = ColoresTorque.Primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Text(stringResource(R.string.section_attachments), color = ColoresTorque.Primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
@@ -153,7 +153,7 @@ fun SeccionAdjuntos(
             ) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Foto", fontSize = 13.sp)
+                Text(stringResource(R.string.btn_add_photo), fontSize = 13.sp)
             }
             OutlinedButton(
                 onClick = onAddFactura,
@@ -162,7 +162,7 @@ fun SeccionAdjuntos(
             ) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Factura", fontSize = 13.sp)
+                Text(stringResource(R.string.btn_add_invoice), fontSize = 13.sp)
             }
         }
 
@@ -182,7 +182,7 @@ fun SeccionAdjuntos(
                             onClick = { onRemoveAdjunto(adjunto) },
                             modifier = Modifier.align(Alignment.TopEnd).size(24.dp)
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = ColoresTorque.RojoError, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.content_desc_delete), tint = ColoresTorque.RojoError, modifier = Modifier.size(16.dp))
                         }
                     }
                 }
@@ -297,7 +297,7 @@ fun BotonGuardarFormulario(
             icon = Icons.Default.Save,
             onClick = {
                 if (idMoto == -1L) {
-                    Toast.makeText(contexto, "Error: No se identificó la moto", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(contexto, contexto.getString(R.string.toast_moto_not_found), Toast.LENGTH_SHORT).show()
                     return@BotonTorque
                 }
                 if (kms.isBlank()) {

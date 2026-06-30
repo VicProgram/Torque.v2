@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import com.example.torque.data.R
 
 object PdfExporter {
 
@@ -64,15 +65,15 @@ object PdfExporter {
             val margen = 40f
             val anchoPagina = 515f
 
-            canvasActual.drawText("Historial de Mantenimiento", margen, y, pinturaTitulo)
+            canvasActual.drawText(contexto.getString(R.string.pdf_title), margen, y, pinturaTitulo)
             y += 30f
-            canvasActual.drawText("${moto.marca} ${moto.modelo} · ${moto.kilometros} km", margen, y, pinturaSubtitulo)
+            canvasActual.drawText(contexto.getString(R.string.pdf_subtitle, "${moto.marca} ${moto.modelo}", moto.kilometros), margen, y, pinturaSubtitulo)
             y += 20f
-            canvasActual.drawText("Matrícula: ${moto.matricula}", margen, y, pinturaSubtitulo)
+            canvasActual.drawText(contexto.getString(R.string.pdf_plate, moto.matricula ?: ""), margen, y, pinturaSubtitulo)
             y += 25f
 
             if (resultadoSalud != null) {
-                canvasActual.drawText("Salud de la moto: ${resultadoSalud.saludGlobal}%", margen, y, pinturaSalud)
+                canvasActual.drawText(contexto.getString(R.string.pdf_health, resultadoSalud.saludGlobal), margen, y, pinturaSalud)
                 y += 30f
             }
 
@@ -80,12 +81,12 @@ object PdfExporter {
             y += 15f
 
             val columnas = listOf(
-                Columna("Fecha", 70f),
-                Columna("Tipo", 120f),
-                Columna("KMs", 60f),
-                Columna("Precio", 70f),
-                Columna("Próx. Serv.", 80f),
-                Columna("Notas", 115f)
+                Columna(contexto.getString(R.string.pdf_col_date), 70f),
+                Columna(contexto.getString(R.string.pdf_col_type), 120f),
+                Columna(contexto.getString(R.string.pdf_col_kms), 60f),
+                Columna(contexto.getString(R.string.pdf_col_price), 70f),
+                Columna(contexto.getString(R.string.pdf_col_next_service), 80f),
+                Columna(contexto.getString(R.string.pdf_col_notes), 115f)
             )
 
             canvasActual.drawRect(margen, y - 5f, margen + anchoPagina, y + 18f, pinturaFondoEncabezado)
@@ -106,12 +107,12 @@ object PdfExporter {
                     y = 40f
                 }
 
-                val proxServicio = if (m.intervaloKms > 0) "${m.kms + m.intervaloKms}" else "—"
+                val proxServicio = if (m.intervaloKms > 0) "${m.kms + m.intervaloKms}" else contexto.getString(R.string.pdf_dash)
                 val fila = listOf(
                     m.fecha.take(10),
                     m.nombreMantenimiento,
                     "${m.kms}",
-                    m.precio ?: "—",
+                    m.precio ?: contexto.getString(R.string.pdf_dash),
                     proxServicio,
                     m.notas ?: ""
                 )

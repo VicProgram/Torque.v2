@@ -172,7 +172,7 @@ class TorqueDashboardViewModel(
         }
     }
 
-    fun guardarAjustesDesgaste(idMoto: Long, porcentajes: Map<Long, Int>, onComplete: () -> Unit) {
+    fun guardarAjustesDesgaste(idMoto: Long, porcentajes: Map<Long, Int>, notas: String, onComplete: () -> Unit) {
         viewModelScope.launch {
             for ((tipoId, pct) in porcentajes) {
                 val ultimo = repositorio.obtenerUltimoMantenimientoPorTipo(idMoto, tipoId)
@@ -189,7 +189,7 @@ class TorqueDashboardViewModel(
                         intervaloKms = 0,
                         precio = "",
                         tiempo = "",
-                        notas = "Ajuste de desgaste",
+                        notas = notas,
                         tareas = tipo.nombre,
                         creadoEn = now,
                         tipoMantenimientoId = tipoId,

@@ -45,6 +45,7 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 | **Exportación a PDF** | Generación de PDF del historial de mantenimiento para entregar al cliente |
 | **Perfil de usuario** | Foto, nombre, email, teléfono, fecha de nacimiento y carnets |
 | **Backup completo** | Exportación/importación ZIP con DB + fotos + preferencias |
+| **Seguridad** | PII cifrada con AES-256-GCM via Android Keystore; backup deshabilitado; permisos mínimos |
 | **Modo oscuro** | Tema oscuro nativo optimizado para taller |
 | **Personalización** | 6 logos seleccionables desde ajustes |
 
@@ -59,6 +60,7 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 | **Material Design 3** | — |
 | **Room** | 2.6.1 |
 | **DataStore Preferences** | 1.1.2 |
+| **Android Keystore** | AES-256-GCM (cifrado PII) |
 | **Coil** | 2.7.0 |
 | **Koin** | 3.5.6 |
 | **Lifecycle ViewModel Compose** | 2.8.7 |
@@ -165,6 +167,8 @@ Torque.v2/
 ```
 
 > **Requisitos**: Android Studio Hedgehog+ · JDK 17 · Android SDK 35
+>
+> **Seguridad**: `android:allowBackup="false"` · solo 1 Activity exportada · `READ_EXTERNAL_STORAGE` eliminada · nombre/email/teléfono cifrados en reposo via Android Keystore (`AES/GCM/NoPadding`)
 
 ---
 
@@ -201,6 +205,17 @@ Reglas personalizadas en `config/detekt/detekt.yml`.
 ## Capturas de pantalla
 
 *(pendiente)*
+
+---
+
+## Seguridad
+
+| Hallazgo | Estado | Solución |
+|---|---|---|
+| Backup sin restricciones | ✅ Corregido | `android:allowBackup="false"` |
+| PII en texto plano | ✅ Corregido | Cifrado AES-256-GCM via Android Keystore (`CifradorPerfil`) |
+| 10 Activities sin `exported` | ✅ Corregido | `android:exported="false"` (excepto launcher) |
+| `READ_EXTERNAL_STORAGE` redundante | ✅ Corregido | Eliminado (sobra `READ_MEDIA_IMAGES`) |
 
 ---
 

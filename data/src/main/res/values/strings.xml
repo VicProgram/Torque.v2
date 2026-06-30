@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pdf_title">Historial de Mantenimiento</string>
+    <string name="pdf_subtitle">%1$s · %2$d km</string>
+    <string name="pdf_plate">Matrícula: %s</string>
+    <string name="pdf_health">Salud de la moto: %1$d%%</string>
+    <string name="pdf_col_date">Fecha</string>
+    <string name="pdf_col_type">Tipo</string>
+    <string name="pdf_col_kms">KMs</string>
+    <string name="pdf_col_price">Precio</string>
+    <string name="pdf_col_next_service">Próx. Serv.</string>
+    <string name="pdf_col_notes">Notas</string>
+    <string name="pdf_dash">—</string>
+</resources>

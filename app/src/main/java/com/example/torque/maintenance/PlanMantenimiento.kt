@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -157,12 +158,12 @@ fun PantallaPlanMantenimiento(idMoto: Long) {
                 IconButton(onClick = { (contexto as? Activity)?.terminar() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
+                        contentDescription = stringResource(com.example.torque.R.string.content_desc_back),
                         tint = ColoresTorque.Primary
                     )
                 }
                 Text(
-                    text = "Plan de Mantenimiento",
+                    text = stringResource(com.example.torque.R.string.plan_maintenance_title),
                     modifier = Modifier.weight(1f),
                     color = ColoresTorque.OnSurface,
                     fontSize = 18.sp,
@@ -212,10 +213,10 @@ fun PantallaPlanMantenimiento(idMoto: Long) {
                             .padding(vertical = 16.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Leyenda(Color(0xFF4CAF50), "OK")
-                        Leyenda(ColoresTorque.AmarilloAdvertencia, "Próximo")
-                        Leyenda(ColoresTorque.RojoError, "Vencido")
-                        Leyenda(ColoresTorque.OnSurfaceVariant, "Sin datos")
+                        Leyenda(Color(0xFF4CAF50), stringResource(com.example.torque.R.string.status_ok))
+                        Leyenda(ColoresTorque.AmarilloAdvertencia, stringResource(com.example.torque.R.string.status_soon))
+                        Leyenda(ColoresTorque.RojoError, stringResource(com.example.torque.R.string.status_expired))
+                        Leyenda(ColoresTorque.OnSurfaceVariant, stringResource(com.example.torque.R.string.status_no_data))
                     }
                 }
 
@@ -235,10 +236,10 @@ private fun ItemTareaPlan(tarea: TareaPlan) {
     }
 
     val textoEstado = when (tarea.estado) {
-        EstadoTarea.OK -> "OK"
-        EstadoTarea.PROXIMO -> "Próximo"
-        EstadoTarea.VENCIDO -> "Vencido"
-        EstadoTarea.SIN_DATOS -> "—"
+        EstadoTarea.OK -> stringResource(com.example.torque.R.string.status_ok)
+        EstadoTarea.PROXIMO -> stringResource(com.example.torque.R.string.status_soon)
+        EstadoTarea.VENCIDO -> stringResource(com.example.torque.R.string.status_expired)
+        EstadoTarea.SIN_DATOS -> stringResource(com.example.torque.R.string.pdf_dash)
     }
 
     Card(
@@ -266,21 +267,20 @@ private fun ItemTareaPlan(tarea: TareaPlan) {
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
-                val detalle = buildString {
-                    if (tarea.ultimoRegistro != null) {
-                        append("Último: ${tarea.ultimoRegistro.kms} km (${tarea.ultimoRegistro.fecha})")
-                    } else {
-                        append("Sin registro")
-                    }
-                    if (tarea.tipo.intervaloKms > 0) {
-                        append(" · Cada ${tarea.tipo.intervaloKms} km")
-                    }
+                val ultimoStr = if (tarea.ultimoRegistro != null) {
+                    stringResource(com.example.torque.R.string.plan_last_record, tarea.ultimoRegistro.kms, tarea.ultimoRegistro.fecha)
+                } else {
+                    stringResource(com.example.torque.R.string.plan_no_record)
                 }
+                val intervaloStr = if (tarea.tipo.intervaloKms > 0) {
+                    " " + stringResource(com.example.torque.R.string.plan_interval, tarea.tipo.intervaloKms)
+                } else ""
+                val detalle = ultimoStr + intervaloStr
                 Text(detalle, color = ColoresTorque.OnSurfaceVariant, fontSize = 11.sp)
 
                 if (tarea.proximoKms != null) {
                     Text(
-                        "Próximo a los ${tarea.proximoKms} km",
+                        stringResource(com.example.torque.R.string.plan_next_at, tarea.proximoKms),
                         color = ColoresTorque.Outline,
                         fontSize = 10.sp
                     )

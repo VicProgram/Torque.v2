@@ -87,12 +87,12 @@ fun AjustesScreen(onBack: () -> Unit) {
     ) { uri: Uri? ->
         uri?.let {
             coroutineScope.launch {
-                Toast.makeText(context, "Exportando copia de seguridad…", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(com.example.torque.R.string.toast_exporting_backup), Toast.LENGTH_SHORT).show()
                 val resultado = BackupManager.exportar(context, it)
                 if (resultado.isSuccess) {
-                    Toast.makeText(context, "Copia de seguridad guardada", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(com.example.torque.R.string.toast_backup_saved_title), Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(context, "Error al exportar: ${resultado.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(com.example.torque.R.string.toast_backup_error, resultado.exceptionOrNull()?.message), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -122,7 +122,7 @@ fun AjustesScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = ColoresTorque.Primary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(com.example.torque.R.string.content_desc_back), tint = ColoresTorque.Primary)
                 }
                 Text(
                     text = stringResource(id = com.example.torque.R.string.settings_title),
@@ -191,7 +191,7 @@ fun AjustesScreen(onBack: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "COPIA DE SEGURIDAD",
+                    text = stringResource(id = com.example.torque.R.string.backup_section),
                     color = ColoresTorque.Primary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
@@ -203,15 +203,15 @@ fun AjustesScreen(onBack: () -> Unit) {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .background(ColoresTorque.SurfaceDark)
-                        .clickable { crearBackup.launch("torque_backup.zip") }
+                        .clickable { crearBackup.launch(context.getString(com.example.torque.R.string.backup_default_name)) }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Default.Backup, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(text = "Exportar copia", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = "BD + fotos + preferencias", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                        Text(text = stringResource(com.example.torque.R.string.export_backup), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(text = stringResource(com.example.torque.R.string.export_backup_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                     }
                 }
 
@@ -227,8 +227,8 @@ fun AjustesScreen(onBack: () -> Unit) {
                     Icon(Icons.Default.Restore, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(text = if (restaurando) "Restaurando…" else "Restaurar copia", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = "Sustituye todos los datos actuales", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                        Text(text = if (restaurando) stringResource(com.example.torque.R.string.restoring) else stringResource(com.example.torque.R.string.restore_backup), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(text = stringResource(com.example.torque.R.string.restore_backup_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                     }
                 }
             }
@@ -241,8 +241,8 @@ fun AjustesScreen(onBack: () -> Unit) {
                 titleContentColor = Color.White,
                 textContentColor = Color.White,
                 icon = { Icon(Icons.Default.Restore, contentDescription = null, tint = ColoresTorque.Primary) },
-                title = { Text("¿Restaurar copia?") },
-                text = { Text("Se sustituirán todos los datos actuales (motos, fotos, mantenimientos y preferencias). La app se reiniciará.") },
+                title = { Text(stringResource(com.example.torque.R.string.dialog_restore_title)) },
+                text = { Text(stringResource(com.example.torque.R.string.dialog_restore_message)) },
                 confirmButton = {
                     TextButton(onClick = {
                         mostrarDialogoRestaurar = false
@@ -251,21 +251,21 @@ fun AjustesScreen(onBack: () -> Unit) {
                             uriRestaurar?.let { uri ->
                                 val resultado = BackupManager.restaurar(context, uri)
                                 if (resultado.isSuccess) {
-                                    Toast.makeText(context, "Datos restaurados. La app se cerrará.", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, context.getString(com.example.torque.R.string.toast_restore_success), Toast.LENGTH_LONG).show()
                                     (context as? android.app.Activity)?.finishAffinity()
                                 } else {
-                                    Toast.makeText(context, "Error al restaurar: ${resultado.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, context.getString(com.example.torque.R.string.toast_restore_error, resultado.exceptionOrNull()?.message), Toast.LENGTH_LONG).show()
                                     restaurando = false
                                 }
                             }
                         }
                     }) {
-                        Text("Restaurar", color = ColoresTorque.Primary)
+                        Text(stringResource(com.example.torque.R.string.btn_restore), color = ColoresTorque.Primary)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoRestaurar = false }) {
-                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                        Text(stringResource(com.example.torque.R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )

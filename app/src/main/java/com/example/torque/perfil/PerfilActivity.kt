@@ -31,6 +31,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.torque.R
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.vector.ImageVector
 import coil.compose.rememberAsyncImagePainter
@@ -109,10 +111,10 @@ fun PerfilScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = ColoresTorque.Primary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(com.example.torque.R.string.content_desc_back), tint = ColoresTorque.Primary)
                 }
                 Text(
-                    text = "Mi Perfil",
+                    text = stringResource(com.example.torque.R.string.my_profile_title),
                     modifier = Modifier.weight(1f),
                     color = Color.White,
                     fontSize = 20.sp,
@@ -127,13 +129,13 @@ fun PerfilScreen(onBack: () -> Unit) {
                             repositorio.establecerFechaNacimientoIso(editFecha.trim())
                             repositorio.establecerCarnets(editCarnets)
                         }
-                        Toast.makeText(contexto, "Perfil guardado", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(contexto, contexto.getString(com.example.torque.R.string.toast_profile_saved), Toast.LENGTH_SHORT).show()
                     }
                     editando = !editando
                 }) {
                     Icon(
                         if (editando) Icons.Default.Save else Icons.Default.Edit,
-                        contentDescription = if (editando) "Guardar" else "Editar",
+                        contentDescription = if (editando) stringResource(com.example.torque.R.string.content_desc_save) else stringResource(com.example.torque.R.string.content_desc_edit),
                         tint = ColoresTorque.Primary
                     )
                 }
@@ -181,7 +183,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                         ) {
                             Icon(
                                 Icons.Default.CameraAlt,
-                                contentDescription = "Cambiar foto",
+                                contentDescription = stringResource(com.example.torque.R.string.change_photo),
                                 tint = Color.White,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -196,10 +198,10 @@ fun PerfilScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (editando) {
-                        CampoTextoTorque(value = editNombre, onValueChange = { editNombre = it }, label = "Nombre")
-                        CampoTextoTorque(value = editEmail, onValueChange = { editEmail = it }, label = "Correo electrónico")
-                        CampoTextoTorque(value = editTelefono, onValueChange = { editTelefono = it }, label = "Teléfono")
-                        CampoTextoTorque(value = editFecha, onValueChange = { editFecha = it }, label = "Fecha nacimiento (YYYY-MM-DD)")
+                        CampoTextoTorque(value = editNombre, onValueChange = { editNombre = it }, label = stringResource(com.example.torque.R.string.profile_name))
+                        CampoTextoTorque(value = editEmail, onValueChange = { editEmail = it }, label = stringResource(com.example.torque.R.string.profile_email))
+                        CampoTextoTorque(value = editTelefono, onValueChange = { editTelefono = it }, label = stringResource(com.example.torque.R.string.profile_phone))
+                        CampoTextoTorque(value = editFecha, onValueChange = { editFecha = it }, label = stringResource(com.example.torque.R.string.profile_birthday_hint))
                     } else {
                         if (nombre.isNullOrBlank().not()) {
                             Text(text = nombre ?: "", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
@@ -221,7 +223,7 @@ fun PerfilScreen(onBack: () -> Unit) {
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "MIS CARNETS",
+                        text = stringResource(com.example.torque.R.string.my_licenses),
                         color = ColoresTorque.Primary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,

@@ -90,7 +90,7 @@ private suspend fun guardarMantenimiento(
 
         val mantenimiento = MantenimientoEntity(
             idMoto = idMoto,
-            nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else "Mantenimiento General",
+            nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else contexto.getString(R.string.general_maintenance),
             fecha = fechaActual,
             kms = kmNuevos,
             intervaloKms = intervaloKms,
@@ -121,7 +121,7 @@ private suspend fun guardarMantenimiento(
         Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
         (contexto as? Activity)?.terminar()
     } catch (e: Exception) {
-        Toast.makeText(contexto, "Error al guardar: ${e.message}", Toast.LENGTH_LONG).show()
+        Toast.makeText(contexto, contexto.getString(R.string.toast_save_error, e.message), Toast.LENGTH_LONG).show()
     }
 }
 

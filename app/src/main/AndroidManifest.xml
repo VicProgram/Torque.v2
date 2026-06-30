@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permisos para imágenes (si usas galería) -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".TorqueApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="Torque"
         android:theme="@style/Theme.TorqueLight">
@@ -30,20 +28,20 @@
         </activity>
 
         <!-- Activities de Maintenance -->
-        <activity android:name=".maintenance.RegistroMantenimiento" />
-        <activity android:name=".maintenance.FormularioMantenimiento" />
-        <activity android:name=".maintenance.OpcionesMantenimiento" />
-        <activity android:name=".maintenance.MantenimientoHistorial" />
-        <activity android:name=".maintenance.PlanMantenimiento" />
+        <activity android:name=".maintenance.RegistroMantenimiento" android:exported="false" />
+        <activity android:name=".maintenance.FormularioMantenimiento" android:exported="false" />
+        <activity android:name=".maintenance.OpcionesMantenimiento" android:exported="false" />
+        <activity android:name=".maintenance.MantenimientoHistorial" android:exported="false" />
+        <activity android:name=".maintenance.PlanMantenimiento" android:exported="false" />
 
         <!-- Activities de Garage -->
-        <activity android:name=".garage.MotoDetalle" />
-        <activity android:name=".garage.AnadirMotoActivity" />
-        <activity android:name=".garage.ListaGaraje" />
+        <activity android:name=".garage.MotoDetalle" android:exported="false" />
+        <activity android:name=".garage.AnadirMotoActivity" android:exported="false" />
+        <activity android:name=".garage.ListaGaraje" android:exported="false" />
 
         <!-- Perfil y Ajustes -->
-        <activity android:name=".perfil.PerfilActivity" />
-        <activity android:name=".ajustes.AjustesActivity" />
+        <activity android:name=".perfil.PerfilActivity" android:exported="false" />
+        <activity android:name=".ajustes.AjustesActivity" android:exported="false" />
 
     </application>
 </manifest>

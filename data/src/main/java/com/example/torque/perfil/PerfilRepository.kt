@@ -18,9 +18,15 @@ object ClavesPerfil {
 
 open class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
 
-    open val nombreFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.NOMBRE] }
-    val emailFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.EMAIL] }
-    val telefonoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.TELEFONO] }
+    open val nombreFlow: Flow<String?> = dataStore.data.map { prefs ->
+        prefs[ClavesPerfil.NOMBRE]?.let { CifradorPerfil.descifrar(it) }
+    }
+    val emailFlow: Flow<String?> = dataStore.data.map { prefs ->
+        prefs[ClavesPerfil.EMAIL]?.let { CifradorPerfil.descifrar(it) }
+    }
+    val telefonoFlow: Flow<String?> = dataStore.data.map { prefs ->
+        prefs[ClavesPerfil.TELEFONO]?.let { CifradorPerfil.descifrar(it) }
+    }
     val fotoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.FOTO_PERFIL] }
     val fechaNacimientoFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.FECHA_NACIMIENTO] }
     val carnetsFlow: Flow<Set<String>> = dataStore.data.map { prefs ->
@@ -28,15 +34,15 @@ open class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
     }
 
     open suspend fun establecerNombre(nombre: String) {
-        dataStore.edit { prefs -> prefs[ClavesPerfil.NOMBRE] = nombre }
+        dataStore.edit { prefs -> prefs[ClavesPerfil.NOMBRE] = CifradorPerfil.cifrar(nombre) }
     }
 
     suspend fun establecerEmail(email: String) {
-        dataStore.edit { prefs -> prefs[ClavesPerfil.EMAIL] = email }
+        dataStore.edit { prefs -> prefs[ClavesPerfil.EMAIL] = CifradorPerfil.cifrar(email) }
     }
 
     suspend fun establecerTelefono(telefono: String) {
-        dataStore.edit { prefs -> prefs[ClavesPerfil.TELEFONO] = telefono }
+        dataStore.edit { prefs -> prefs[ClavesPerfil.TELEFONO] = CifradorPerfil.cifrar(telefono) }
     }
 
     suspend fun establecerFoto(ruta: String) {

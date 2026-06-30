@@ -128,9 +128,9 @@ fun VistaListaGaraje() {
                         modifier = Modifier.padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        item { FiltroChip("Todas", estaSeleccionado = filtroActivo == "Todas", onClick = { filtroActivo = "Todas" }) }
-                        item { FiltroChip("En Uso", estaSeleccionado = filtroActivo == "En Uso", onClick = { filtroActivo = "En Uso" }) }
-                        item { FiltroChip("Históricas", estaSeleccionado = filtroActivo == "Históricas", onClick = { filtroActivo = "Históricas" }) }
+                        item { FiltroChip(stringResource(R.string.filter_all_bikes), estaSeleccionado = filtroActivo == "Todas", onClick = { filtroActivo = "Todas" }) }
+                        item { FiltroChip(stringResource(R.string.filter_in_use), estaSeleccionado = filtroActivo == "En Uso", onClick = { filtroActivo = "En Uso" }) }
+                        item { FiltroChip(stringResource(R.string.filter_historical), estaSeleccionado = filtroActivo == "Históricas", onClick = { filtroActivo = "Históricas" }) }
                     }
                 }
 

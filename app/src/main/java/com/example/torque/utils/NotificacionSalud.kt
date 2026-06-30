@@ -24,8 +24,8 @@ object NotificacionSalud {
     private val ClaveNotificados = stringPreferencesKey(TAG_NOTIFICADOS)
 
     fun crearCanal(contexto: Context) {
-        val nombre = "Vencimiento de Mantenimiento"
-        val descripcion = "Notificaciones de mantenimientos próximos a vencer o vencidos"
+        val nombre = contexto.getString(R.string.channel_maintenance_name)
+        val descripcion = contexto.getString(R.string.channel_maintenance_desc)
         val importancia = NotificationManager.IMPORTANCE_DEFAULT
         val canal = NotificationChannel(CANAL_MANTENIMIENTO, nombre, importancia).apply {
             description = descripcion
@@ -84,8 +84,8 @@ object NotificacionSalud {
             mostrarNotificacion(
                 contexto = contexto,
                 id = (tipoId * 10 + 1).toInt(),
-                titulo = "Mantenimiento próximo a vencer",
-                mensaje = "$nombreTipo de $motoNombre necesita atención (${100 - cumplimiento}% del intervalo recorrido)"
+                titulo = contexto.getString(R.string.notif_soon_title),
+                mensaje = contexto.getString(R.string.notif_soon_body, nombreTipo, motoNombre, 100 - cumplimiento)
             )
             nuevosNotificados.add(claveWarning)
         }
@@ -94,8 +94,8 @@ object NotificacionSalud {
             mostrarNotificacion(
                 contexto = contexto,
                 id = (tipoId * 10 + 2).toInt(),
-                titulo = "Mantenimiento vencido",
-                mensaje = "$nombreTipo de $motoNombre — ya deberías haberlo realizado"
+                titulo = contexto.getString(R.string.notif_expired_title),
+                mensaje = contexto.getString(R.string.notif_expired_body, nombreTipo, motoNombre)
             )
             nuevosNotificados.add(claveExpired)
         }

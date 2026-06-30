@@ -21,6 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.torque.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -108,13 +110,13 @@ fun PantallaOpcionesMantenimiento(
                 IconButton(onClick = onAtras) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
+                        contentDescription = stringResource(R.string.content_desc_back),
                         tint = ColoresTorque.Primary,
                         modifier = Modifier.size(24.dp)
                     )
                 }
                 Text(
-                    text = "Mantenimiento",
+                    text = stringResource(R.string.maintenance_option_title),
                     modifier = Modifier.weight(1f),
                     color = Color.White,
                     fontSize = 18.sp,
@@ -150,31 +152,31 @@ fun PantallaOpcionesMantenimiento(
                     }
 
                     TarjetaOpcionMantenimiento(
-                        titulo = "Nuevo Registro",
-                        subtitulo = "Registrar tareas realizadas",
+                        titulo = stringResource(R.string.new_record),
+                        subtitulo = stringResource(R.string.new_record_subtitle),
                         icono = Icons.Default.Build,
                         color = ColoresTorque.Primary,
                         onClick = { onNuevoMantenimiento(moto.idMoto) }
                     )
 
                     TarjetaOpcionMantenimiento(
-                        titulo = "Ver Historial",
-                        subtitulo = "Consulta registros pasados",
+                        titulo = stringResource(R.string.view_history),
+                        subtitulo = stringResource(R.string.view_history_subtitle),
                         icono = Icons.Default.History,
                         color = ColoresTorque.Accent,
                         onClick = { onVerHistorial(moto.idMoto) }
                     )
 
                     TarjetaOpcionMantenimiento(
-                        titulo = "Plan de Mantenimiento",
-                        subtitulo = "Calendario de tareas recomendadas",
+                        titulo = stringResource(R.string.plan_maintenance),
+                        subtitulo = stringResource(R.string.plan_maintenance_subtitle),
                         icono = Icons.Default.Schedule,
                         color = ColoresTorque.Tertiary,
                         onClick = { onVerPlan(moto.idMoto) }
                     )
                 } ?: run {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay ninguna moto seleccionada", color = Color.White)
+                        Text(stringResource(R.string.no_moto_selected), color = Color.White)
                     }
                 }
             }

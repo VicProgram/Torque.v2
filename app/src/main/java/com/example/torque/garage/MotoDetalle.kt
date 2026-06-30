@@ -225,7 +225,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Plan de Mantenimiento", color = Color.White) },
+                                text = { Text(stringResource(R.string.menu_plan_maintenance), color = Color.White) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.Schedule,
@@ -345,8 +345,8 @@ fun VistaMotoDetalle(idMoto: Long) {
                         FilaDetalle(stringResource(R.string.label_kilometers), "${m.kilometros} km", editable = true, onClick = {
                             mostrarDialogoKm = true
                         })
-                        FilaDetalle("ITV", m.fechaItv ?: stringResource(R.string.not_available))
-                        FilaDetalle("Seguro", m.fechaSeguro ?: stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_itv), m.fechaItv ?: stringResource(R.string.not_available))
+                        FilaDetalle(stringResource(R.string.label_insurance), m.fechaSeguro ?: stringResource(R.string.not_available))
                         FilaDetalle(stringResource(R.string.label_style), m.estilo ?: stringResource(R.string.not_available))
                     }
 

@@ -101,7 +101,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 exportandoPdf = true
                 val resultado = idMoto?.let { id -> viewModel.exportarPdf(contexto, it, id) }
                 if (resultado?.isFailure == true) {
-                    android.widget.Toast.makeText(contexto, "Error al exportar PDF: ${resultado.exceptionOrNull()?.message}", android.widget.Toast.LENGTH_LONG).show()
+                    android.widget.Toast.makeText(contexto, contexto.getString(R.string.toast_pdf_error, resultado.exceptionOrNull()?.message), android.widget.Toast.LENGTH_LONG).show()
                 }
                 exportandoPdf = false
             }
@@ -186,7 +186,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 ) {
                     Icon(
                         Icons.Default.Description,
-                        contentDescription = "Exportar PDF",
+                        contentDescription = stringResource(R.string.export_pdf_content_desc),
                         tint = if (exportandoPdf) ColoresTorque.OnSurfaceVariant else ColoresTorque.Primary
                     )
                 }
@@ -195,11 +195,11 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
             LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(bottom = 140.dp)) {
                 // Filtros
                 item {
+                    val filtros = listOf(stringResource(R.string.filter_all), stringResource(R.string.filter_oil), stringResource(R.string.filter_filter), stringResource(R.string.filter_tire), stringResource(R.string.filter_chain), stringResource(R.string.filter_brakes), stringResource(R.string.filter_suspension))
                     LazyRow(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val filtros = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos", "Suspensión")
                         items(filtros) { filtro ->
                             FiltroChip(
                                 texto = filtro,

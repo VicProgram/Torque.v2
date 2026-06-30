@@ -24,7 +24,8 @@
 20. [Cómo Añadir un Nuevo Tipo de Mantenimiento](#20-cómo-añadir-un-nuevo-tipo-de-mantenimiento)
 21. [Cómo Añadir un Nuevo Elemento al Plan](#21-cómo-añadir-un-nuevo-elemento-al-plan)
 22. [Cómo Añadir una Nueva Pantalla](#22-cómo-añadir-una-nueva-pantalla)
-23. [Convenciones de Código](#23-convenciones-de-código)
+23. [Seguridad](#23-seguridad)
+24. [Convenciones de Código](#24-convenciones-de-código)
 
 ---
 
@@ -114,6 +115,9 @@ Torque.v2/
 │       │           └── DatosAnualesDao.kt      # ITV + Seguro
 │       ├── ajustes/
 │       │   └── AjustesRepository.kt # DataStore: notificaciones, dark mode, logo
+│       ├── perfil/
+│       │   ├── PerfilRepository.kt  # DataStore del perfil (nombres, email, teléfono)
+│       │   └── CifradorPerfil.kt    # Cifrado AES-256-GCM via Android Keystore
 │       └── utils/
 │           ├── SaludMotoCalculator.kt # Algoritmo de salud
 │           ├── BackupManager.kt       # Export/import ZIP
@@ -366,8 +370,9 @@ val appModule = module {
 
 ### AndroidManifest.xml
 
-- 10 Activities declaradas
-- Permisos: `READ_EXTERNAL_STORAGE`, `READ_MEDIA_IMAGES`, `POST_NOTIFICATIONS`
+- 11 Activities declaradas (10 con `android:exported="false"`, solo launcher con `exported="true"`)
+- Permisos: `READ_MEDIA_IMAGES`, `POST_NOTIFICATIONS` (se eliminó `READ_EXTERNAL_STORAGE` — sobra desde API 33)
+- `android:allowBackup="false"` — deshabilitado para evitar extracción de DB y DataStore via adb
 - Launcher Activity: `MenuPrincipal` con splash theme
 - Sentry auto-init deshabilitado (se inicializa manualmente)
 
@@ -497,8 +502,15 @@ Objeto que re-exporta los colores del tema + componentes reutilizables:
 
 ### Perfil
 
+**`CifradorPerfil.kt`** — Cifrado de datos personales en reposo:
+- Usa AES-256-GCM con clave generada en Android Keystore (`KeyGenParameterSpec`)
+- `cifrar(texto)` → Base64(IV + ciphertext); `descifrar(cifrado)` → texto original
+- `descifrar()` tiene fallback silencioso para datos legacy no cifrados (migración automática)
+- Sin dependencias externas — usa `KeyStore` + `Cipher` del JDK
+
 **`PerfilRepository.kt`** — DataStore con 5 claves:
-- `perfil_nombre`, `perfil_email`, `perfil_telefono`, `perfil_foto`, `perfil_fecha_nacimiento_iso`
+- `perfil_nombre`, `perfil_email`, `perfil_telefono` → cifrados con `CifradorPerfil`
+- `perfil_foto`, `perfil_fecha_nacimiento_iso` → sin cifrar (rutas de archivo, no PII sensible)
 
 **`PerfilActivity.kt`** — Pantalla de perfil:
 - Foto circular (click para cambiar desde galería, usando `ArchivoUtils.copiarImagenAInterno`)
@@ -1155,7 +1167,39 @@ Genera un documento PDF con:
 
 ---
 
-## 23. Convenciones de Código
+## 23. Seguridad
+
+### AndroidManifest
+
+| Medida | Detalle |
+|---|---|
+| `android:allowBackup="false"` | Previene extracción de DB + DataStore via `adb backup` |
+| `android:exported="false"` en 10/11 Activities | Solo `MenuPrincipal` (launcher) es exportada |
+| `READ_EXTERNAL_STORAGE` eliminado | `READ_MEDIA_IMAGES` (API 33+) cubre la selección de fotos |
+
+### Cifrado de PII en reposo
+
+**Archivo**: `data/src/main/java/.../perfil/CifradorPerfil.kt`
+
+Las claves `perfil_nombre`, `perfil_email` y `perfil_telefono` del DataStore de perfil se almacenan cifradas:
+
+```
+cifrar:  texto → Cipher(AES/GCM/NoPadding, ENCRYPT_MODE) → IV(12) + ciphertext → Base64
+descifrar: Base64 → IV(12) + ciphertext → Cipher(AES/GCM/NoPadding, DECRYPT_MODE, KeystoreKey) → texto
+```
+
+- Algoritmo: **AES-256-GCM** con IV de 12 bytes y tag de 128 bits
+- Clave generada en **Android Keystore** (`KeyGenParameterSpec`) — no exportable, hardware-backed si el dispositivo lo soporta
+- Sin dependencias externas: usa `java.security.KeyStore` + `javax.crypto.Cipher`
+- Migración automática: `descifrar()` captura excepciones y retorna el texto intacto si el valor legacy no estaba cifrado
+
+### Actividades exportadas
+
+Todas las Activities internas (10 de 11) tienen `android:exported="false"`. Solo `MenuPrincipal` (launcher con `MAIN`/`LAUNCHER`) es exportada. Esto elimina la ambigüedad en API 28–30 y evita intents externos no deseados.
+
+---
+
+## 24. Convenciones de Código
 
 ### Estilo
 - Kotlin con nombres en español (el proyecto fue desarrollado para un público hispanohablante)
@@ -1195,4 +1239,5 @@ Genera un documento PDF con:
 
 ### Manejo de permisos
 - `POST_NOTIFICATIONS`: solicitado en runtime (Android 13+) vía `rememberLauncherForActivityResult` en el dashboard
-- `READ_MEDIA_IMAGES` / `READ_EXTERNAL_STORAGE`: declarados en manifest (para selección de fotos de galería)
+- `READ_MEDIA_IMAGES`: declarado en manifest (para selección de fotos de galería, API 33+)
+- `READ_EXTERNAL_STORAGE`: eliminado — redundante desde API 33

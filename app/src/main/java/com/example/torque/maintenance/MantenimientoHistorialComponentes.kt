@@ -146,7 +146,7 @@ fun DetalleMantenimientoEntityScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Text("ADJUNTOS", color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.section_attachments), color = ColoresTorque.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
                 onClick = { launcherFoto.launch("image/*") },
@@ -155,7 +155,7 @@ fun DetalleMantenimientoEntityScreen(
             ) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Foto", fontSize = 12.sp)
+                Text(stringResource(R.string.btn_add_photo), fontSize = 12.sp)
             }
             OutlinedButton(
                 onClick = { launcherFactura.launch("image/*") },
@@ -164,7 +164,7 @@ fun DetalleMantenimientoEntityScreen(
             ) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Factura", fontSize = 12.sp)
+                Text(stringResource(R.string.btn_add_invoice), fontSize = 12.sp)
             }
         }
         if (fotos.isNotEmpty()) {
@@ -184,7 +184,7 @@ fun DetalleMantenimientoEntityScreen(
                             onClick = { onDeleteFoto(foto) },
                             modifier = Modifier.align(Alignment.TopEnd).size(20.dp)
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = "Eliminar", tint = ColoresTorque.RojoError, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.content_desc_delete), tint = ColoresTorque.RojoError, modifier = Modifier.size(14.dp))
                         }
                         if (foto.tipo == "factura") {
                             Box(
@@ -193,7 +193,7 @@ fun DetalleMantenimientoEntityScreen(
                                     .background(ColoresTorque.Accent.copy(alpha = 0.8f), RoundedCornerShape(topEnd = 4.dp, bottomStart = 4.dp))
                                     .padding(horizontal = 4.dp, vertical = 1.dp)
                             ) {
-                                Text("FACTURA", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.invoice_badge), color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }

@@ -84,7 +84,7 @@ fun TorqueDashboardScreen(
         val salud = uiState.resultadoSalud
         val moto = motoActual
         if (salud != null && moto != null) {
-            val nombreMoto = moto.modelo.ifBlank { "Tu moto" }
+            val nombreMoto = moto.modelo.ifBlank { contexto.getString(R.string.your_main_bike) }
             NotificacionSalud.verificarYNotificar(contexto, salud, nombreMoto)
         }
     }
@@ -275,7 +275,7 @@ fun TorqueDashboardScreen(
                     item {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = "RECORDATORIOS",
+                                text = stringResource(R.string.reminders_section),
                                 color = ColoresTorque.AmarilloAdvertencia,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
@@ -294,8 +294,8 @@ fun TorqueDashboardScreen(
                                 ) {
                                     Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = ColoresTorque.AmarilloAdvertencia, modifier = Modifier.size(24.dp))
                                     Column {
-                                        Text("ITX próximos 30 días", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                                        Text("Vence: ${uiState.fechaItv ?: "—"}", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                                        Text(stringResource(R.string.itv_soon), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                        Text(stringResource(R.string.itv_expires, uiState.fechaItv ?: "-"), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                                     }
                                 }
                             }
@@ -311,8 +311,8 @@ fun TorqueDashboardScreen(
                                 ) {
                                     Icon(Icons.Default.Shield, contentDescription = null, tint = ColoresTorque.AmarilloAdvertencia, modifier = Modifier.size(24.dp))
                                     Column {
-                                        Text("Seguro próximo a vencer", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                                        Text("Vence: ${uiState.fechaSeguro ?: "—"}", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                                        Text(stringResource(R.string.insurance_soon), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                                        Text(stringResource(R.string.insurance_expires, uiState.fechaSeguro ?: "-"), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                                     }
                                 }
                             }
@@ -341,7 +341,7 @@ fun TorqueDashboardScreen(
                 initialPorcentajes = uiState.porcentajesDesgaste,
                 onDismiss = { mostrarDialogoDesgaste = false },
                 onGuardar = { porcentajes ->
-                    viewModel.guardarAjustesDesgaste(motoActual.idMoto, porcentajes) {
+                    viewModel.guardarAjustesDesgaste(motoActual.idMoto, porcentajes, contexto.getString(R.string.wear_adjustment_note)) {
                         mostrarDialogoDesgaste = false
                     }
                 }
