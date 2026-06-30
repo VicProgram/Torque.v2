@@ -2,7 +2,7 @@ package com.example.torque.maintenance
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import com.example.torque.base.BaseActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -37,7 +37,7 @@ import com.example.torque.R
 import com.example.torque.components.ui.dashboard.*
 import com.example.torque.ui.theme.TorqueTheme
 
-class RegistroMantenimiento : ComponentActivity() {
+class RegistroMantenimiento : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

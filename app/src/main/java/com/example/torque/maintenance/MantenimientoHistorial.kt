@@ -4,7 +4,7 @@ import android.content.Intent
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import com.example.torque.base.BaseActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class MantenimientoHistorial : ComponentActivity() {
+class MantenimientoHistorial : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

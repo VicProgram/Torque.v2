@@ -100,6 +100,11 @@
     <string name="privacy_subtitle">Manage your data</string>
     <string name="backup">Backup</string>
     <string name="backup_subtitle">Database backup</string>
+    <string name="language">Language</string>
+    <string name="language_subtitle">Select app language</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_english">English</string>
+
     <string name="backup_section">BACKUP</string>
     <string name="export_backup">Export backup</string>
     <string name="export_backup_subtitle">DB + photos + preferences</string>

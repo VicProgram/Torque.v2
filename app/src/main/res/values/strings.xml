@@ -100,6 +100,11 @@
     <string name="privacy_subtitle">Gestionar tus datos</string>
     <string name="backup">Copia de Seguridad</string>
     <string name="backup_subtitle">Copia de seguridad de la base de datos</string>
+    <string name="language">Idioma</string>
+    <string name="language_subtitle">Seleccionar idioma de la aplicación</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">Inglés</string>
+
     <string name="backup_section">COPIA DE SEGURIDAD</string>
     <string name="export_backup">Exportar copia</string>
     <string name="export_backup_subtitle">BD + fotos + preferencias</string>

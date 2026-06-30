@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
+import com.example.torque.base.BaseActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -115,7 +115,7 @@ class PlanMantenimientoViewModel(application: Application) : AndroidViewModel(ap
     }
 }
 
-class PlanMantenimiento : ComponentActivity() {
+class PlanMantenimiento : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

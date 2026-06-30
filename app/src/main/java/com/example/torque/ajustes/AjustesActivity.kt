@@ -3,7 +3,6 @@ package com.example.torque.ajustes
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Restore
@@ -53,12 +53,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
+import com.example.torque.R
+import com.example.torque.base.BaseActivity
 import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.ajustes.AjustesRepositorio
 import com.example.torque.utils.BackupManager
+import com.example.torque.utils.LocaleHelper
 
-class AjustesActivity : ComponentActivity() {
+class AjustesActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -78,6 +81,8 @@ fun AjustesScreen(onBack: () -> Unit) {
 
     val notificacionesActivadas by repo.notificacionesActivadasFlow.collectAsState(initial = true)
     val modoOscuroActivado by repo.modoOscuroActivadoFlow.collectAsState(initial = true)
+    val idiomaActual by repo.idiomaFlow.collectAsState(initial = "es")
+    var mostrarDialogoIdioma by remember { mutableStateOf(false) }
     var mostrarDialogoRestaurar by remember { mutableStateOf(false) }
     var uriRestaurar by remember { mutableStateOf<Uri?>(null) }
     var restaurando by remember { mutableStateOf(false) }
@@ -189,6 +194,29 @@ fun AjustesScreen(onBack: () -> Unit) {
                     )
                 }
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(ColoresTorque.SurfaceDark)
+                        .clickable { mostrarDialogoIdioma = true }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Language, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = stringResource(id = R.string.language), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(text = stringResource(id = R.string.language_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                    }
+                    Text(
+                        text = if (idiomaActual == "es") stringResource(id = R.string.language_spanish) else stringResource(id = R.string.language_english),
+                        color = ColoresTorque.Primary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(id = com.example.torque.R.string.backup_section),
@@ -232,6 +260,64 @@ fun AjustesScreen(onBack: () -> Unit) {
                     }
                 }
             }
+        }
+
+        if (mostrarDialogoIdioma) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoIdioma = false },
+                containerColor = ColoresTorque.SurfaceDark,
+                titleContentColor = Color.White,
+                textContentColor = Color.White,
+                icon = { Icon(Icons.Default.Language, contentDescription = null, tint = ColoresTorque.Primary) },
+                title = { Text(stringResource(R.string.language)) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoIdioma = false
+                                coroutineScope.launch {
+                                    repo.establecerIdioma("es")
+                                    LocaleHelper.setLanguage(context, "es")
+                                    Toast.makeText(context, context.getString(R.string.language_spanish), Toast.LENGTH_SHORT).show()
+                                    (context as? android.app.Activity)?.recreate()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                stringResource(R.string.language_spanish),
+                                color = if (idiomaActual == "es") ColoresTorque.Primary else Color.White,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp
+                            )
+                        }
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoIdioma = false
+                                coroutineScope.launch {
+                                    repo.establecerIdioma("en")
+                                    LocaleHelper.setLanguage(context, "en")
+                                    Toast.makeText(context, context.getString(R.string.language_english), Toast.LENGTH_SHORT).show()
+                                    (context as? android.app.Activity)?.recreate()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                stringResource(R.string.language_english),
+                                color = if (idiomaActual == "en") ColoresTorque.Primary else Color.White,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { mostrarDialogoIdioma = false }) {
+                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
+                    }
+                }
+            )
         }
 
         if (mostrarDialogoRestaurar) {
