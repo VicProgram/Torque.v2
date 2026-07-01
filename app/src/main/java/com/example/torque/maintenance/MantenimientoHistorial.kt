@@ -92,7 +92,6 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
     var filtroSeleccionado by remember { mutableStateOf("Todos") }
     var itemSeleccionado by remember { mutableStateOf<MantenimientoEntity?>(null) }
     var itemAEliminar by remember { mutableStateOf<MantenimientoEntity?>(null) }
-    var fotosItemSeleccionado by remember { mutableStateOf<List<FotoMantenimientoEntity>>(emptyList()) }
     var exportandoPdf by remember { mutableStateOf(false) }
 
     val launcherPdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
@@ -121,76 +120,24 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
         }
     }
 
-    itemSeleccionado?.let { sel ->
-        val fotos = fotosPorMantenimiento[sel.id] ?: emptyList()
-        Dialog(onDismissRequest = { itemSeleccionado = null }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark)
-            ) {
-                DetalleMantenimientoEntityScreen(
-                    mantenimiento = sel,
-                    fotos = fotos,
-                    onBack = { itemSeleccionado = null },
-                    onAddFoto = { uri ->
-                        viewModel.viewModelScope.launch {
-                            viewModel.agregarFoto(sel.id, uri)
-                        }
-                    },
-                    onAddFactura = { uri ->
-                        viewModel.viewModelScope.launch {
-                            viewModel.agregarFoto(sel.id, uri, "factura")
-                        }
-                    },
-                    onDeleteFoto = { foto ->
-                        viewModel.viewModelScope.launch {
-                            viewModel.eliminarFoto(foto)
-                        }
-                    }
-                )
-            }
-        }
-    }
+    DialogoDetalleMantenimiento(
+        item = itemSeleccionado,
+        fotosPorMantenimiento = fotosPorMantenimiento,
+        viewModel = viewModel,
+        onDismiss = { itemSeleccionado = null }
+    )
 
     Box(modifier = Modifier.fillMaxSize().systemBarsPadding().background(ColoresTorque.Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Cabecera
-            Row(
-                modifier = Modifier.fillMaxWidth().height(ColoresTorque.ALTURA_CABECERA).padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { (contexto as? Activity)?.terminar() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.content_desc_back),
-                        tint = ColoresTorque.Primary
-                    )
+            CabeceraHistorial(
+                exportandoPdf = exportandoPdf,
+                onBack = { (contexto as? Activity)?.terminar() },
+                onExportPdf = {
+                    if (!exportandoPdf && idMoto != null) {
+                        launcherPdf.launch(contexto.getString(R.string.pdf_export_filename, idMoto))
+                    }
                 }
-                Text(
-                    text = stringResource(R.string.maintenance_history_title),
-                    modifier = Modifier.weight(1f),
-                    color = ColoresTorque.OnSurface,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                IconButton(
-                    onClick = {
-                        if (!exportandoPdf && idMoto != null) {
-                            launcherPdf.launch(contexto.getString(R.string.pdf_export_filename, idMoto))
-                        }
-                    },
-                    enabled = !exportandoPdf
-                ) {
-                    Icon(
-                        Icons.Default.Description,
-                        contentDescription = stringResource(R.string.export_pdf_content_desc),
-                        tint = if (exportandoPdf) ColoresTorque.OnSurfaceVariant else ColoresTorque.Primary
-                    )
-                }
-            }
+            )
 
             LazyColumn(modifier = Modifier.weight(1f), contentPadding = PaddingValues(bottom = 140.dp)) {
                 // Filtros
@@ -264,27 +211,104 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
             Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add))
         }
 
-        itemAEliminar?.let { elim ->
-            AlertDialog(
-                onDismissRequest = { itemAEliminar = null },
-                containerColor = ColoresTorque.SurfaceDark,
-                title = { Text(stringResource(R.string.dialog_delete_record_title)) },
-                text = { Text(stringResource(R.string.action_irreversible)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        viewModel.eliminarMantenimiento(elim)
-                        itemAEliminar = null
-                    }) {
-                        Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { itemAEliminar = null }) {
-                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
-                    }
-                }
+        DialogoEliminarMantenimiento(
+            item = itemAEliminar,
+            viewModel = viewModel,
+            onDismiss = { itemAEliminar = null }
+        )
+    }
+}
+
+@Composable
+private fun CabeceraHistorial(exportandoPdf: Boolean, onBack: () -> Unit, onExportPdf: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(ColoresTorque.ALTURA_CABECERA).padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onBack) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.content_desc_back),
+                tint = ColoresTorque.Primary
             )
         }
+        Text(
+            text = stringResource(R.string.maintenance_history_title),
+            modifier = Modifier.weight(1f),
+            color = ColoresTorque.OnSurface,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        IconButton(onClick = onExportPdf, enabled = !exportandoPdf) {
+            Icon(
+                Icons.Default.Description,
+                contentDescription = stringResource(R.string.export_pdf_content_desc),
+                tint = if (exportandoPdf) ColoresTorque.OnSurfaceVariant else ColoresTorque.Primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun DialogoDetalleMantenimiento(
+    item: MantenimientoEntity?,
+    fotosPorMantenimiento: Map<Long, List<FotoMantenimientoEntity>>,
+    viewModel: MantenimientoHistorialViewModel,
+    onDismiss: () -> Unit
+) {
+    item?.let { sel ->
+        val fotos = fotosPorMantenimiento[sel.id] ?: emptyList()
+        Dialog(onDismissRequest = onDismiss) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark)
+            ) {
+                DetalleMantenimientoEntityScreen(
+                    mantenimiento = sel,
+                    fotos = fotos,
+                    onBack = onDismiss,
+                    onAddFoto = { uri ->
+                        viewModel.viewModelScope.launch { viewModel.agregarFoto(sel.id, uri) }
+                    },
+                    onAddFactura = { uri ->
+                        viewModel.viewModelScope.launch { viewModel.agregarFoto(sel.id, uri, "factura") }
+                    },
+                    onDeleteFoto = { foto ->
+                        viewModel.viewModelScope.launch { viewModel.eliminarFoto(foto) }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogoEliminarMantenimiento(
+    item: MantenimientoEntity?,
+    viewModel: MantenimientoHistorialViewModel,
+    onDismiss: () -> Unit
+) {
+    item?.let { elim ->
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            containerColor = ColoresTorque.SurfaceDark,
+            title = { Text(stringResource(R.string.dialog_delete_record_title)) },
+            text = { Text(stringResource(R.string.action_irreversible)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.eliminarMantenimiento(elim)
+                    onDismiss()
+                }) {
+                    Text(stringResource(R.string.btn_delete), color = ColoresTorque.RojoError)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
+                }
+            }
+        )
     }
 }
 

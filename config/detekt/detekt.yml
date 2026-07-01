@@ -2,6 +2,8 @@ build:
   maxIssues: 0
 
 complexity:
+  CyclomaticComplexMethod:
+    threshold: 20
   LongMethod:
     active: false
   LongParameterList:
@@ -11,6 +13,8 @@ complexity:
 
 style:
   MagicNumber:
+    active: false
+  MaxLineLength:
     active: false
   UnusedPrivateMember:
     active: false

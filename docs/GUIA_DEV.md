@@ -906,7 +906,7 @@ Para ejecutar:
 
 ### Tests de Plan de Mantenimiento
 
-**`PlanMantenimientoLogicTest.kt`** — 19 tests de lógica del plan de mantenimiento:
+**`PlanMantenimientoLogicTest.kt`** — 20 tests de lógica del plan de mantenimiento:
 
 | Test | Verifica |
 |------|----------|
@@ -996,6 +996,7 @@ Reglas para: Room entities, Compose, Coroutines, DataStore, Sentry, Koin.
 ### Detekt — `config/detekt/detekt.yml`
 
 Reglas deshabilitadas: `LongMethod`, `LongParameterList`, `LargeClass`, `MagicNumber`, etc.
+`CyclomaticComplexMethod` configurado con `threshold = 20` para tolerar la complejidad natural de composables Compose.
 
 ---
 

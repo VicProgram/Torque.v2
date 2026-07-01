@@ -64,6 +64,53 @@ class FormularioMantenimiento : BaseActivity() {
     }
 }
 
+private fun crearEntidadMantenimiento(
+    tareasSeleccionadas: List<String>,
+    idMoto: Long,
+    kmNuevos: Int,
+    intervaloKms: Int,
+    precio: String,
+    tiempo: String,
+    notas: String,
+    fechaActual: String,
+    contexto: android.content.Context,
+    porcentajeVida: Int
+): MantenimientoEntity {
+    val tipoId = if (tareasSeleccionadas.size == 1)
+        TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.id ?: 0L
+    else 0L
+    return MantenimientoEntity(
+        idMoto = idMoto,
+        nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else contexto.getString(R.string.general_maintenance),
+        fecha = fechaActual,
+        kms = kmNuevos,
+        intervaloKms = intervaloKms,
+        precio = precio,
+        tiempo = tiempo,
+        notas = notas,
+        tareas = tareasSeleccionadas.joinToString(", "),
+        creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date()),
+        tipoMantenimientoId = tipoId,
+        porcentajeVida = porcentajeVida
+    )
+}
+
+private suspend fun procesarAdjuntos(adjuntos: List<Adjunto>, idMantenimiento: Long, repositorio: RepositorioApp, contexto: android.content.Context) {
+    for (adjunto in adjuntos) {
+        val ruta = adjunto.rutaInterna ?: ArchivoUtils.copiarImagenAInterno(contexto, adjunto.uri)
+        if (ruta != null) {
+            repositorio.insertarFotoMantenimiento(
+                FotoMantenimientoEntity(
+                    idMantenimiento = idMantenimiento,
+                    ruta = ruta,
+                    tipo = adjunto.tipo,
+                    creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
+                )
+            )
+        }
+    }
+}
+
 private suspend fun guardarMantenimiento(
     tareasSeleccionadas: List<String>,
     idMoto: Long,
@@ -83,40 +130,11 @@ private suspend fun guardarMantenimiento(
         if (actualizarKmMoto) {
             repositorio.actualizarKilometros(idMoto, kmNuevos)
         }
-
-        val tipoId = if (tareasSeleccionadas.size == 1)
-            TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.id ?: 0L
-        else 0L
-
-        val mantenimiento = MantenimientoEntity(
-            idMoto = idMoto,
-            nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else contexto.getString(R.string.general_maintenance),
-            fecha = fechaActual,
-            kms = kmNuevos,
-            intervaloKms = intervaloKms,
-            precio = precio,
-            tiempo = tiempo,
-            notas = notas,
-            tareas = tareasSeleccionadas.joinToString(", "),
-            creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date()),
-            tipoMantenimientoId = tipoId,
-            porcentajeVida = porcentajeVida
+        val idMantenimiento = repositorio.insertarMantenimiento(
+            crearEntidadMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervaloKms, precio, tiempo, notas, fechaActual, contexto, porcentajeVida)
         )
-        val idMantenimiento = repositorio.insertarMantenimiento(mantenimiento)
         if (idMantenimiento > 0L) {
-            for (adjunto in adjuntos) {
-                val ruta = adjunto.rutaInterna ?: ArchivoUtils.copiarImagenAInterno(contexto, adjunto.uri)
-                if (ruta != null) {
-                    repositorio.insertarFotoMantenimiento(
-                        FotoMantenimientoEntity(
-                            idMantenimiento = idMantenimiento,
-                            ruta = ruta,
-                            tipo = adjunto.tipo,
-                            creadoEn = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
-                        )
-                    )
-                }
-            }
+            procesarAdjuntos(adjuntos, idMantenimiento, repositorio, contexto)
         }
         Toast.makeText(contexto, contexto.getString(R.string.toast_maintenance_saved), Toast.LENGTH_SHORT).show()
         (contexto as? Activity)?.terminar()

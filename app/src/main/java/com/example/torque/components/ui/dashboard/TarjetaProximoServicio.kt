@@ -25,7 +25,6 @@ fun TarjetaProximoServicio(
     moto: MotoEntity?,
     fotoPortada: String? = null,
     kmRestantes: Int? = null,
-    progreso: Float = 0f,
     resultadoSalud: ResultadoSalud? = null,
     onClick: () -> Unit
 ) {
