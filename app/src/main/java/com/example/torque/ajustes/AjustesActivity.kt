@@ -152,206 +152,89 @@ fun AjustesScreen(onBack: () -> Unit) {
                     letterSpacing = 1.sp,
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(ColoresTorque.SurfaceDark)
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = stringResource(id = com.example.torque.R.string.notifications), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = stringResource(id = com.example.torque.R.string.notifications_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
-                    }
-                    Switch(
-                        checked = notificacionesActivadas,
-                        onCheckedChange = { activado -> coroutineScope.launch { repo.establecerNotificacionesActivadas(activado) } },
-                        colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary, uncheckedThumbColor = ColoresTorque.OnSurfaceVariant)
-                    )
-                }
+                FilaAjusteConSwitch(
+                    icono = Icons.Default.Notifications,
+                    titulo = stringResource(R.string.notifications),
+                    subtitulo = stringResource(R.string.notifications_subtitle),
+                    activado = notificacionesActivadas,
+                    onCambio = { activado -> coroutineScope.launch { repo.establecerNotificacionesActivadas(activado) } }
+                )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(ColoresTorque.SurfaceDark)
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Palette, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = stringResource(id = com.example.torque.R.string.dark_mode), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = stringResource(id = com.example.torque.R.string.dark_mode_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
-                    }
-                    Switch(
-                        checked = modoOscuroActivado,
-                        onCheckedChange = { activado -> coroutineScope.launch { repo.establecerModoOscuroActivado(activado) } },
-                        colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary, uncheckedThumbColor = ColoresTorque.OnSurfaceVariant)
-                    )
-                }
+                FilaAjusteConSwitch(
+                    icono = Icons.Default.Palette,
+                    titulo = stringResource(R.string.dark_mode),
+                    subtitulo = stringResource(R.string.dark_mode_subtitle),
+                    activado = modoOscuroActivado,
+                    onCambio = { activado -> coroutineScope.launch { repo.establecerModoOscuroActivado(activado) } }
+                )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(ColoresTorque.SurfaceDark)
-                        .clickable { mostrarDialogoIdioma = true }
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Language, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = stringResource(id = R.string.language), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = stringResource(id = R.string.language_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
-                    }
-                    Text(
-                        text = if (idiomaActual == "es") stringResource(id = R.string.language_spanish) else stringResource(id = R.string.language_english),
-                        color = ColoresTorque.Primary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                FilaAjusteConValor(
+                    icono = Icons.Default.Language,
+                    titulo = stringResource(R.string.language),
+                    subtitulo = stringResource(R.string.language_subtitle),
+                    valor = if (idiomaActual == "es") stringResource(R.string.language_spanish) else stringResource(R.string.language_english),
+                    onClick = { mostrarDialogoIdioma = true }
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(id = com.example.torque.R.string.backup_section),
+                    text = stringResource(R.string.backup_section),
                     color = ColoresTorque.Primary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(ColoresTorque.SurfaceDark)
-                        .clickable { crearBackup.launch(context.getString(com.example.torque.R.string.backup_default_name)) }
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Backup, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = stringResource(com.example.torque.R.string.export_backup), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = stringResource(com.example.torque.R.string.export_backup_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
-                    }
-                }
+                FilaAjusteAccion(
+                    icono = Icons.Default.Backup,
+                    titulo = stringResource(R.string.export_backup),
+                    subtitulo = stringResource(R.string.export_backup_subtitle),
+                    onClick = { crearBackup.launch(context.getString(R.string.backup_default_name)) }
+                )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(ColoresTorque.SurfaceDark)
-                        .clickable(enabled = !restaurando) { seleccionarBackup.launch(arrayOf("application/zip")) }
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Restore, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = if (restaurando) stringResource(com.example.torque.R.string.restoring) else stringResource(com.example.torque.R.string.restore_backup), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = stringResource(com.example.torque.R.string.restore_backup_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
-                    }
-                }
+                FilaAjusteAccion(
+                    icono = Icons.Default.Restore,
+                    titulo = if (restaurando) stringResource(R.string.restoring) else stringResource(R.string.restore_backup),
+                    subtitulo = stringResource(R.string.restore_backup_subtitle),
+                    onClick = { seleccionarBackup.launch(arrayOf("application/zip")) },
+                    habilitado = !restaurando
+                )
             }
         }
 
         if (mostrarDialogoIdioma) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoIdioma = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                titleContentColor = Color.White,
-                textContentColor = Color.White,
-                icon = { Icon(Icons.Default.Language, contentDescription = null, tint = ColoresTorque.Primary) },
-                title = { Text(stringResource(R.string.language)) },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TextButton(
-                            onClick = {
-                                mostrarDialogoIdioma = false
-                                coroutineScope.launch {
-                                    repo.establecerIdioma("es")
-                                    LocaleHelper.setLanguage(context, "es")
-                                    Toast.makeText(context, context.getString(R.string.language_spanish), Toast.LENGTH_SHORT).show()
-                                    (context as? android.app.Activity)?.recreate()
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                stringResource(R.string.language_spanish),
-                                color = if (idiomaActual == "es") ColoresTorque.Primary else Color.White,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 16.sp
-                            )
-                        }
-                        TextButton(
-                            onClick = {
-                                mostrarDialogoIdioma = false
-                                coroutineScope.launch {
-                                    repo.establecerIdioma("en")
-                                    LocaleHelper.setLanguage(context, "en")
-                                    Toast.makeText(context, context.getString(R.string.language_english), Toast.LENGTH_SHORT).show()
-                                    (context as? android.app.Activity)?.recreate()
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                stringResource(R.string.language_english),
-                                color = if (idiomaActual == "en") ColoresTorque.Primary else Color.White,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 16.sp
-                            )
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { mostrarDialogoIdioma = false }) {
-                        Text(stringResource(R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
+            DialogoSeleccionIdioma(
+                idiomaActual = idiomaActual,
+                onDismiss = { mostrarDialogoIdioma = false },
+                onIdiomaChange = { codigo ->
+                    mostrarDialogoIdioma = false
+                    coroutineScope.launch {
+                        repo.establecerIdioma(codigo)
+                        LocaleHelper.setLanguage(context, codigo)
+                        Toast.makeText(context, context.getString(if (codigo == "es") R.string.language_spanish else R.string.language_english), Toast.LENGTH_SHORT).show()
+                        (context as? android.app.Activity)?.recreate()
                     }
                 }
             )
         }
 
         if (mostrarDialogoRestaurar) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogoRestaurar = false },
-                containerColor = ColoresTorque.SurfaceDark,
-                titleContentColor = Color.White,
-                textContentColor = Color.White,
-                icon = { Icon(Icons.Default.Restore, contentDescription = null, tint = ColoresTorque.Primary) },
-                title = { Text(stringResource(com.example.torque.R.string.dialog_restore_title)) },
-                text = { Text(stringResource(com.example.torque.R.string.dialog_restore_message)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        mostrarDialogoRestaurar = false
-                        restaurando = true
-                        coroutineScope.launch {
-                            uriRestaurar?.let { uri ->
-                                val resultado = BackupManager.restaurar(context, uri)
-                                if (resultado.isSuccess) {
-                                    Toast.makeText(context, context.getString(com.example.torque.R.string.toast_restore_success), Toast.LENGTH_LONG).show()
-                                    (context as? android.app.Activity)?.finishAffinity()
-                                } else {
-                                    Toast.makeText(context, context.getString(com.example.torque.R.string.toast_restore_error, resultado.exceptionOrNull()?.message), Toast.LENGTH_LONG).show()
-                                    restaurando = false
-                                }
+            DialogoConfirmarRestauracion(
+                onDismiss = { mostrarDialogoRestaurar = false },
+                onConfirmar = {
+                    mostrarDialogoRestaurar = false
+                    restaurando = true
+                    coroutineScope.launch {
+                        uriRestaurar?.let { uri ->
+                            val resultado = BackupManager.restaurar(context, uri)
+                            if (resultado.isSuccess) {
+                                Toast.makeText(context, context.getString(R.string.toast_restore_success), Toast.LENGTH_LONG).show()
+                                (context as? android.app.Activity)?.finishAffinity()
+                            } else {
+                                Toast.makeText(context, context.getString(R.string.toast_restore_error, resultado.exceptionOrNull()?.message), Toast.LENGTH_LONG).show()
+                                restaurando = false
                             }
                         }
-                    }) {
-                        Text(stringResource(com.example.torque.R.string.btn_restore), color = ColoresTorque.Primary)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { mostrarDialogoRestaurar = false }) {
-                        Text(stringResource(com.example.torque.R.string.btn_cancel), color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
