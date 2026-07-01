@@ -24,7 +24,9 @@ import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
 import com.example.torque.garage.AnadirMotoActivity
 import com.example.torque.utils.BackupManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CabeceraDashboard(
@@ -236,16 +238,22 @@ fun CabeceraDashboard(
 
 private suspend fun exportarBaseDeDatos(contexto: Context) {
     try {
-        val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
-        val zipFile = java.io.File(downloadsDir, "Torque_backup_${System.currentTimeMillis()}.zip")
-        val uri = android.net.Uri.fromFile(zipFile)
+        val uri = withContext(Dispatchers.IO) {
+            val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+            val zipFile = java.io.File(downloadsDir, "Torque_backup_${System.currentTimeMillis()}.zip")
+            android.net.Uri.fromFile(zipFile)
+        }
         val resultado = BackupManager.exportar(contexto, uri)
-        if (resultado.isSuccess) {
-            Toast.makeText(contexto, contexto.getString(R.string.toast_backup_saved), Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(contexto, "Error al exportar: ${resultado.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+        withContext(Dispatchers.Main) {
+            if (resultado.isSuccess) {
+                Toast.makeText(contexto, contexto.getString(R.string.toast_backup_saved), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(contexto, "Error al exportar: ${resultado.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+            }
         }
     } catch (e: Exception) {
-        Toast.makeText(contexto, "Error al exportar: ${e.message}", Toast.LENGTH_LONG).show()
+        withContext(Dispatchers.Main) {
+            Toast.makeText(contexto, "Error al exportar: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 }
