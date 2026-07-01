@@ -208,7 +208,8 @@ class TorqueDashboardViewModel(
 
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val app = this[AndroidViewModelFactory.APPLICATION_KEY] as Application
+                val app = this[AndroidViewModelFactory.APPLICATION_KEY] as? Application
+                    ?: error("TorqueDashboardViewModel requires Application context")
                 TorqueDashboardViewModel(
                     repositorio = RepositorioApp.obtenerInstancia(app),
                     perfilRepositorio = PerfilRepositorio(app.dataStore)

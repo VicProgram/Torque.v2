@@ -30,7 +30,7 @@ object NotificacionSalud {
         val canal = NotificationChannel(CANAL_MANTENIMIENTO, nombre, importancia).apply {
             description = descripcion
         }
-        val manager = contexto.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val manager = contexto.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
         manager.createNotificationChannel(canal)
     }
 
