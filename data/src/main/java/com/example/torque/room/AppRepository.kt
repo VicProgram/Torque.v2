@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.room.withTransaction
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.room.entity.MantenimientoEntity
+import com.example.torque.utils.TipoVehiculo
 import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.FotoMantenimientoEntity
 import kotlinx.coroutines.flow.Flow
@@ -62,6 +63,16 @@ open class RepositorioApp(private val db: BaseDeDatosApp) {
         db.motoDao().contarMotos()
     } catch (e: Exception) {
         Log.e(TAG, "Error al contar motos", e)
+        0
+    }
+
+    open fun obtenerMotosPorTipoFlow(tipoVehiculo: TipoVehiculo): Flow<List<MotoEntity>> =
+        db.motoDao().obtenerPorTipoFlow(tipoVehiculo)
+
+    suspend fun contarMotosPorTipo(tipoVehiculo: TipoVehiculo): Int = try {
+        db.motoDao().contarPorTipo(tipoVehiculo)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error al contar motos por tipo", e)
         0
     }
 

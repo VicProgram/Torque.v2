@@ -38,6 +38,7 @@ import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.TipoMantenimiento
 import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.TipoVehiculo
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -93,7 +94,9 @@ class PlanMantenimientoViewModel(application: Application) : AndroidViewModel(ap
 
             val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-            _tareas.value = TiposMantenimiento.TODOS.map { tipo ->
+            val tiposFiltrados = TiposMantenimiento.obtenerPorTipo(_moto.value?.tipoVehiculo ?: TipoVehiculo.MOTO)
+
+            _tareas.value = tiposFiltrados.map { tipo ->
                 val ultimo = agrupados[tipo.id]?.maxByOrNull { it.kms }
                 val cumplimiento = if (ultimo != null) {
                     calcularCumplimiento(ultimo, tipo, kmActuales, format)

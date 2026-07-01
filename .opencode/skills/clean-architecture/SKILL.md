@@ -9,14 +9,18 @@ description: Use when refactoring module boundaries, fixing dependency violation
 
 ```
 :app  →  :data  →  :core
+:desktop  →  :shared  ←  :data
 ```
 
-- `:core` — Zero Android dependencies. Only `androidx.core-ktx`. Contains domain types (`TiposMantenimiento`, `DateUtils`).
-- `:data` — Can depend on `:core`, Room, DataStore, Lifecycle. Contains DB, repositories, calculators, backup logic.
-- `:app` — Can depend on `:data` and `:core`. Contains Activities, Composables, theme, navigation.
+- `:shared` — Pure Kotlin JVM. Zero Android dependencies. Domain models (`MotoData`, `MantenimientoData`), algorithms (`SaludMotoCalculator`), utilities (`DateUtils`).
+- `:core` — Zero Android dependencies. Contains domain types (`TiposMantenimiento`, `DateUtils`). Will eventually merge into `:shared`.
+- `:data` — Can depend on `:core`, `:shared`, Room, DataStore, Lifecycle. Contains DB, repositories, backup logic.
+- `:app` — Android UI. Depends on `:data` and `:core`.
+- `:desktop` — Compose Desktop app. Depends on `:shared`. Never depends on Android modules.
 
-**NEVER** allow `:data` to depend on `:app`.  
-**NEVER** allow `:core` to depend on Android framework classes.
+**NEVER** allow `:data` to depend on `:app` or `:desktop`.  
+**NEVER** allow `:shared` or `:core` to depend on Android framework classes.  
+**NEVER** allow `:desktop` to depend on Android modules.
 
 ## Current Violations to Fix
 

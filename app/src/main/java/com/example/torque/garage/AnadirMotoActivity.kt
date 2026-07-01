@@ -39,6 +39,7 @@ import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
 import com.example.torque.utils.DateUtils
+import com.example.torque.utils.TipoVehiculo
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,7 +67,10 @@ internal suspend fun guardarMoto(
     repositorio: RepositorioApp, marca: String, modelo: String, anio: String,
     matricula: String, kilometros: String, cilindrada: String, caballos: String,
     estilo: String, uriImagen: android.net.Uri?, fotoActual: String?,
-    esPrincipal: Boolean, fechaItv: String, fechaSeguro: String
+    esPrincipal: Boolean, fechaItv: String, fechaSeguro: String,
+    tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO,
+    tipoCarroceria: String = "", tipoCombustible: String = "",
+    tipoTransmision: String = "", numeroPuertas: String = ""
 ) {
     val fecha = SimpleDateFormat(DateUtils.FORMATO_FECHA_COMPLETA, Locale.getDefault()).format(Date())
     val rutaFoto = uriImagen?.let { ArchivoUtils.copiarImagenAInterno(contexto, it) } ?: fotoActual
@@ -80,6 +84,11 @@ internal suspend fun guardarMoto(
                 cilindrada = cilindrada.trim(), caballos = caballos.trim().ifEmpty { null },
                 estilo = estilo.trim(), uriFoto = rutaFoto,
                 fechaItv = fechaItv.trim().ifEmpty { null }, fechaSeguro = fechaSeguro.trim().ifEmpty { null },
+                tipoVehiculo = tipoVehiculo,
+                tipoCarroceria = tipoCarroceria.trim().ifEmpty { null },
+                tipoCombustible = tipoCombustible.trim().ifEmpty { null },
+                tipoTransmision = tipoTransmision.trim().ifEmpty { null },
+                numeroPuertas = numeroPuertas.toIntOrNull(),
                 actualizadoEn = fecha
             )
         )
@@ -99,6 +108,11 @@ internal suspend fun guardarMoto(
             cilindrada = cilindrada.trim(), caballos = caballos.trim().ifEmpty { null },
             estilo = estilo.trim(), esPrincipal = 0, uriFoto = rutaFoto,
             fechaItv = fechaItv.trim().ifEmpty { null }, fechaSeguro = fechaSeguro.trim().ifEmpty { null },
+            tipoVehiculo = tipoVehiculo,
+            tipoCarroceria = tipoCarroceria.trim().ifEmpty { null },
+            tipoCombustible = tipoCombustible.trim().ifEmpty { null },
+            tipoTransmision = tipoTransmision.trim().ifEmpty { null },
+            numeroPuertas = numeroPuertas.toIntOrNull(),
             creadoEn = fecha, actualizadoEn = fecha
         )
         val id = repositorio.insertarMoto(nuevaMoto)
@@ -165,18 +179,25 @@ private fun DialogoDescartarMoto(mostrar: Boolean, onDescartar: () -> Unit, onCa
 private fun hayCambiosEnFormulario(
     marca: String, modelo: String, anio: String, matricula: String,
     cilindrada: String, caballos: String, estilo: String, kilometros: String,
-    uriImagen: android.net.Uri?, esPrincipal: Boolean, fechaItv: String, fechaSeguro: String
+    uriImagen: android.net.Uri?, esPrincipal: Boolean, fechaItv: String, fechaSeguro: String,
+    tipoCarroceria: String = "", tipoCombustible: String = "",
+    tipoTransmision: String = "", numeroPuertas: String = ""
 ): Boolean {
     return marca.isNotBlank() || modelo.isNotBlank() || anio.isNotBlank() ||
         matricula.isNotBlank() || cilindrada.isNotBlank() || caballos.isNotBlank() ||
         estilo.isNotBlank() || kilometros.isNotBlank() || uriImagen != null || esPrincipal ||
-        fechaItv.isNotBlank() || fechaSeguro.isNotBlank()
+        fechaItv.isNotBlank() || fechaSeguro.isNotBlank() ||
+        tipoCarroceria.isNotBlank() || tipoCombustible.isNotBlank() ||
+        tipoTransmision.isNotBlank() || numeroPuertas.isNotBlank()
 }
 
 private data class DatosMotoCarga(
     val marca: String, val modelo: String, val anio: String, val matricula: String,
     val cilindrada: String, val caballos: String, val estilo: String, val kilometros: String,
-    val fotoActual: String?, val esPrincipal: Boolean, val fechaItv: String, val fechaSeguro: String
+    val fotoActual: String?, val esPrincipal: Boolean, val fechaItv: String, val fechaSeguro: String,
+    val tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO,
+    val tipoCarroceria: String = "", val tipoCombustible: String = "",
+    val tipoTransmision: String = "", val numeroPuertas: String = ""
 )
 
 private suspend fun cargarDatosMoto(repositorio: RepositorioApp, idMoto: Long, onDatos: (DatosMotoCarga) -> Unit) {
@@ -189,7 +210,12 @@ private suspend fun cargarDatosMoto(repositorio: RepositorioApp, idMoto: Long, o
             caballos = moto.caballos ?: "", estilo = moto.estilo ?: "",
             kilometros = moto.kilometros.toString(), fotoActual = moto.uriFoto,
             esPrincipal = moto.esPrincipal == 1, fechaItv = moto.fechaItv ?: "",
-            fechaSeguro = moto.fechaSeguro ?: ""
+            fechaSeguro = moto.fechaSeguro ?: "",
+            tipoVehiculo = moto.tipoVehiculo,
+            tipoCarroceria = moto.tipoCarroceria ?: "",
+            tipoCombustible = moto.tipoCombustible ?: "",
+            tipoTransmision = moto.tipoTransmision ?: "",
+            numeroPuertas = moto.numeroPuertas?.toString() ?: ""
         ))
     }
 }
@@ -201,6 +227,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 
+    var tipoVehiculo by remember { mutableStateOf(TipoVehiculo.MOTO) }
     var marca by remember { mutableStateOf("") }
     var modelo by remember { mutableStateOf("") }
     var anio by remember { mutableStateOf("") }
@@ -219,12 +246,17 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
     var mostrarDialogoDescartar by remember { mutableStateOf(false) }
     var fechaItv by remember { mutableStateOf("") }
     var fechaSeguro by remember { mutableStateOf("") }
+    var tipoCarroceria by remember { mutableStateOf("") }
+    var tipoCombustible by remember { mutableStateOf("") }
+    var tipoTransmision by remember { mutableStateOf("") }
+    var numeroPuertas by remember { mutableStateOf("") }
 
-    val hayCambios = hayCambiosEnFormulario(marca, modelo, anio, matricula, cilindrada, caballos, estilo, kilometros, uriImagen, esPrincipal, fechaItv, fechaSeguro)
+    val hayCambios = hayCambiosEnFormulario(marca, modelo, anio, matricula, cilindrada, caballos, estilo, kilometros, uriImagen, esPrincipal, fechaItv, fechaSeguro, tipoCarroceria, tipoCombustible, tipoTransmision, numeroPuertas)
 
     LaunchedEffect(idMoto) {
         if (editando && idMoto != -1L) {
             cargarDatosMoto(repositorio, idMoto) { datos ->
+                tipoVehiculo = datos.tipoVehiculo
                 marca = datos.marca
                 modelo = datos.modelo
                 anio = datos.anio
@@ -237,6 +269,10 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 esPrincipal = datos.esPrincipal
                 fechaItv = datos.fechaItv
                 fechaSeguro = datos.fechaSeguro
+                tipoCarroceria = datos.tipoCarroceria
+                tipoCombustible = datos.tipoCombustible
+                tipoTransmision = datos.tipoTransmision
+                numeroPuertas = datos.numeroPuertas
             }
             cargando = false
         }
@@ -269,6 +305,8 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
         } else {
             FormularioMotoBody(
                 modifier = Modifier.weight(1f),
+                tipoVehiculo = tipoVehiculo,
+                onTipoVehiculoChange = { tipoVehiculo = it; marca = ""; modelo = "" },
                 marca = marca,
                 onMarcaChange = { marca = it; errorMarca = false },
                 onMarcaSeleccionada = { modelo = "" },
@@ -297,7 +335,15 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 uriImagen = uriImagen,
                 fotoActual = fotoActual,
                 scrollState = scrollState,
-                selectorImagen = selectorImagen
+                selectorImagen = selectorImagen,
+                tipoCarroceria = tipoCarroceria,
+                onTipoCarroceriaChange = { tipoCarroceria = it },
+                tipoCombustible = tipoCombustible,
+                onTipoCombustibleChange = { tipoCombustible = it },
+                tipoTransmision = tipoTransmision,
+                onTipoTransmisionChange = { tipoTransmision = it },
+                numeroPuertas = numeroPuertas,
+                onNumeroPuertasChange = { numeroPuertas = it }
             )
         }
         }
@@ -329,7 +375,7 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         return@BotonTorque
                     }
                     scope.launch {
-                        guardarMoto(editando, idMoto, contexto, repositorio, marca, modelo, anio, matricula, kilometros, cilindrada, caballos, estilo, uriImagen, fotoActual, esPrincipal, fechaItv, fechaSeguro)
+                        guardarMoto(editando, idMoto, contexto, repositorio, marca, modelo, anio, matricula, kilometros, cilindrada, caballos, estilo, uriImagen, fotoActual, esPrincipal, fechaItv, fechaSeguro, tipoVehiculo, tipoCarroceria, tipoCombustible, tipoTransmision, numeroPuertas)
                     }
                 }
             )

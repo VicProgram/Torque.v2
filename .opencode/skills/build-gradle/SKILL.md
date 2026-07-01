@@ -17,12 +17,16 @@ description: Use when modifying build configuration — Gradle tasks, version ca
 
 ## Module Structure
 
-3 modules defined in `settings.gradle.kts`:
+5 modules defined in `settings.gradle.kts`:
 ```
 include(":app")
 include(":core")
 include(":data")
+include(":shared")     # Pure Kotlin JVM — logica de dominio compartida
+include(":desktop")    # Compose Desktop app
 ```
+- `:shared` — domain models, algorithms, utilities (no Android deps). Used by `:data` and `:desktop`.
+- `:desktop` — Compose Desktop UI, SQLDelight DB, backup sync. Depends on `:shared`.
 
 ## Version Catalog
 
@@ -41,13 +45,20 @@ Reference in build files as: `alias(libs.plugins.android.application)` or `libs.
 ## Common Commands
 
 ```bash
-# Build
+# Android build
 ./gradlew assembleDebug
 ./gradlew assembleRelease
 
+# Desktop build
+./gradlew :desktop:run             # Run desktop app (development)
+./gradlew :desktop:packageDmg      # Package for macOS
+./gradlew :desktop:packageDeb      # Package for Linux
+./gradlew :desktop:packageMsi      # Package for Windows
+
 # Tests
-./gradlew testDebugUnitTest
-./gradlew connectedCheck
+./gradlew testDebugUnitTest        # Android tests
+./gradlew :shared:test             # Shared module tests
+./gradlew :desktop:test            # Desktop tests
 
 # Static analysis
 ./gradlew detekt

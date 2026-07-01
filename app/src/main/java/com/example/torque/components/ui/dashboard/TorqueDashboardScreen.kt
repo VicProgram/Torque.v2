@@ -165,7 +165,8 @@ fun TorqueDashboardScreen(
                     viewModel.guardarAjustesDesgaste(motoActual.idMoto, porcentajes, contexto.getString(R.string.wear_adjustment_note)) {
                         mostrarDialogoDesgaste = false
                     }
-                }
+                },
+                tipoVehiculo = motoActual.tipoVehiculo
             )
         }
 

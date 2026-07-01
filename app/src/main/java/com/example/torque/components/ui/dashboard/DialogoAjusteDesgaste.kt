@@ -20,15 +20,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.torque.R
 import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.TipoVehiculo
 import kotlin.math.roundToInt
 
 @Composable
 fun DialogoAjusteDesgaste(
     initialPorcentajes: Map<Long, Int>,
     onDismiss: () -> Unit,
-    onGuardar: (Map<Long, Int>) -> Unit = {}
+    onGuardar: (Map<Long, Int>) -> Unit = {},
+    tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO
 ) {
-    val wearTipos = TiposMantenimiento.WEAR_TIPOS
+    val wearTipos = TiposMantenimiento.WEAR_TIPOS.filter { it.tipoVehiculo == tipoVehiculo }
     var porcentajes by remember { mutableStateOf(initialPorcentajes) }
 
     DialogoTorque(

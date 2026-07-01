@@ -3,6 +3,7 @@ package com.example.torque.room.entity.dao
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import com.example.torque.room.entity.MotoEntity
+import com.example.torque.utils.TipoVehiculo
 
 @Dao
 interface MotoDao {
@@ -35,4 +36,10 @@ interface MotoDao {
 
     @Query("UPDATE motos SET kilometros = :kilometros WHERE idMoto = :idMoto")
     suspend fun actualizarKilometros(idMoto: Long, kilometros: Int)
+
+    @Query("SELECT * FROM motos WHERE tipoVehiculo = :tipoVehiculo ORDER BY creadoEn DESC")
+    fun obtenerPorTipoFlow(tipoVehiculo: TipoVehiculo): Flow<List<MotoEntity>>
+
+    @Query("SELECT COUNT(*) FROM motos WHERE tipoVehiculo = :tipoVehiculo")
+    suspend fun contarPorTipo(tipoVehiculo: TipoVehiculo): Int
 }

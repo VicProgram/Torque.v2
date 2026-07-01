@@ -2,6 +2,7 @@ package com.example.torque.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.torque.utils.TipoVehiculo
 
 @Entity(tableName = "motos")
 data class MotoEntity(
@@ -21,5 +22,10 @@ data class MotoEntity(
     val creadoEn: String? = null,
     val actualizadoEn: String? = null,
     val fechaItv: String? = null,
-    val fechaSeguro: String? = null
+    val fechaSeguro: String? = null,
+    val tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO,
+    val tipoCarroceria: String? = null,
+    val tipoCombustible: String? = null,
+    val tipoTransmision: String? = null,
+    val numeroPuertas: Int? = null
 )

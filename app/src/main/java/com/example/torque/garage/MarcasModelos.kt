@@ -11,11 +11,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.utils.TipoVehiculo
 
 object MarcasModelos {
     val TODAS = MarcasData.TODAS
     val MARCAS = MarcasData.MARCAS
     fun modelosDe(marca: String): List<String> = MarcasData.modelosDe(marca)
+
+    val TODAS_COCHE = MarcasModelosCoche.TODAS
+    val MARCAS_COCHE = MarcasModelosCoche.MARCAS
+    fun modelosDeCoche(marca: String): List<String> = MarcasModelosCoche.modelosDe(marca)
+
+    fun obtenerMarcas(tipo: TipoVehiculo): List<String> =
+        if (tipo == TipoVehiculo.COCHE) MARCAS_COCHE else MARCAS
+
+    fun obtenerModelos(tipo: TipoVehiculo, marca: String): List<String> =
+        if (tipo == TipoVehiculo.COCHE) modelosDeCoche(marca) else modelosDe(marca)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,11 +37,12 @@ fun SelectorMarca(
     onMarcaSeleccionada: (String) -> Unit,
     label: String,
     error: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val marcasFiltradas = remember(marca) {
-        MarcasModelos.MARCAS.filter { it.lowercase().contains(marca.lowercase()) }
+    val marcasFiltradas = remember(marca, tipoVehiculo) {
+        MarcasModelos.obtenerMarcas(tipoVehiculo).filter { it.lowercase().contains(marca.lowercase()) }
     }
 
     ExposedDropdownMenuBox(
@@ -91,12 +103,15 @@ fun SelectorModelo(
     marca: String,
     label: String,
     error: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val modelosDisponibles = remember(marca) {
-        val modelos = MarcasModelos.modelosDe(marca)
-        if (modelos.isEmpty()) MarcasModelos.TODAS.values.flatten().distinct().sorted()
+    val modelosDisponibles = remember(marca, tipoVehiculo) {
+        val modelos = MarcasModelos.obtenerModelos(tipoVehiculo, marca)
+        if (modelos.isEmpty()) MarcasModelos.obtenerMarcas(tipoVehiculo).let { marcas ->
+            marcas.flatMap { MarcasModelos.obtenerModelos(tipoVehiculo, it) }.distinct().sorted()
+        }
         else modelos
     }
     val modelosFiltrados = remember(modelo, modelosDisponibles) {
