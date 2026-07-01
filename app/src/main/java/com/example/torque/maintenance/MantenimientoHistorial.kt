@@ -179,7 +179,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
                 IconButton(
                     onClick = {
                         if (!exportandoPdf && idMoto != null) {
-                            launcherPdf.launch("historial_mantenimiento_${idMoto}.pdf")
+                            launcherPdf.launch(contexto.getString(R.string.pdf_export_filename, idMoto))
                         }
                     },
                     enabled = !exportandoPdf

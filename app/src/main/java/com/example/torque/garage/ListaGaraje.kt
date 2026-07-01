@@ -328,7 +328,7 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                 }
             }
             Text(
-                text = "${moto.marca} • ${moto.anio}",
+                text = stringResource(R.string.brand_year_separator, moto.marca, moto.anio),
                 color = ColoresTorque.OnSurfaceVariant,
                 fontSize = 14.sp, // Reducido de 24.sp
                 fontWeight = FontWeight.Medium,

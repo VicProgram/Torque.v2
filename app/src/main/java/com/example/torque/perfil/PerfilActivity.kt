@@ -75,7 +75,15 @@ fun PerfilScreen(onBack: () -> Unit) {
     var editFecha by remember { mutableStateOf(fechaNacimiento ?: "") }
     var editCarnets by remember { mutableStateOf(emptySet<String>()) }
 
-    val carnetsDisponibles = remember { listOf("AM", "A1", "A2", "A") }
+    val carnetsDisponibles = remember {
+        val res = contexto.resources
+        listOf(
+            res.getString(R.string.license_am),
+            res.getString(R.string.license_a1),
+            res.getString(R.string.license_a2),
+            res.getString(R.string.license_a)
+        )
+    }
 
     LaunchedEffect(nombre, email, telefono, fechaNacimiento, carnetsGuardados) {
         editNombre = nombre ?: ""
@@ -260,7 +268,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = carnet, color = textoColor, fontWeight = FontWeight.Bold)
+                                    Text(text = carnet, color = textoColor, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                                 }
                             }
                         }

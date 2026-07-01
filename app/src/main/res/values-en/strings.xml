@@ -332,6 +332,21 @@
     <string name="notif_expired_title">Maintenance overdue</string>
     <string name="notif_expired_body">%1$s for %2$s — you should have done this by now</string>
 
+    <!-- License categories -->
+    <string name="license_am">AM</string>
+    <string name="license_a1">A1</string>
+    <string name="license_a2">A2</string>
+    <string name="license_a">A</string>
+
+    <!-- Units -->
+    <string name="km_unit"> km</string>
+
+    <!-- PDF Export (filename template) -->
+    <string name="pdf_export_filename">maintenance_history_%1$d.pdf</string>
+
+    <!-- Garage separator -->
+    <string name="brand_year_separator">%1$s • %2$d</string>
+
     <!-- PDF Export -->
     <string name="pdf_title">Maintenance History</string>
     <string name="pdf_subtitle">%1$s · %2$d km</string>

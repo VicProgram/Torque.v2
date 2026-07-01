@@ -146,7 +146,7 @@ fun PantallaOpcionesMantenimiento(
                             Icon(Icons.Default.Motorcycle, contentDescription = null, tint = ColoresTorque.Primary)
                             Column {
                                 Text("${moto.marca} ${moto.modelo}", color = Color.White, fontWeight = FontWeight.Bold)
-                                Text("${moto.kilometros} km", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
+                                Text("${moto.kilometros}${stringResource(R.string.km_unit)}", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                             }
                         }
                     }

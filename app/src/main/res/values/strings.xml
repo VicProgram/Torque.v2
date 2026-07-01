@@ -285,6 +285,12 @@
     <string name="label_insurance">Seguro</string>
     <string name="menu_plan_maintenance">Plan de Mantenimiento</string>
 
+    <!-- PDF Export (filename template) -->
+    <string name="pdf_export_filename">historial_mantenimiento_%1$d.pdf</string>
+
+    <!-- Garage separator -->
+    <string name="brand_year_separator">%1$s • %2$d</string>
+
     <!-- AnadirMotoActivity -->
     <string name="title_edit_motorcycle">Editar Motocicleta</string>
     <string name="title_new_motorcycle">Nueva Motocicleta</string>
@@ -331,6 +337,15 @@
     <string name="notif_soon_body">%1$s de %2$s necesita atención (%3$d%% del intervalo recorrido)</string>
     <string name="notif_expired_title">Mantenimiento vencido</string>
     <string name="notif_expired_body">%1$s de %2$s — ya deberías haberlo realizado</string>
+
+    <!-- License categories -->
+    <string name="license_am">AM</string>
+    <string name="license_a1">A1</string>
+    <string name="license_a2">A2</string>
+    <string name="license_a">A</string>
+
+    <!-- Units -->
+    <string name="km_unit"> km</string>
 
     <!-- Shared -->
     <string name="pdf_dash">—</string>
