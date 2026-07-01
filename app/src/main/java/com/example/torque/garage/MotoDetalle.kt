@@ -1,25 +1,45 @@
 package com.example.torque.garage
 
 import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import com.example.torque.base.BaseActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,7 +54,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
+import com.example.torque.base.BaseActivity
 import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.maintenance.MantenimientoHistorial
+import com.example.torque.maintenance.PlanMantenimiento
+import com.example.torque.maintenance.RegistroMantenimiento
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MotoEntity
@@ -48,11 +72,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import android.content.Intent
-import androidx.compose.foundation.clickable
-import com.example.torque.maintenance.MantenimientoHistorial
-import com.example.torque.maintenance.PlanMantenimiento
-import com.example.torque.maintenance.RegistroMantenimiento
 
 class MotoDetalle : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +94,6 @@ fun VistaMotoDetalle(idMoto: Long) {
     
     var moto by remember { mutableStateOf<MotoEntity?>(null) }
     val fotos = remember { mutableStateListOf<FotoEntity>() }
-    var mostrarMenu by remember { mutableStateOf(false) }
     var mostrarDialogoKm by remember { mutableStateOf(false) }
     var mostrarDialogoEliminar by remember { mutableStateOf(false) }
     var mostrarDialogoEliminarFoto by remember { mutableStateOf<FotoEntity?>(null) }
@@ -123,159 +141,43 @@ fun VistaMotoDetalle(idMoto: Long) {
         } else {
             val m = requireNotNull(moto)
             Column(modifier = Modifier.fillMaxSize()) {
-                // --- Cabecera (Compacta) ---
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(ColoresTorque.ALTURA_CABECERA)
-                        .padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { (contexto as? Activity)?.terminar() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.content_desc_back),
-                        tint = ColoresTorque.Primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Text(
-                    text = m.modelo,
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    if (m.esPrincipal == 1) {
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Icon(
-                            Icons.Default.Star,
-                            contentDescription = stringResource(R.string.content_desc_principal),
-                            tint = ColoresTorque.Primary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box {
-                        IconButton(onClick = { mostrarMenu = true }) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.menu),
-                                tint = Color.White,
-                                modifier = Modifier.size(22.dp)
-                            )
+                CabeceraDetalleMoto(
+                    modelo = m.modelo,
+                    esPrincipal = m.esPrincipal == 1,
+                    onBack = { (contexto as? Activity)?.terminar() },
+                    onSetPrimary = {
+                        scope.launch {
+                            repositorio.establecerMotoPrincipal(idMoto)
+                            moto = repositorio.obtenerMotoPorId(idMoto)
+                            launch(Dispatchers.Main) {
+                                Toast.makeText(contexto, contexto.getString(R.string.toast_primary_updated), Toast.LENGTH_SHORT).show()
+                                (contexto as? Activity)?.setResult(Activity.RESULT_OK)
+                            }
                         }
-                        DropdownMenu(
-                            expanded = mostrarMenu,
-                            onDismissRequest = { mostrarMenu = false },
-                            modifier = Modifier.background(ColoresTorque.SurfaceDark)
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_make_primary), color = Color.White) },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Star,
-                                        contentDescription = null,
-                                        tint = ColoresTorque.Primary
-                                    )
-                                },
-                                onClick = {
-                                    scope.launch {
-                                        repositorio.establecerMotoPrincipal(idMoto)
-                                        moto = repositorio.obtenerMotoPorId(idMoto)
-                                        launch(kotlinx.coroutines.Dispatchers.Main) {
-                                            Toast.makeText(contexto, contexto.getString(R.string.toast_primary_updated), Toast.LENGTH_SHORT).show()
-                                            (contexto as? Activity)?.setResult(Activity.RESULT_OK)
-                                        }
-                                    }
-                                    mostrarMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_register_maintenance), color = Color.White) },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Build,
-                                        contentDescription = null,
-                                        tint = ColoresTorque.Primary
-                                    )
-                                },
-                                onClick = {
-                                    val intent = Intent(contexto, RegistroMantenimiento::class.java).apply {
-                                        putExtra("idMoto", idMoto)
-                                    }
-                                    contexto.startActivity(intent)
-                                    mostrarMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_view_history), color = Color.White) },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.History,
-                                        contentDescription = null,
-                                        tint = ColoresTorque.Primary
-                                    )
-                                },
-                                onClick = {
-                                    val intent = Intent(contexto, MantenimientoHistorial::class.java).apply {
-                                        putExtra("idMoto", idMoto)
-                                    }
-                                    contexto.startActivity(intent)
-                                    mostrarMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_plan_maintenance), color = Color.White) },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Schedule,
-                                        contentDescription = null,
-                                        tint = ColoresTorque.Primary
-                                    )
-                                },
-                                onClick = {
-                                    val intent = Intent(contexto, PlanMantenimiento::class.java).apply {
-                                        putExtra("idMoto", idMoto)
-                                    }
-                                    contexto.startActivity(intent)
-                                    mostrarMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_edit_bike), color = Color.White) },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Edit,
-                                        contentDescription = null,
-                                        tint = ColoresTorque.Primary
-                                    )
-                                },
-                                onClick = {
-                                    val intent = Intent(contexto, AnadirMotoActivity::class.java).apply {
-                                        putExtra("idMoto", idMoto)
-                                        putExtra("editando", true)
-                                    }
-                                    contexto.startActivity(intent)
-                                    mostrarMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_delete_bike), color = Color.Red) },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = null,
-                                        tint = Color.Red
-                                    )
-                                },
-                                onClick = {
-                                    mostrarDialogoEliminar = true
-                                    mostrarMenu = false
-                                }
-                            )
-                        }
-                    }
-                }
+                    },
+                    onRegisterMaintenance = {
+                        contexto.startActivity(Intent(contexto, RegistroMantenimiento::class.java).apply {
+                            putExtra("idMoto", idMoto)
+                        })
+                    },
+                    onViewHistory = {
+                        contexto.startActivity(Intent(contexto, MantenimientoHistorial::class.java).apply {
+                            putExtra("idMoto", idMoto)
+                        })
+                    },
+                    onPlanMaintenance = {
+                        contexto.startActivity(Intent(contexto, PlanMantenimiento::class.java).apply {
+                            putExtra("idMoto", idMoto)
+                        })
+                    },
+                    onEditBike = {
+                        contexto.startActivity(Intent(contexto, AnadirMotoActivity::class.java).apply {
+                            putExtra("idMoto", idMoto)
+                            putExtra("editando", true)
+                        })
+                    },
+                    onDeleteBike = { mostrarDialogoEliminar = true }
+                )
 
                 Column(
                     modifier = Modifier
