@@ -158,113 +158,38 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                 CircularProgressIndicator(color = ColoresTorque.Primary)
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(16f / 9f)
-                        .padding(top = 16.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(ColoresTorque.SurfaceDark)
-                        .clickable { selectorImagen.launch("image/*") },
-                    contentAlignment = Alignment.Center
-                ) {
-                    val imagenAMostrar = uriImagen ?: fotoActual
-                    if (imagenAMostrar != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(imagenAMostrar),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
-                            Text(stringResource(R.string.add_photo), color = ColoresTorque.OnSurfaceVariant)
-                        }
-                    }
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    SelectorMarca(
-                        marca = marca,
-                        onMarcaChange = { marca = it; errorMarca = false },
-                        onMarcaSeleccionada = { modelo = "" },
-                        label = stringResource(R.string.field_brand_required),
-                        error = errorMarca
-                    )
-                    if (errorMarca) {
-                        Text(stringResource(R.string.error_brand_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
-                    }
-                    SelectorModelo(
-                        modelo = modelo,
-                        onModeloChange = { modelo = it; errorModelo = false },
-                        marca = marca,
-                        label = stringResource(R.string.field_model_required),
-                        error = errorModelo
-                    )
-                    if (errorModelo) {
-                        Text(stringResource(R.string.error_model_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CampoTextoTorque(anio, { anio = it }, stringResource(R.string.label_year), modifier = Modifier.weight(1f))
-                        Column(modifier = Modifier.weight(1f)) {
-                            CampoTextoTorque(
-                                value = matricula,
-                                onValueChange = {
-                                    matricula = it
-                                    errorMatricula = false
-                                },
-                                label = stringResource(R.string.label_plate)
-                            )
-                            if (errorMatricula) {
-                                Text(
-                                    text = stringResource(R.string.error_plate_required),
-                                    color = ColoresTorque.RojoError,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(start = 4.dp)
-                                )
-                            }
-                        }
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CampoTextoTorque(kilometros, { kilometros = it }, stringResource(R.string.field_current_kms_short), modifier = Modifier.weight(1f))
-                        CampoTextoTorque(cilindrada, { cilindrada = it }, stringResource(R.string.label_displacement), modifier = Modifier.weight(1f))
-                    }
-
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.label_set_as_primary), color = Color.White, modifier = Modifier.weight(1f))
-                        Switch(
-                            checked = esPrincipal,
-                            onCheckedChange = { esPrincipal = it },
-                            colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary)
-                        )
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        CampoTextoTorque(fechaItv, { fechaItv = it }, "Fecha ITV (dd/mm/aaaa)", modifier = Modifier.weight(1f))
-                        CampoTextoTorque(fechaSeguro, { fechaSeguro = it }, "Fecha Seguro (dd/mm/aaaa)", modifier = Modifier.weight(1f))
-                    }
-
-                    CampoTextoTorque(
-                        value = estilo,
-                        onValueChange = { estilo = it },
-                        label = stringResource(R.string.field_notes),
-                        singleLine = false,
-                        modifier = Modifier.height(100.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(120.dp))
-            }
+            FormularioMotoBody(
+                modifier = Modifier.weight(1f),
+                marca = marca,
+                onMarcaChange = { marca = it; errorMarca = false },
+                onMarcaSeleccionada = { modelo = "" },
+                onMarcaDropdown = { errorMarca = false },
+                errorMarca = errorMarca,
+                modelo = modelo,
+                onModeloChange = { modelo = it; errorModelo = false },
+                errorModelo = errorModelo,
+                anio = anio,
+                onAnioChange = { anio = it },
+                matricula = matricula,
+                onMatriculaChange = { matricula = it; errorMatricula = false },
+                errorMatricula = errorMatricula,
+                kilometros = kilometros,
+                onKilometrosChange = { kilometros = it },
+                cilindrada = cilindrada,
+                onCilindradaChange = { cilindrada = it },
+                esPrincipal = esPrincipal,
+                onEsPrincipalChange = { esPrincipal = it },
+                fechaItv = fechaItv,
+                onFechaItvChange = { fechaItv = it },
+                fechaSeguro = fechaSeguro,
+                onFechaSeguroChange = { fechaSeguro = it },
+                estilo = estilo,
+                onEstiloChange = { estilo = it },
+                uriImagen = uriImagen,
+                fotoActual = fotoActual,
+                scrollState = scrollState,
+                selectorImagen = selectorImagen
+            )
         }
         }
 
