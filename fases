@@ -1,7 +1,0 @@
-Perfecto. El plan entonces es:
-Fase 1: Crear 6 skills → commit + push
-Fase 2: Null safety (17 !! + 2 unsafe casts) → commit + push
-Fase 3: Strings hardcoded a strings.xml → commit + push
-Fase 4: Clean architecture fixes → commit + push
-Fase 5: Refactor archivos grandes → commit + push
-Fase 6: Coroutine fixes → commit + push
