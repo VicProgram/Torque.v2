@@ -127,9 +127,9 @@ fun obtenerNombresSeccion(): Map<String, String> = mapOf(
     "Neumáticos" to stringResource(R.string.category_tires),
     "Eléctrico" to stringResource(R.string.category_electrical),
     "Suspensión" to stringResource(R.string.category_suspension),
-    "Climatización" to "Climatización",
-    "Combustible" to "Combustible",
-    "Dirección" to "Dirección"
+    "Climatización" to stringResource(R.string.category_climate),
+    "Combustible" to stringResource(R.string.category_fuel),
+    "Dirección" to stringResource(R.string.category_steering)
 )
 
 @Composable

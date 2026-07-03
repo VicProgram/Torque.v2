@@ -33,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.torque.R
 import com.example.torque.garage.AnadirMotoActivity
 import com.example.torque.utils.NotificacionSalud
+import com.example.torque.utils.TipoVehiculo
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -269,7 +270,7 @@ private fun SeccionMotoPager(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.Motorcycle, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
+                Icon(Icons.Default.DirectionsCar, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(stringResource(R.string.no_bike), color = ColoresTorque.OnSurfaceVariant)
             }

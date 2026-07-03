@@ -3,6 +3,9 @@ package com.example.torque.components.ui.dashboard
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Motorcycle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +22,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.utils.ResultadoSalud
+import com.example.torque.utils.TipoVehiculo
 
 @Composable
 fun TarjetaProximoServicio(
@@ -86,19 +90,28 @@ fun TarjetaProximoServicio(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
-                    Column {
-                        Text(
-                            text = moto?.modelo ?: stringResource(R.string.no_bike),
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (moto?.tipoVehiculo == TipoVehiculo.COCHE) Icons.Default.DirectionsCar else Icons.Default.Motorcycle,
+                            contentDescription = null,
+                            tint = ColoresTorque.Primary,
+                            modifier = Modifier.size(20.dp)
                         )
-                        Text(
-                            text = if (moto != null) stringResource(R.string.your_main_bike) else stringResource(R.string.add_a_bike),
-                            color = ColoresTorque.OnSurfaceVariant,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = moto?.modelo ?: stringResource(R.string.no_bike),
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = if (moto != null) stringResource(R.string.your_main_bike) else stringResource(R.string.add_a_bike),
+                                color = ColoresTorque.OnSurfaceVariant,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         if (kmRestantes != null) {

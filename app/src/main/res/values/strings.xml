@@ -26,12 +26,12 @@
     <string name="welcome_name">Motorista</string>
     <string name="quick_actions_title">ACCIONES RÁPIDAS</string>
     <string name="garage_title">Garaje</string>
-    <string name="garage_subtitle">Mis Motos</string>
+    <string name="garage_subtitle">Mis Vehículos</string>
     <string name="maintenance_title">Mantenimiento</string>
     <string name="maintenance_subtitle">Registros y Más</string>
     <string name="next_service_image">Imagen de moto</string>
     <string name="upcoming_label">PRÓXIMO</string>
-    <string name="your_primary_bike">Tu Moto Principal</string>
+    <string name="your_primary_bike">Tu Vehículo Principal</string>
     <string name="days_left">DÍAS REST.</string>
     <string name="oil_change">CAMBIO DE ACEITE</string>
     <string name="schedule_service">Agendar Servicio</string>
@@ -45,24 +45,56 @@
     <string name="logout">Cerrar Sesión</string>
     <string name="logged_out">Sesión cerrada</string>
     <string name="menu_go_to_garage">Ir al Garaje</string>
-    <string name="menu_add_motorcycle">Añadir Moto</string>
+    <string name="menu_add_vehicle">Añadir Vehículo</string>
     <string name="menu_reminders">Recordatorios</string>
     <string name="menu_export_data">Exportar Datos</string>
     <string name="menu_about">Acerca de</string>
+    <!-- Vehicle type labels -->
+    <string name="type_motorcycle">Moto</string>
+    <string name="type_car">Coche</string>
+
+    <!-- Car specification fields -->
+    <string name="car_specs_section">Especificaciones del coche</string>
+    <string name="body_type">Carrocería</string>
+    <string name="fuel_type">Combustible</string>
+    <string name="transmission_type">Transmisión</string>
+    <string name="num_doors">Nº Puertas</string>
+
+    <!-- Car body types -->
+    <string name="car_body_sedan">Sedán</string>
+    <string name="car_body_hatchback">Hatchback</string>
+    <string name="car_body_suv">SUV</string>
+    <string name="car_body_coupe">Coupé</string>
+    <string name="car_body_estate">Familiar</string>
+    <string name="car_body_convertible">Descapotable</string>
+    <string name="car_body_van">Monovolumen</string>
+    <string name="car_body_pickup">Pickup</string>
+
+    <!-- Car fuel types -->
+    <string name="car_fuel_gasoline">Gasolina</string>
+    <string name="car_fuel_diesel">Diésel</string>
+    <string name="car_fuel_electric">Eléctrico</string>
+    <string name="car_fuel_hybrid">Híbrido</string>
+    <string name="car_fuel_lpg">GLP</string>
+
+    <!-- Car transmission types -->
+    <string name="car_transmission_manual">Manual</string>
+    <string name="car_transmission_automatic">Automática</string>
+
     <string name="about_dialog_title">Torque v1.0</string>
-    <string name="about_dialog_description">App de gestión de mantenimiento para motocicletas.</string>
+    <string name="about_dialog_description">App de gestión de mantenimiento para vehículos.</string>
     <string name="about_dialog_tech">Desarrollada con Jetpack Compose y Room.</string>
     <string name="export_dialog_message">Se guardará un ZIP con la base de datos, fotos y configuración.</string>
     <string name="toast_backup_saved">Backup guardado</string>
     <string name="next_service_badge">PRÓXIMO SERVICIO</string>
-    <string name="no_bike">Sin Moto</string>
-    <string name="your_main_bike">Tu moto principal</string>
-    <string name="add_a_bike">Añade una moto</string>
+    <string name="no_bike">Sin Vehículo</string>
+    <string name="your_main_bike">Tu vehículo principal</string>
+    <string name="add_a_bike">Añade un vehículo</string>
     <string name="overdue">¡VENCIDO!</string>
     <string name="service_km">KM DE SERVICIO</string>
     <string name="km_remaining">KM RESTANTES</string>
     <string name="no_data">SIN DATOS</string>
-    <string name="bike_health">SALUD DE LA MOTO</string>
+    <string name="bike_health">SALUD DEL VEHÍCULO</string>
     <string name="btn_view_maintenance">Ver Mantenimiento</string>
     <string name="total_mileage">KILOMETRAJE TOTAL</string>
     <string name="kilometers_label">KILÓMETROS</string>
@@ -239,16 +271,39 @@
     <string name="task_fork_seals_replace">Cambio de Retenes Horquilla</string>
     <string name="task_fork_seals_replace_desc">Cambio cada 10.000 km</string>
 
+    <!-- Coche — Motor -->
+    <string name="task_car_timing_belt">Correa de Distribución</string>
+    <string name="task_car_timing_belt_desc">Cambio cada 60.000 km</string>
+    <!-- Coche — Transmisión -->
+    <string name="task_car_gear_oil">Aceite de Cambio</string>
+    <string name="task_car_gear_oil_desc">Cambio cada 60.000 km</string>
+    <!-- Coche — Neumáticos -->
+    <string name="task_car_tire_rotation">Rotación de Neumáticos</string>
+    <string name="task_car_tire_rotation_desc">Cada 10.000 km</string>
+    <!-- Coche — Climatización -->
+    <string name="task_car_cabin_filter">Filtro de Habitáculo</string>
+    <string name="task_car_cabin_filter_desc">Cambio cada 15.000 km</string>
+    <string name="task_car_ac_gas">Gas Aire Acondicionado</string>
+    <string name="task_car_ac_gas_desc">Recarga cada 2 años</string>
+    <!-- Coche — Dirección -->
+    <string name="task_car_steering_fluid">Líquido de Dirección</string>
+    <string name="task_car_steering_fluid_desc">Cambio cada 60.000 km</string>
+    <!-- Coche — Combustible -->
+    <string name="task_car_diesel_filter">Filtro de Gasóleo</string>
+    <string name="task_car_diesel_filter_desc">Cambio cada 30.000 km</string>
+
     <!-- ListaGaraje filters -->
-    <string name="filter_all_bikes">Todas</string>
+    <string name="filter_all_bikes">Todos</string>
+    <string name="filter_motorcycles">Motos</string>
+    <string name="filter_cars">Coches</string>
     <string name="filter_in_use">En Uso</string>
     <string name="filter_historical">Históricas</string>
     <string name="search_by_brand_hint">Buscar por marca, modelo o matrícula…</string>
     <string name="content_desc_clear">Limpiar</string>
-    <string name="my_garage_title">Mi Garaje</string>
+    <string name="my_garage_title">Mis Vehículos</string>
     <string name="content_desc_search">Buscar</string>
-    <string name="no_bikes_yet">Aún no tienes motos</string>
-    <string name="add_first_bike_hint">Pulsa el botón + para añadir tu primera moto</string>
+    <string name="no_bikes_yet">Aún no tienes vehículos</string>
+    <string name="add_first_bike_hint">Pulsa el botón + para añadir tu primer vehículo</string>
     <string name="no_results">Sin resultados</string>
     <string name="try_different_filters">Prueba con otros términos o filtros</string>
     <string name="content_desc_principal">Principal</string>
@@ -362,4 +417,7 @@
     <string name="category_tires">Neumáticos</string>
     <string name="category_electrical">Eléctrico</string>
     <string name="category_suspension">Suspensión</string>
+    <string name="category_climate">Climatización</string>
+    <string name="category_steering">Dirección</string>
+    <string name="category_fuel">Combustible</string>
 </resources>

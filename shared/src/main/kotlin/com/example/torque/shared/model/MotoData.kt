@@ -1,7 +1,5 @@
 package com.example.torque.shared.model
 
-enum class TipoVehiculo { MOTO, COCHE }
-
 data class MotoData(
     val id: Long = 0,
     val marca: String = "",

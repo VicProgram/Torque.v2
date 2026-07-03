@@ -66,6 +66,7 @@ import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
 import com.example.torque.utils.DateUtils
+import com.example.torque.utils.TipoVehiculo
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -154,6 +155,16 @@ private fun TarjetaEspecificaciones(m: MotoEntity) {
         FilaDetalle(stringResource(R.string.label_itv), m.fechaItv ?: stringResource(R.string.not_available))
         FilaDetalle(stringResource(R.string.label_insurance), m.fechaSeguro ?: stringResource(R.string.not_available))
         FilaDetalle(stringResource(R.string.label_style), m.estilo ?: stringResource(R.string.not_available))
+        FilaDetalle(
+            stringResource(R.string.type_motorcycle),
+            if (m.tipoVehiculo == TipoVehiculo.COCHE) stringResource(R.string.type_car) else stringResource(R.string.type_motorcycle)
+        )
+        if (m.tipoVehiculo == TipoVehiculo.COCHE) {
+            m.tipoCarroceria?.let { FilaDetalle(stringResource(R.string.body_type), it) }
+            m.tipoCombustible?.let { FilaDetalle(stringResource(R.string.fuel_type), it) }
+            m.tipoTransmision?.let { FilaDetalle(stringResource(R.string.transmission_type), it) }
+            m.numeroPuertas?.let { FilaDetalle(stringResource(R.string.num_doors), it) }
+        }
     }
 }
 

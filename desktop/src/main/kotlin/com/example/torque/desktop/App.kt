@@ -60,6 +60,7 @@ fun App() {
             when (currentScreen) {
                 Screen.DASHBOARD -> DashboardScreen()
                 Screen.GARAJE -> GarajeScreen()
+                Screen.MOTO_DETALLE -> DashboardScreen()
                 Screen.AJUSTES -> AjustesScreen()
             }
         }

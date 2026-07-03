@@ -7,8 +7,8 @@ import com.example.torque.shared.model.FotoMantenimientoData
 import com.example.torque.shared.model.MantenimientoDto
 import com.example.torque.shared.model.MotoData
 
-class DesktopRepositorio {
-    private val db: TorqueDatabase by lazy { DatabaseFactory.obtenerBaseDeDatos() }
+class DesktopRepositorio(private val testDb: TorqueDatabase? = null) {
+    private val db: TorqueDatabase = testDb ?: DatabaseFactory.obtenerBaseDeDatos()
     private val queries get() = db.torqueQueries
 
     fun obtenerMotos(): List<MotoData> {
@@ -81,7 +81,7 @@ class DesktopRepositorio {
     }
 }
 
-private fun com.example.torque.desktop.db.Moto.toMotoData(): MotoData = MotoData(
+private fun com.example.torque.desktop.db.Motos.toMotoData(): MotoData = MotoData(
     id = idMoto, marca = marca, modelo = modelo, anio = anio.toInt(),
     matricula = matricula ?: "", kilometros = kilometros.toInt(),
     cilindrada = cilindrada, caballos = caballos, estilo = estilo,
@@ -90,7 +90,7 @@ private fun com.example.torque.desktop.db.Moto.toMotoData(): MotoData = MotoData
     creadoEn = creadoEn, actualizadoEn = actualizadoEn
 )
 
-private fun com.example.torque.desktop.db.Mantenimiento.toMantenimientoDto(): MantenimientoDto = MantenimientoDto(
+private fun com.example.torque.desktop.db.Mantenimientos.toMantenimientoDto(): MantenimientoDto = MantenimientoDto(
     id = id, idMoto = idMoto, nombreMantenimiento = nombreMantenimiento,
     fecha = fecha, kms = kms.toInt(), intervaloKms = intervaloKms.toInt(),
     precio = precio, tiempo = tiempo, notas = notas, tareas = tareas ?: "",

@@ -201,14 +201,14 @@ fun FormularioMotoBody(
             )
 
             if (tipoVehiculo == TipoVehiculo.COCHE) {
-                Text("Especificaciones del coche", color = ColoresTorque.Primary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.car_specs_section), color = ColoresTorque.Primary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CampoTextoTorque(tipoCarroceria, onTipoCarroceriaChange, "Carrocería", modifier = Modifier.weight(1f))
-                    CampoTextoTorque(tipoCombustible, onTipoCombustibleChange, "Combustible", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(tipoCarroceria, onTipoCarroceriaChange, stringResource(R.string.body_type), modifier = Modifier.weight(1f))
+                    CampoTextoTorque(tipoCombustible, onTipoCombustibleChange, stringResource(R.string.fuel_type), modifier = Modifier.weight(1f))
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CampoTextoTorque(tipoTransmision, onTipoTransmisionChange, "Transmisión", modifier = Modifier.weight(1f))
-                    CampoTextoTorque(numeroPuertas, onNumeroPuertasChange, "Nº Puertas", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(tipoTransmision, onTipoTransmisionChange, stringResource(R.string.transmission_type), modifier = Modifier.weight(1f))
+                    CampoTextoTorque(numeroPuertas, onNumeroPuertasChange, stringResource(R.string.num_doors), modifier = Modifier.weight(1f))
                 }
             }
         }
