@@ -45,6 +45,7 @@ import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
 import com.example.torque.utils.DateUtils
 import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.TipoVehiculo
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -74,10 +75,11 @@ private fun crearEntidadMantenimiento(
     notas: String,
     fechaActual: String,
     contexto: android.content.Context,
-    porcentajeVida: Int
+    porcentajeVida: Int,
+    tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO
 ): MantenimientoEntity {
     val tipoId = if (tareasSeleccionadas.size == 1)
-        TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.id ?: 0L
+        TiposMantenimiento.desdeNombre(tareasSeleccionadas[0], tipoVehiculo)?.id ?: 0L
     else 0L
     return MantenimientoEntity(
         idMoto = idMoto,
@@ -124,14 +126,15 @@ private suspend fun guardarMantenimiento(
     contexto: android.content.Context,
     porcentajeVida: Int = 100,
     adjuntos: List<Adjunto> = emptyList(),
-    actualizarKmMoto: Boolean = false
+    actualizarKmMoto: Boolean = false,
+    tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO
 ) {
     try {
         if (actualizarKmMoto) {
             repositorio.actualizarKilometros(idMoto, kmNuevos)
         }
         val idMantenimiento = repositorio.insertarMantenimiento(
-            crearEntidadMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervaloKms, precio, tiempo, notas, fechaActual, contexto, porcentajeVida)
+            crearEntidadMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervaloKms, precio, tiempo, notas, fechaActual, contexto, porcentajeVida, tipoVehiculo)
         )
         if (idMantenimiento > 0L) {
             procesarAdjuntos(adjuntos, idMantenimiento, repositorio, contexto)
@@ -160,19 +163,24 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
     var kmMotoActual by remember { mutableStateOf(0) }
     var porcentajeVida by remember { mutableStateOf(100) }
     var adjuntos by remember { mutableStateOf<List<Adjunto>>(emptyList()) }
+    var tipoVehiculo by remember { mutableStateOf(TipoVehiculo.MOTO) }
+
+    LaunchedEffect(idMoto) {
+        repositorio.obtenerMotoPorId(idMoto)?.let { tipoVehiculo = it.tipoVehiculo }
+    }
 
     val hayCambios = kms.isNotBlank() || intervalo.isNotBlank() || precio.isNotBlank() ||
         tiempo.isNotBlank() || notas.isNotBlank() || adjuntos.isNotEmpty()
 
     val fechaActual = SimpleDateFormat(DateUtils.FORMATO_FECHA_VISUAL, Locale.getDefault()).format(Date())
 
-    val esDesgaste = remember {
+    val esDesgaste = remember(tipoVehiculo) {
         tareasSeleccionadas.size == 1 &&
-            TiposMantenimiento.desdeNombre(tareasSeleccionadas[0])?.esDesgaste == true
+            TiposMantenimiento.desdeNombre(tareasSeleccionadas[0], tipoVehiculo)?.esDesgaste == true
     }
 
-    val tipoDesgaste = remember {
-        if (esDesgaste) TiposMantenimiento.desdeNombre(tareasSeleccionadas[0]) else null
+    val tipoDesgaste = remember(tipoVehiculo) {
+        if (esDesgaste) TiposMantenimiento.desdeNombre(tareasSeleccionadas[0], tipoVehiculo) else null
     }
 
     val launcherFoto = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -217,7 +225,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                 mostrarDialogoActualizarKm = false
                 scope.launch {
                     val kmNuevos = kms.toIntOrNull() ?: 0
-                    guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, adjuntos, actualizarKmMoto = actualizarKm)
+                    guardarMantenimiento(tareasSeleccionadas, idMoto, kmNuevos, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, adjuntos, actualizarKmMoto = actualizarKm, tipoVehiculo = tipoVehiculo)
                 }
             }
         )
@@ -227,7 +235,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             mostrarDialogoActualizarKm = it.mostrarActualizarKm
             if (it.guardarDirecto) {
                 scope.launch {
-                    guardarMantenimiento(tareasSeleccionadas, idMoto, kms.toIntOrNull() ?: 0, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, adjuntos)
+                    guardarMantenimiento(tareasSeleccionadas, idMoto, kms.toIntOrNull() ?: 0, intervalo.toIntOrNull() ?: 0, precio, tiempo, notas, fechaActual, repositorio, contexto, porcentajeVida, adjuntos, tipoVehiculo = tipoVehiculo)
                 }
             }
         }

@@ -90,7 +90,7 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
     suspend fun exportarPdf(contexto: android.content.Context, uri: Uri, idMoto: Long): Result<Unit> {
         val moto = repositorio.obtenerMotoPorId(idMoto) ?: return Result.failure(Exception("Moto no encontrada"))
         val mantenimientos = repositorio.obtenerTodosMantenimientosPorMoto(idMoto)
-        val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros)
+        val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros, moto.tipoVehiculo)
         return PdfExporter.exportarHistorial(contexto, uri, moto, mantenimientos, salud)
     }
 }

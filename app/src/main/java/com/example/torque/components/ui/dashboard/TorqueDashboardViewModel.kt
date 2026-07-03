@@ -105,7 +105,7 @@ class TorqueDashboardViewModel(
                         val ultimo = mantenimientos.firstOrNull()
                         updateDerivedState(ultimo)
 
-                        val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros)
+                        val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros, moto.tipoVehiculo)
                         val pendientes = salud.desglose.count {
                             it.cumplimiento <= 20 && !it.tipo.esDesgaste
                         }

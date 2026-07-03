@@ -26,3 +26,5 @@ rootProject.name = "Torque"
 include(":app")
 include(":core")
 include(":data")
+include(":shared")
+include(":desktop")
