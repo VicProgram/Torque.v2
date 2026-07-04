@@ -22,3 +22,18 @@ torque.db
 *.db-wal
 .dart_tool/
 .kotlin/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+*.egg
+dist/
+*.sqlite3
+test_torque.db
+.env
+*.db-shm
+*.db-wal

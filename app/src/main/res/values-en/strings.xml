@@ -26,12 +26,12 @@
     <string name="welcome_name">Rider</string>
     <string name="quick_actions_title">QUICK ACTIONS</string>
     <string name="garage_title">Garage</string>
-    <string name="garage_subtitle">My Bikes</string>
+    <string name="garage_subtitle">My Vehicles</string>
     <string name="maintenance_title">Maintenance</string>
     <string name="maintenance_subtitle">Records and More</string>
     <string name="next_service_image">Motorcycle image</string>
     <string name="upcoming_label">UPCOMING</string>
-    <string name="your_primary_bike">Your Main Bike</string>
+    <string name="your_primary_bike">Your Main Vehicle</string>
     <string name="days_left">DAYS LEFT</string>
     <string name="oil_change">OIL CHANGE</string>
     <string name="schedule_service">Schedule Service</string>
@@ -45,24 +45,24 @@
     <string name="logout">Log Out</string>
     <string name="logged_out">Logged out</string>
     <string name="menu_go_to_garage">Go to Garage</string>
-    <string name="menu_add_motorcycle">Add Motorcycle</string>
+    <string name="menu_add_vehicle">Add Vehicle</string>
     <string name="menu_reminders">Reminders</string>
     <string name="menu_export_data">Export Data</string>
     <string name="menu_about">About</string>
     <string name="about_dialog_title">Torque v1.0</string>
-    <string name="about_dialog_description">Motorcycle maintenance management app.</string>
+    <string name="about_dialog_description">Vehicle maintenance management app.</string>
     <string name="about_dialog_tech">Built with Jetpack Compose and Room.</string>
     <string name="export_dialog_message">A ZIP with the database, photos and settings will be saved.</string>
     <string name="toast_backup_saved">Backup saved</string>
     <string name="next_service_badge">NEXT SERVICE</string>
-    <string name="no_bike">No Bike</string>
-    <string name="your_main_bike">Your main bike</string>
-    <string name="add_a_bike">Add a bike</string>
+    <string name="no_bike">No Vehicle</string>
+    <string name="your_main_bike">Your main vehicle</string>
+    <string name="add_a_bike">Add a vehicle</string>
     <string name="overdue">OVERDUE!</string>
     <string name="service_km">SERVICE KM</string>
     <string name="km_remaining">KM REMAINING</string>
     <string name="no_data">NO DATA</string>
-    <string name="bike_health">BIKE HEALTH</string>
+    <string name="bike_health">VEHICLE HEALTH</string>
     <string name="btn_view_maintenance">View Maintenance</string>
     <string name="total_mileage">TOTAL MILEAGE</string>
     <string name="kilometers_label">KILOMETERS</string>
@@ -239,22 +239,67 @@
     <string name="task_fork_seals_replace">Fork Seals Replacement</string>
     <string name="task_fork_seals_replace_desc">Replace every 10,000 km</string>
 
+    <!-- Car — Engine -->
+    <string name="task_car_timing_belt">Timing Belt</string>
+    <string name="task_car_timing_belt_desc">Replace every 60,000 km</string>
+    <!-- Car — Transmission -->
+    <string name="task_car_gear_oil">Gear Oil</string>
+    <string name="task_car_gear_oil_desc">Change every 60,000 km</string>
+    <!-- Car — Tires -->
+    <string name="task_car_tire_rotation">Tire Rotation</string>
+    <string name="task_car_tire_rotation_desc">Every 10,000 km</string>
+    <!-- Car — Climate -->
+    <string name="task_car_cabin_filter">Cabin Filter</string>
+    <string name="task_car_cabin_filter_desc">Replace every 15,000 km</string>
+    <string name="task_car_ac_gas">A/C Gas</string>
+    <string name="task_car_ac_gas_desc">Recharge every 2 years</string>
+    <!-- Car — Steering -->
+    <string name="task_car_steering_fluid">Steering Fluid</string>
+    <string name="task_car_steering_fluid_desc">Change every 60,000 km</string>
+    <!-- Car — Fuel -->
+    <string name="task_car_diesel_filter">Diesel Filter</string>
+    <string name="task_car_diesel_filter_desc">Replace every 30,000 km</string>
+
     <!-- ListaGaraje filters -->
     <string name="filter_all_bikes">All</string>
+    <string name="filter_motorcycles">Motorcycles</string>
+    <string name="filter_cars">Cars</string>
     <string name="filter_in_use">In Use</string>
     <string name="filter_historical">Historical</string>
     <string name="search_by_brand_hint">Search by brand, model or plate…</string>
     <string name="content_desc_clear">Clear</string>
-    <string name="my_garage_title">My Garage</string>
+    <string name="my_garage_title">My Vehicles</string>
     <string name="content_desc_search">Search</string>
-    <string name="no_bikes_yet">No bikes yet</string>
-    <string name="add_first_bike_hint">Tap the + button to add your first bike</string>
+    <string name="no_bikes_yet">No vehicles yet</string>
+    <string name="add_first_bike_hint">Tap the + button to add your first vehicle</string>
     <string name="no_results">No results</string>
     <string name="try_different_filters">Try different terms or filters</string>
     <string name="content_desc_principal">Primary</string>
     <string name="healthy_status">Healthy</string>
     <string name="btn_view_details">View Details</string>
-    <string name="content_desc_new_moto">New Motorcycle</string>
+    <string name="content_desc_new_moto">New Vehicle</string>
+    <string name="type_motorcycle">Motorcycle</string>
+    <string name="type_car">Car</string>
+    <string name="car_specs_section">Car Specifications</string>
+    <string name="body_type">Body Type</string>
+    <string name="fuel_type">Fuel</string>
+    <string name="transmission_type">Transmission</string>
+    <string name="num_doors">Doors</string>
+    <string name="car_body_sedan">Sedan</string>
+    <string name="car_body_hatchback">Hatchback</string>
+    <string name="car_body_suv">SUV</string>
+    <string name="car_body_coupe">Coupe</string>
+    <string name="car_body_estate">Estate</string>
+    <string name="car_body_convertible">Convertible</string>
+    <string name="car_body_van">Minivan</string>
+    <string name="car_body_pickup">Pickup</string>
+    <string name="car_fuel_gasoline">Gasoline</string>
+    <string name="car_fuel_diesel">Diesel</string>
+    <string name="car_fuel_electric">Electric</string>
+    <string name="car_fuel_hybrid">Hybrid</string>
+    <string name="car_fuel_lpg">LPG</string>
+    <string name="car_transmission_manual">Manual</string>
+    <string name="car_transmission_automatic">Automatic</string>
 
     <!-- MotoDetalle -->
     <string name="menu_make_primary">Set as Primary</string>
@@ -372,4 +417,7 @@
     <string name="category_tires">Tires</string>
     <string name="category_electrical">Electrical</string>
     <string name="category_suspension">Suspension</string>
+    <string name="category_climate">Climate</string>
+    <string name="category_steering">Steering</string>
+    <string name="category_fuel">Fuel</string>
 </resources>

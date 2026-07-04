@@ -32,7 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.torque.R
 import com.example.torque.components.ui.dashboard.*
+import com.example.torque.room.RepositorioApp
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.utils.TipoVehiculo
 
 class RegistroMantenimiento : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,16 +52,25 @@ class RegistroMantenimiento : BaseActivity() {
 @Composable
 fun PantallaRegistroMantenimiento(idMoto: Long) {
     val contexto = LocalContext.current
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val itemsSeleccionados = remember { mutableStateMapOf<String, Boolean>() }
     var consultaBusqueda by remember { mutableStateOf("") }
     var filtroSeleccionado by remember { mutableStateOf("Todas") }
+    var tipoVehiculo by remember { mutableStateOf(TipoVehiculo.MOTO) }
 
-    val tareasMotor = obtenerTareasMotor()
-    val tareasTransmision = obtenerTareasTransmision()
-    val tareasFrenos = obtenerTareasFrenos()
-    val tareasNeumaticos = obtenerTareasNeumaticos()
-    val tareasElectrico = obtenerTareasElectrico()
-    val tareasSuspension = obtenerTareasSuspension()
+    LaunchedEffect(idMoto) {
+        repositorio.obtenerMotoPorId(idMoto)?.let { tipoVehiculo = it.tipoVehiculo }
+    }
+
+    val tareasMotor = obtenerTareasMotor(tipoVehiculo)
+    val tareasTransmision = obtenerTareasTransmision(tipoVehiculo)
+    val tareasFrenos = obtenerTareasFrenos(tipoVehiculo)
+    val tareasNeumaticos = obtenerTareasNeumaticos(tipoVehiculo)
+    val tareasElectrico = obtenerTareasElectrico(tipoVehiculo)
+    val tareasSuspension = obtenerTareasSuspension(tipoVehiculo)
+    val tareasClimatizacion = if (tipoVehiculo == TipoVehiculo.COCHE) obtenerTareasClimatizacion() else emptyList()
+    val tareasCombustible = if (tipoVehiculo == TipoVehiculo.COCHE) obtenerTareasCombustible() else emptyList()
+    val tareasDireccion = if (tipoVehiculo == TipoVehiculo.COCHE) obtenerTareasDireccion() else emptyList()
     val nombresSeccion = obtenerNombresSeccion()
 
     Box(
@@ -140,11 +151,16 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                             item { FiltroChip(stringResource(R.string.category_transmission), estaSeleccionado = filtroSeleccionado == "Transmisión", onClick = { filtroSeleccionado = "Transmisión" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
                             item { FiltroChip(stringResource(R.string.category_brakes), estaSeleccionado = filtroSeleccionado == "Frenos", onClick = { filtroSeleccionado = "Frenos" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
                             item { FiltroChip(stringResource(R.string.category_wheels), estaSeleccionado = filtroSeleccionado == "Ruedas", onClick = { filtroSeleccionado = "Ruedas" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            if (tipoVehiculo == TipoVehiculo.COCHE) {
+                                item { FiltroChip("Climatización", estaSeleccionado = filtroSeleccionado == "Climatización", onClick = { filtroSeleccionado = "Climatización" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                                item { FiltroChip("Combustible", estaSeleccionado = filtroSeleccionado == "Combustible", onClick = { filtroSeleccionado = "Combustible" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                                item { FiltroChip("Dirección", estaSeleccionado = filtroSeleccionado == "Dirección", onClick = { filtroSeleccionado = "Dirección" }, forma = CircleShape, colorSeleccionado = ColoresTorque.Primary, colorSeleccionadoContenido = Color.White, colorNoSeleccionadoFondo = ColoresTorque.SurfaceDark, colorNoSeleccionadoBorde = ColoresTorque.BorderDark) }
+                            }
                         }
                     }
                 }
 
-                val secciones = listOf(
+                val todasLasSecciones = mutableListOf(
                     "Motor" to tareasMotor,
                     "Transmisión" to tareasTransmision,
                     "Frenos" to tareasFrenos,
@@ -152,9 +168,16 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     "Eléctrico" to tareasElectrico,
                     "Suspensión" to tareasSuspension
                 )
+                if (tipoVehiculo == TipoVehiculo.COCHE) {
+                    todasLasSecciones.add("Climatización" to tareasClimatizacion)
+                    todasLasSecciones.add("Combustible" to tareasCombustible)
+                    todasLasSecciones.add("Dirección" to tareasDireccion)
+                }
+                val secciones = todasLasSecciones.toList()
                 item {
                     val todasLasTareas = tareasMotor + tareasTransmision + tareasFrenos +
-                        tareasNeumaticos + tareasElectrico + tareasSuspension
+                        tareasNeumaticos + tareasElectrico + tareasSuspension +
+                        tareasClimatizacion + tareasCombustible + tareasDireccion
                     val tareasFiltradas = if (consultaBusqueda.isBlank()) todasLasTareas
                         else todasLasTareas.filter { it.nombre.contains(consultaBusqueda, ignoreCase = true) }
                     if (tareasFiltradas.isEmpty()) {

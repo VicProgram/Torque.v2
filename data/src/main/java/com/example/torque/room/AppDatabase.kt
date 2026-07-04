@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.torque.room.entity.dao.MotoDao
@@ -17,9 +18,10 @@ import com.example.torque.room.entity.FotoMantenimientoEntity
 
 @Database(
     entities = [MotoEntity::class, MantenimientoEntity::class, FotoEntity::class, FotoMantenimientoEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
+@TypeConverters(Convertidores::class)
 abstract class BaseDeDatosApp : RoomDatabase() {
     abstract fun motoDao(): MotoDao
     abstract fun mantenimientoDao(): MantenimientoDao
@@ -50,13 +52,23 @@ abstract class BaseDeDatosApp : RoomDatabase() {
             }
         }
 
+        val MIGRACION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE motos ADD COLUMN tipoVehiculo TEXT NOT NULL DEFAULT 'MOTO'")
+                db.execSQL("ALTER TABLE motos ADD COLUMN tipoCarroceria TEXT")
+                db.execSQL("ALTER TABLE motos ADD COLUMN tipoCombustible TEXT")
+                db.execSQL("ALTER TABLE motos ADD COLUMN tipoTransmision TEXT")
+                db.execSQL("ALTER TABLE motos ADD COLUMN numeroPuertas INTEGER")
+            }
+        }
+
         fun obtenerInstancia(context: Context): BaseDeDatosApp =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     BaseDeDatosApp::class.java,
                     "torque_room.db"
-                ).addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4)
+                ).addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4, MIGRACION_4_5)
                     .fallbackToDestructiveMigration()
                     .build().also { INSTANCE = it }
             }

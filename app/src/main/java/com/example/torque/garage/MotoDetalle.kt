@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +66,7 @@ import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
 import com.example.torque.utils.DateUtils
+import com.example.torque.utils.TipoVehiculo
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,6 +84,86 @@ class MotoDetalle : BaseActivity() {
             TorqueTheme {
                 VistaMotoDetalle(idMoto)
             }
+        }
+    }
+}
+
+@Composable
+private fun GaleriaMoto(fotos: SnapshotStateList<FotoEntity>, uriFotoInicial: String?, onAddPhoto: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(16f / 9f)
+            .clip(RoundedCornerShape(20.dp))
+            .background(ColoresTorque.SurfaceDark)
+            .clickable { onAddPhoto() }
+    ) {
+        val imagenAMostrar = if (fotos.isNotEmpty()) fotos.last().ruta else uriFotoInicial
+
+        if (!imagenAMostrar.isNullOrEmpty()) {
+            Image(
+                painter = rememberAsyncImagePainter(imagenAMostrar),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    Icons.Default.AddAPhoto,
+                    contentDescription = null,
+                    tint = ColoresTorque.OnSurfaceVariant,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(stringResource(R.string.no_photos_yet), color = ColoresTorque.OnSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TarjetaEspecificaciones(m: MotoEntity) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(ColoresTorque.SurfaceDark)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            stringResource(R.string.section_specifications),
+            color = ColoresTorque.Primary,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
+        )
+        FilaDetalle(stringResource(R.string.label_brand), m.marca)
+        FilaDetalle(stringResource(R.string.label_year), m.anio.toString())
+        FilaDetalle(stringResource(R.string.label_plate), m.matricula ?: stringResource(R.string.not_available))
+        FilaDetalle(stringResource(R.string.label_displacement), m.cilindrada ?: stringResource(R.string.not_available))
+        val caballos = m.caballos
+        FilaDetalle(
+            stringResource(R.string.label_power),
+            if (caballos != null) stringResource(R.string.power_cv_format, caballos) else stringResource(R.string.not_available)
+        )
+        FilaDetalle(stringResource(R.string.label_kilometers), "${m.kilometros} km", editable = true, onClick = { })
+        FilaDetalle(stringResource(R.string.label_itv), m.fechaItv ?: stringResource(R.string.not_available))
+        FilaDetalle(stringResource(R.string.label_insurance), m.fechaSeguro ?: stringResource(R.string.not_available))
+        FilaDetalle(stringResource(R.string.label_style), m.estilo ?: stringResource(R.string.not_available))
+        FilaDetalle(
+            stringResource(R.string.type_motorcycle),
+            if (m.tipoVehiculo == TipoVehiculo.COCHE) stringResource(R.string.type_car) else stringResource(R.string.type_motorcycle)
+        )
+        if (m.tipoVehiculo == TipoVehiculo.COCHE) {
+            m.tipoCarroceria?.let { FilaDetalle(stringResource(R.string.body_type), it) }
+            m.tipoCombustible?.let { FilaDetalle(stringResource(R.string.fuel_type), it) }
+            m.tipoTransmision?.let { FilaDetalle(stringResource(R.string.transmission_type), it) }
+            m.numeroPuertas?.let { FilaDetalle(stringResource(R.string.num_doors), it.toString()) }
         }
     }
 }
@@ -186,73 +268,14 @@ fun VistaMotoDetalle(idMoto: Long) {
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // --- Galería de Imágenes ---
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(16f / 9f) // Un poco más horizontal
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(ColoresTorque.SurfaceDark)
-                            .clickable { selectorImagen.launch("image/*") }
-                    ) {
-                        val imagenAMostrar = if (fotos.isNotEmpty()) fotos.last().ruta else moto?.uriFoto
-                        
-                        if (!imagenAMostrar.isNullOrEmpty()) {
-                            Image(
-                                painter = rememberAsyncImagePainter(imagenAMostrar),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        } else {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    Icons.Default.AddAPhoto,
-                                    contentDescription = null,
-                                    tint = ColoresTorque.OnSurfaceVariant,
-                                    modifier = Modifier.size(48.dp)
-                                )
-                                Text(stringResource(R.string.no_photos_yet), color = ColoresTorque.OnSurfaceVariant)
-                            }
-                        }
-                    }
+                    GaleriaMoto(
+                        fotos = fotos,
+                        uriFotoInicial = moto?.uriFoto,
+                        onAddPhoto = { selectorImagen.launch("image/*") }
+                    )
 
-                    // --- Tarjeta de Información Básica ---
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(ColoresTorque.SurfaceDark)
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            stringResource(R.string.section_specifications),
-                            color = ColoresTorque.Primary,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        )
+                    TarjetaEspecificaciones(m = m)
 
-                        FilaDetalle(stringResource(R.string.label_brand), m.marca)
-                        FilaDetalle(stringResource(R.string.label_year), m.anio.toString())
-                        FilaDetalle(stringResource(R.string.label_plate), m.matricula ?: stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_displacement), m.cilindrada ?: stringResource(R.string.not_available))
-                        val caballos = m.caballos
-                        FilaDetalle(stringResource(R.string.label_power), if (caballos != null) stringResource(R.string.power_cv_format, caballos) else stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_kilometers), "${m.kilometros} km", editable = true, onClick = {
-                            mostrarDialogoKm = true
-                        })
-                        FilaDetalle(stringResource(R.string.label_itv), m.fechaItv ?: stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_insurance), m.fechaSeguro ?: stringResource(R.string.not_available))
-                        FilaDetalle(stringResource(R.string.label_style), m.estilo ?: stringResource(R.string.not_available))
-                    }
-
-                    // --- Fila de Fotos ---
                     if (fotos.size > 1) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Text(

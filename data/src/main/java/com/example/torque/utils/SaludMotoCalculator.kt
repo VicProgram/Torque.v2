@@ -25,7 +25,8 @@ object SaludMotoCalculator {
 
     fun calcular(
         mantenimientos: List<MantenimientoEntity>,
-        kmActuales: Int
+        kmActuales: Int,
+        tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO
     ): ResultadoSalud {
         val agrupadosPorId = mantenimientos
             .filter { it.tipoMantenimientoId > 0L }
@@ -39,7 +40,7 @@ object SaludMotoCalculator {
             return sinId.filter { coincide(it, tipo) }.maxByOrNull { it.kms }
         }
 
-        val detalles = TiposMantenimiento.TODOS.mapNotNull { tipo ->
+        val detalles = TiposMantenimiento.obtenerPorTipo(tipoVehiculo).mapNotNull { tipo ->
             val ultimo = mejorMatch(tipo)
 
             val cumplimiento = if (ultimo != null) {

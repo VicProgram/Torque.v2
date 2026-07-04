@@ -111,24 +111,10 @@ fun PerfilScreen(onBack: () -> Unit) {
             .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(ColoresTorque.ALTURA_CABECERA)
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(com.example.torque.R.string.content_desc_back), tint = ColoresTorque.Primary)
-                }
-                Text(
-                    text = stringResource(com.example.torque.R.string.my_profile_title),
-                    modifier = Modifier.weight(1f),
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                IconButton(onClick = {
+            CabeceraPerfil(
+                editando = editando,
+                onBack = onBack,
+                onToggleEdit = {
                     if (editando) {
                         scope.launch {
                             repositorio.establecerNombre(editNombre.trim())
@@ -140,15 +126,8 @@ fun PerfilScreen(onBack: () -> Unit) {
                         Toast.makeText(contexto, contexto.getString(com.example.torque.R.string.toast_profile_saved), Toast.LENGTH_SHORT).show()
                     }
                     editando = !editando
-                }) {
-                    Icon(
-                        if (editando) Icons.Default.Save else Icons.Default.Edit,
-                        contentDescription = if (editando) stringResource(com.example.torque.R.string.content_desc_save) else stringResource(com.example.torque.R.string.content_desc_edit),
-                        tint = ColoresTorque.Primary
-                    )
                 }
-            }
-
+            )
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -156,124 +135,41 @@ fun PerfilScreen(onBack: () -> Unit) {
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(ColoresTorque.SurfaceDark)
-                        .border(2.dp, ColoresTorque.Primary, CircleShape)
-                        .clickable { if (editando) selectorImagen.launch("image/*") },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (fotoPerfil != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(fotoPerfil),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    } else {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = ColoresTorque.OnSurfaceVariant
-                        )
-                    }
-                    if (editando) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(ColoresTorque.Primary),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Default.CameraAlt,
-                                contentDescription = stringResource(com.example.torque.R.string.change_photo),
-                                tint = Color.White,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-                }
+                FotoPerfilEditable(
+                    fotoPerfil = fotoPerfil,
+                    editando = editando,
+                    onCambiarFoto = { selectorImagen.launch("image/*") }
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    if (editando) {
-                        CampoTextoTorque(value = editNombre, onValueChange = { editNombre = it }, label = stringResource(com.example.torque.R.string.profile_name))
-                        CampoTextoTorque(value = editEmail, onValueChange = { editEmail = it }, label = stringResource(com.example.torque.R.string.profile_email))
-                        CampoTextoTorque(value = editTelefono, onValueChange = { editTelefono = it }, label = stringResource(com.example.torque.R.string.profile_phone))
-                        CampoTextoTorque(value = editFecha, onValueChange = { editFecha = it }, label = stringResource(com.example.torque.R.string.profile_birthday_hint))
-                    } else {
-                        if (nombre.isNullOrBlank().not()) {
-                            Text(text = nombre ?: "", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                        if (email.isNullOrBlank().not()) {
-                            FilaPerfil(Icons.Default.Email, email ?: "")
-                        }
-                        if (telefono.isNullOrBlank().not()) {
-                            FilaPerfil(Icons.Default.Phone, telefono ?: "")
-                        }
-                        if (fechaNacimiento.isNullOrBlank().not()) {
-                            FilaPerfil(Icons.Default.CalendarMonth, fechaNacimiento ?: "")
-                        }
-                    }
-                }
+                DatosPerfil(
+                    editando = editando,
+                    nombre = nombre,
+                    email = email,
+                    telefono = telefono,
+                    fechaNacimiento = fechaNacimiento,
+                    editNombre = editNombre,
+                    editEmail = editEmail,
+                    editTelefono = editTelefono,
+                    editFecha = editFecha,
+                    onNombreChange = { editNombre = it },
+                    onEmailChange = { editEmail = it },
+                    onTelefonoChange = { editTelefono = it },
+                    onFechaChange = { editFecha = it }
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(com.example.torque.R.string.my_licenses),
-                        color = ColoresTorque.Primary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    val carnetsMostrar = if (editando) carnetsDisponibles else carnetsDisponibles.filter { it in carnetsGuardados }
-                    @OptIn(ExperimentalLayoutApi::class)
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        carnetsMostrar.forEach { carnet ->
-                            val seleccionado = carnet in editCarnets
-                            val bgColor = if (editando && seleccionado) ColoresTorque.Primary else ColoresTorque.SurfaceDark
-                            val borderColor = if (editando && seleccionado) Color.Transparent else ColoresTorque.BorderDark
-                            val textoColor = if (editando && seleccionado) Color.White else Color.White
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(bgColor)
-                                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
-                                    .clickable(enabled = editando) {
-                                        editCarnets = if (seleccionado) editCarnets - carnet else editCarnets + carnet
-                                    }
-                                    .padding(horizontal = 20.dp, vertical = 12.dp)
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Default.Badge,
-                                        contentDescription = null,
-                                        tint = if (editando && seleccionado) Color.White else ColoresTorque.Primary,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = carnet, color = textoColor, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                }
-                            }
-                        }
+                SeccionCarnets(
+                    editando = editando,
+                    carnetsDisponibles = carnetsDisponibles,
+                    carnetsGuardados = carnetsGuardados,
+                    editCarnets = editCarnets,
+                    onToggleCarnet = { carnet ->
+                        editCarnets = if (carnet in editCarnets) editCarnets - carnet else editCarnets + carnet
                     }
-                }
+                )
             }
         }
     }
@@ -292,5 +188,165 @@ fun FilaPerfil(icono: ImageVector, texto: String) {
     ) {
         Icon(icono, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(20.dp))
         Text(text = texto, color = Color.White, fontSize = 16.sp)
+    }
+}
+
+@Composable
+private fun CabeceraPerfil(editando: Boolean, onBack: () -> Unit, onToggleEdit: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(ColoresTorque.ALTURA_CABECERA)
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(com.example.torque.R.string.content_desc_back), tint = ColoresTorque.Primary)
+        }
+        Text(
+            text = stringResource(com.example.torque.R.string.my_profile_title),
+            modifier = Modifier.weight(1f),
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        IconButton(onClick = onToggleEdit) {
+            Icon(
+                if (editando) Icons.Default.Save else Icons.Default.Edit,
+                contentDescription = if (editando) stringResource(com.example.torque.R.string.content_desc_save) else stringResource(com.example.torque.R.string.content_desc_edit),
+                tint = ColoresTorque.Primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun FotoPerfilEditable(fotoPerfil: String?, editando: Boolean, onCambiarFoto: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(120.dp)
+            .clip(CircleShape)
+            .background(ColoresTorque.SurfaceDark)
+            .border(2.dp, ColoresTorque.Primary, CircleShape)
+            .clickable { if (editando) onCambiarFoto() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (fotoPerfil != null) {
+            Image(
+                painter = rememberAsyncImagePainter(fotoPerfil),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Icon(
+                Icons.Default.Person,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = ColoresTorque.OnSurfaceVariant
+            )
+        }
+        if (editando) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(ColoresTorque.Primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.CameraAlt,
+                    contentDescription = stringResource(com.example.torque.R.string.change_photo),
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DatosPerfil(
+    editando: Boolean, nombre: String?, email: String?, telefono: String?,
+    fechaNacimiento: String?, editNombre: String, editEmail: String,
+    editTelefono: String, editFecha: String,
+    onNombreChange: (String) -> Unit, onEmailChange: (String) -> Unit,
+    onTelefonoChange: (String) -> Unit, onFechaChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        if (editando) {
+            CampoTextoTorque(value = editNombre, onValueChange = onNombreChange, label = stringResource(com.example.torque.R.string.profile_name))
+            CampoTextoTorque(value = editEmail, onValueChange = onEmailChange, label = stringResource(com.example.torque.R.string.profile_email))
+            CampoTextoTorque(value = editTelefono, onValueChange = onTelefonoChange, label = stringResource(com.example.torque.R.string.profile_phone))
+            CampoTextoTorque(value = editFecha, onValueChange = onFechaChange, label = stringResource(com.example.torque.R.string.profile_birthday_hint))
+        } else {
+            if (nombre.isNullOrBlank().not()) {
+                Text(text = nombre ?: "", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            if (email.isNullOrBlank().not()) {
+                FilaPerfil(Icons.Default.Email, email ?: "")
+            }
+            if (telefono.isNullOrBlank().not()) {
+                FilaPerfil(Icons.Default.Phone, telefono ?: "")
+            }
+            if (fechaNacimiento.isNullOrBlank().not()) {
+                FilaPerfil(Icons.Default.CalendarMonth, fechaNacimiento ?: "")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SeccionCarnets(
+    editando: Boolean, carnetsDisponibles: List<String>, carnetsGuardados: Set<String>,
+    editCarnets: Set<String>, onToggleCarnet: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(com.example.torque.R.string.my_licenses),
+            color = ColoresTorque.Primary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val carnetsMostrar = if (editando) carnetsDisponibles else carnetsDisponibles.filter { it in carnetsGuardados }
+        @OptIn(ExperimentalLayoutApi::class)
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            carnetsMostrar.forEach { carnet ->
+                val seleccionado = carnet in editCarnets
+                val bgColor = if (editando && seleccionado) ColoresTorque.Primary else ColoresTorque.SurfaceDark
+                val borderColor = if (editando && seleccionado) Color.Transparent else ColoresTorque.BorderDark
+                val textoColor = if (editando && seleccionado) Color.White else Color.White
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(bgColor)
+                        .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                        .clickable(enabled = editando) { onToggleCarnet(carnet) }
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.Badge,
+                            contentDescription = null,
+                            tint = if (editando && seleccionado) Color.White else ColoresTorque.Primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = carnet, color = textoColor, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
     }
 }

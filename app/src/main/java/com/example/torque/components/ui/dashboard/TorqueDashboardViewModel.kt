@@ -34,7 +34,7 @@ data class DashboardUiState(
     val resultadoSalud: ResultadoSalud? = null,
     val nombrePerfil: String? = null,
     val kmRestantes: Int? = null,
-    val progreso: Float = 0f,
+
     val notificacionesPendientes: Int = 0,
     val porcentajesDesgaste: Map<Long, Int> = emptyMap(),
     val itvProxima: Boolean = false,
@@ -105,7 +105,7 @@ class TorqueDashboardViewModel(
                         val ultimo = mantenimientos.firstOrNull()
                         updateDerivedState(ultimo)
 
-                        val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros)
+                        val salud = SaludMotoCalculator.calcular(mantenimientos, moto.kilometros, moto.tipoVehiculo)
                         val pendientes = salud.desglose.count {
                             it.cumplimiento <= 20 && !it.tipo.esDesgaste
                         }
@@ -157,12 +157,7 @@ class TorqueDashboardViewModel(
             if (restante < 0) -1 else restante
         } else null
 
-        val progreso = if (ultimo != null && ultimo.intervaloKms > 0 && kmRestantes != null) {
-            val transcurrido = moto.kilometros - ultimo.kms
-            if (ultimo.intervaloKms > 0) (transcurrido.toFloat() / ultimo.intervaloKms).coerceIn(0f, 1f) else 0f
-        } else 0f
-
-        _uiState.update { it.copy(kmRestantes = kmRestantes, progreso = progreso) }
+        _uiState.update { it.copy(kmRestantes = kmRestantes) }
     }
 
     fun actualizarKilometros(km: Int) {

@@ -6,21 +6,21 @@ Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrol
 
 ## Casos de Uso
 
-### 🏍️ Para el motero diario
+### Para el motero diario
 - Lleva el control del **cambio de aceite**, **filtros**, **cadena**, **neumáticos** y más
 - Recibe notificaciones cuando un mantenimiento está **próximo a vencer** o **vencido**
 - Consulta de un vistazo la **salud global** de tu moto (0–100%)
 - **Plan de mantenimiento** con todas las tareas recomendadas, su estado y próximos vencimientos
 - **Recordatorios de ITV y seguro** con avisos visuales en el panel
 
-### 🏪 Para el taller
+### Para el taller
 - Gestiona el **garaje completo** con múltiples motos
 - Registra mantenimientos con **kilometraje**, **precio**, **tiempo**, **notas** y **fotos/facturas adjuntas**
 - Ajusta el **desgaste de consumibles** con sliders intuitivos
 - Exporta e importa **copias de seguridad** completas (DB + fotos + preferencias)
 - **Exporta el historial a PDF** para entregar al cliente
 
-### 👤 Para el propietario
+### Para el propietario
 - Perfil con foto, nombre, email, teléfono y fecha de nacimiento
 - Carnets de conducir (AM, A1, A2, A)
 - **Modo oscuro** optimizado para uso en taller y carretera
@@ -188,7 +188,7 @@ Torque.v2/
 # (incluidos en testDebugUnitTest)
 ```
 
-**Cobertura**: 78 tests de algoritmo de salud + 19 tests de plan de mantenimiento + 7 tests de exportación PDF + 9 tests de performance + 1 test de humo (114 unitarios) + 1 test instrumentado (115 en total).
+**Cobertura**: 78 tests de algoritmo de salud + 20 tests de plan de mantenimiento + 7 tests de exportación PDF + 9 tests de performance + 1 test de humo (115 unitarios) + 2 tests instrumentados (117 en total).
 
 ---
 
@@ -212,10 +212,10 @@ Reglas personalizadas en `config/detekt/detekt.yml`.
 
 | Hallazgo | Estado | Solución |
 |---|---|---|
-| Backup sin restricciones | ✅ Corregido | `android:allowBackup="false"` |
-| PII en texto plano | ✅ Corregido | Cifrado AES-256-GCM via Android Keystore (`CifradorPerfil`) |
-| 10 Activities sin `exported` | ✅ Corregido | `android:exported="false"` (excepto launcher) |
-| `READ_EXTERNAL_STORAGE` redundante | ✅ Corregido | Eliminado (sobra `READ_MEDIA_IMAGES`) |
+| Backup sin restricciones | Corregido | `android:allowBackup="false"` |
+| PII en texto plano | Corregido | Cifrado AES-256-GCM via Android Keystore (`CifradorPerfil`) |
+| 10 Activities sin `exported` | Corregido | `android:exported="false"` (excepto launcher) |
+| `READ_EXTERNAL_STORAGE` redundante | Corregido | Eliminado (sobra `READ_MEDIA_IMAGES`) |
 
 ---
 

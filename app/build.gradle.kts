@@ -6,19 +6,9 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-val keystoreFile = rootProject.file("keystore.properties")
-val keystoreExists = keystoreFile.exists()
-val keystoreProps = mutableMapOf<String, String>()
-if (keystoreExists) {
-    keystoreFile.readLines().forEach { line ->
-        val trimmed = line.trim()
-        if (trimmed.isNotEmpty() && !trimmed.startsWith("#")) {
-            val eq = trimmed.indexOf('=')
-            if (eq > 0) {
-                keystoreProps[trimmed.substring(0, eq).trim()] = trimmed.substring(eq + 1).trim()
-            }
-        }
-    }
+val keystoreProps = java.util.Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) load(f.inputStream())
 }
 
 android {
@@ -34,7 +24,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "SENTRY_DSN", "\"https://example@sentry.io/placeholder\"")
+        val sentryDsn = System.getenv("SENTRY_DSN") ?: ""
+        buildConfigField("String", "SENTRY_DSN", "\"$sentryDsn\"")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -42,10 +33,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = keystoreProps["storeFile"]?.let { rootProject.file(it) }
-            storePassword = keystoreProps["storePassword"]
-            keyAlias = keystoreProps["keyAlias"]
-            keyPassword = keystoreProps["keyPassword"]
+            storeFile = keystoreProps.getProperty("storeFile")?.let { rootProject.file(it) }
+            storePassword = keystoreProps.getProperty("storePassword")
+            keyAlias = keystoreProps.getProperty("keyAlias")
+            keyPassword = keystoreProps.getProperty("keyPassword")
         }
     }
 
@@ -119,6 +110,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // --- Networking ---
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
 
     // --- Imágenes (Coil) ---
     implementation(libs.coil.compose)

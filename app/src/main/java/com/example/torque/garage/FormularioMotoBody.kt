@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Motorcycle
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,10 +26,13 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.components.ui.dashboard.*
+import com.example.torque.utils.TipoVehiculo
 
 @Composable
 fun FormularioMotoBody(
     modifier: Modifier = Modifier,
+    tipoVehiculo: TipoVehiculo = TipoVehiculo.MOTO,
+    onTipoVehiculoChange: (TipoVehiculo) -> Unit = {},
     marca: String,
     onMarcaChange: (String) -> Unit,
     onMarcaSeleccionada: (String) -> Unit,
@@ -56,7 +61,15 @@ fun FormularioMotoBody(
     uriImagen: Uri?,
     fotoActual: String?,
     scrollState: androidx.compose.foundation.ScrollState,
-    selectorImagen: androidx.activity.result.ActivityResultLauncher<String>
+    selectorImagen: androidx.activity.result.ActivityResultLauncher<String>,
+    tipoCarroceria: String = "",
+    onTipoCarroceriaChange: (String) -> Unit = {},
+    tipoCombustible: String = "",
+    onTipoCombustibleChange: (String) -> Unit = {},
+    tipoTransmision: String = "",
+    onTipoTransmisionChange: (String) -> Unit = {},
+    numeroPuertas: String = "",
+    onNumeroPuertasChange: (String) -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -92,12 +105,39 @@ fun FormularioMotoBody(
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
+            ) {
+                FilterChip(
+                    selected = tipoVehiculo == TipoVehiculo.MOTO,
+                    onClick = { onTipoVehiculoChange(TipoVehiculo.MOTO) },
+                    label = { Text("Moto") },
+                    leadingIcon = { Icon(Icons.Default.Motorcycle, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = ColoresTorque.Primary,
+                        selectedLabelColor = Color.Black
+                    )
+                )
+                FilterChip(
+                    selected = tipoVehiculo == TipoVehiculo.COCHE,
+                    onClick = { onTipoVehiculoChange(TipoVehiculo.COCHE) },
+                    label = { Text("Coche") },
+                    leadingIcon = { Icon(Icons.Default.DirectionsCar, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = ColoresTorque.Primary,
+                        selectedLabelColor = Color.Black
+                    )
+                )
+            }
+
             SelectorMarca(
                 marca = marca,
                 onMarcaChange = { onMarcaChange(it); onMarcaDropdown() },
                 onMarcaSeleccionada = onMarcaSeleccionada,
                 label = stringResource(R.string.field_brand_required),
-                error = errorMarca
+                error = errorMarca,
+                tipoVehiculo = tipoVehiculo
             )
             if (errorMarca) {
                 Text(stringResource(R.string.error_brand_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
@@ -107,7 +147,8 @@ fun FormularioMotoBody(
                 onModeloChange = { onModeloChange(it) },
                 marca = marca,
                 label = stringResource(R.string.field_model_required),
-                error = errorModelo
+                error = errorModelo,
+                tipoVehiculo = tipoVehiculo
             )
             if (errorModelo) {
                 Text(stringResource(R.string.error_model_required), color = ColoresTorque.RojoError, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
@@ -158,6 +199,18 @@ fun FormularioMotoBody(
                 singleLine = false,
                 modifier = Modifier.height(100.dp)
             )
+
+            if (tipoVehiculo == TipoVehiculo.COCHE) {
+                Text(stringResource(R.string.car_specs_section), color = ColoresTorque.Primary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    CampoTextoTorque(tipoCarroceria, onTipoCarroceriaChange, stringResource(R.string.body_type), modifier = Modifier.weight(1f))
+                    CampoTextoTorque(tipoCombustible, onTipoCombustibleChange, stringResource(R.string.fuel_type), modifier = Modifier.weight(1f))
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    CampoTextoTorque(tipoTransmision, onTipoTransmisionChange, stringResource(R.string.transmission_type), modifier = Modifier.weight(1f))
+                    CampoTextoTorque(numeroPuertas, onNumeroPuertasChange, stringResource(R.string.num_doors), modifier = Modifier.weight(1f))
+                }
+            }
         }
         Spacer(modifier = Modifier.height(120.dp))
     }

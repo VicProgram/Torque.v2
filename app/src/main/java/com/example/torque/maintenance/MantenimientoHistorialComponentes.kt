@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -28,28 +29,31 @@ import com.example.torque.room.entity.FotoMantenimientoEntity
 import com.example.torque.room.entity.MantenimientoEntity
 import java.io.File
 
+private val iconosMantenimiento = listOf(
+    listOf("aceite") to Icons.Default.OilBarrel,
+    listOf("neumático", "rueda") to Icons.Default.TireRepair,
+    listOf("cadena", "kit") to Icons.Default.SettingsSuggest,
+    listOf("luz", "eléctrico", "batería") to Icons.Default.Bolt,
+    listOf("freno") to Icons.Default.BackHand,
+    listOf("retenes", "horquilla") to Icons.Default.Construction
+)
+
+private fun iconoMantenimiento(nombre: String, tareas: String?): ImageVector {
+    for (match in iconosMantenimiento) {
+        for (keyword in match.first) {
+            if (nombre.contains(keyword, ignoreCase = true) ||
+                (tareas?.contains(keyword, ignoreCase = true) ?: false)
+            ) {
+                return match.second
+            }
+        }
+    }
+    return Icons.Default.Build
+}
+
 @Composable
 fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit, onEliminar: () -> Unit = {}) {
-    val icono = when {
-        item.nombreMantenimiento.contains("aceite", ignoreCase = true) ||
-        (item.tareas?.contains("aceite", ignoreCase = true) ?: false) -> Icons.Default.OilBarrel
-        item.nombreMantenimiento.contains("neumático", ignoreCase = true) ||
-        item.nombreMantenimiento.contains("rueda", ignoreCase = true) ||
-        (item.tareas?.contains("neumático", ignoreCase = true) ?: false) -> Icons.Default.TireRepair
-        item.nombreMantenimiento.contains("cadena", ignoreCase = true) ||
-        item.nombreMantenimiento.contains("kit", ignoreCase = true) ||
-        (item.tareas?.contains("cadena", ignoreCase = true) ?: false) -> Icons.Default.SettingsSuggest
-        item.nombreMantenimiento.contains("luz", ignoreCase = true) ||
-        item.nombreMantenimiento.contains("eléctrico", ignoreCase = true) ||
-        item.nombreMantenimiento.contains("batería", ignoreCase = true) ||
-        (item.tareas?.contains("eléctrico", ignoreCase = true) ?: false) -> Icons.Default.Bolt
-        item.nombreMantenimiento.contains("freno", ignoreCase = true) ||
-        (item.tareas?.contains("freno", ignoreCase = true) ?: false) -> Icons.Default.BackHand
-        item.nombreMantenimiento.contains("retenes", ignoreCase = true) ||
-        item.nombreMantenimiento.contains("horquilla", ignoreCase = true) ||
-        (item.tareas?.contains("suspensión", ignoreCase = true) ?: false) -> Icons.Default.Construction
-        else -> Icons.Default.Build
-    }
+    val icono = iconoMantenimiento(item.nombreMantenimiento, item.tareas)
 
     Row(
         modifier = Modifier
@@ -90,7 +94,6 @@ fun DetalleMantenimientoEntityScreen(
     onAddFactura: (Uri) -> Unit = {},
     onDeleteFoto: (FotoMantenimientoEntity) -> Unit = {}
 ) {
-    val contexto = LocalContext.current
     val launcherFoto = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { onAddFoto(it) }
     }

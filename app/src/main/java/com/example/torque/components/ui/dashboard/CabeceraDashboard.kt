@@ -73,7 +73,7 @@ fun CabeceraDashboard(
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.menu_add_motorcycle), color = Color.White) },
+                        text = { Text(stringResource(R.string.menu_add_vehicle), color = Color.White) },
                         leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, tint = ColoresTorque.Primary) },
                         onClick = {
                             mostrarMenuPrincipal = false

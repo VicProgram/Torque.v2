@@ -38,6 +38,7 @@ import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.TipoMantenimiento
 import com.example.torque.utils.TiposMantenimiento
+import com.example.torque.utils.TipoVehiculo
 import com.example.torque.utils.terminar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,6 +65,24 @@ class PlanMantenimientoViewModel(application: Application) : AndroidViewModel(ap
     private val _tareas = MutableStateFlow<List<TareaPlan>>(emptyList())
     val tareas: StateFlow<List<TareaPlan>> = _tareas
 
+    private fun calcularCumplimiento(ultimo: MantenimientoEntity, tipo: TipoMantenimiento, kmActuales: Int, format: SimpleDateFormat): Int {
+        if (tipo.esDesgaste) return ultimo.porcentajeVida
+        var cumpl = 100
+        if (tipo.intervaloKms > 0) {
+            val avanzado = kmActuales - ultimo.kms
+            cumpl = ((1f - avanzado.toFloat() / tipo.intervaloKms) * 100).toInt().coerceIn(0, 100)
+        }
+        if (tipo.intervaloDias > 0) {
+            try {
+                val fechaUltimo = format.parse(ultimo.fecha)
+                val dias = fechaUltimo?.let { (Date().time - it.time) / (1000 * 60 * 60 * 24) } ?: 0
+                val cumplDias = ((1f - dias.toFloat() / tipo.intervaloDias) * 100).toInt().coerceIn(0, 100)
+                cumpl = minOf(cumpl, cumplDias)
+            } catch (_: Exception) {}
+        }
+        return cumpl
+    }
+
     fun cargar(idMoto: Long) {
         viewModelScope.launch {
             _moto.value = repositorio.obtenerMotoPorId(idMoto)
@@ -75,40 +94,22 @@ class PlanMantenimientoViewModel(application: Application) : AndroidViewModel(ap
 
             val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-            _tareas.value = TiposMantenimiento.TODOS.map { tipo ->
+            val tiposFiltrados = TiposMantenimiento.obtenerPorTipo(_moto.value?.tipoVehiculo ?: TipoVehiculo.MOTO)
+
+            _tareas.value = tiposFiltrados.map { tipo ->
                 val ultimo = agrupados[tipo.id]?.maxByOrNull { it.kms }
                 val cumplimiento = if (ultimo != null) {
-                    if (tipo.esDesgaste) {
-                        ultimo.porcentajeVida
-                    } else {
-                        var cumpl = 100
-                        if (tipo.intervaloKms > 0) {
-                            val avanzado = kmActuales - ultimo.kms
-                            cumpl = ((1f - avanzado.toFloat() / tipo.intervaloKms) * 100).toInt().coerceIn(0, 100)
-                        }
-                        if (tipo.intervaloDias > 0) {
-                            try {
-                                val fechaUltimo = format.parse(ultimo.fecha)
-                                val dias = fechaUltimo?.let { (Date().time - it.time) / (1000 * 60 * 60 * 24) } ?: 0
-                                val cumplDias = ((1f - dias.toFloat() / tipo.intervaloDias) * 100).toInt().coerceIn(0, 100)
-                                cumpl = minOf(cumpl, cumplDias)
-                            } catch (_: Exception) {}
-                        }
-                        cumpl
-                    }
+                    calcularCumplimiento(ultimo, tipo, kmActuales, format)
                 } else 100
-
                 val proximoKms = if (ultimo != null && tipo.intervaloKms > 0) {
                     ultimo.kms + tipo.intervaloKms
                 } else null
-
                 val estado = when {
                     ultimo == null -> EstadoTarea.SIN_DATOS
                     cumplimiento <= 0 -> EstadoTarea.VENCIDO
                     cumplimiento <= 20 -> EstadoTarea.PROXIMO
                     else -> EstadoTarea.OK
                 }
-
                 TareaPlan(tipo, ultimo, cumplimiento, proximoKms, estado)
             }.sortedBy { it.estado.ordinal }
         }

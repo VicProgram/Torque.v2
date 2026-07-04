@@ -38,6 +38,7 @@ import com.example.torque.components.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.utils.TipoVehiculo
 import android.content.Intent
 import com.example.torque.garage.AnadirMotoActivity
 
@@ -60,7 +61,7 @@ fun VistaListaGaraje() {
     val motos by repositorio.obtenerMotosFlow().collectAsState(initial = emptyList())
 
     var textoBusqueda by remember { mutableStateOf("") }
-    var filtroActivo by remember { mutableStateOf("Todas") }
+    var filtroActivo by remember { mutableStateOf("Todos") }
     var mostrarBusqueda by remember { mutableStateOf(false) }
 
     val motosFiltradas = motos.filter { moto ->
@@ -69,8 +70,8 @@ fun VistaListaGaraje() {
             moto.modelo.contains(textoBusqueda, ignoreCase = true) ||
             moto.matricula.contains(textoBusqueda, ignoreCase = true)
         val coincideFiltro = when (filtroActivo) {
-            "En Uso" -> moto.esPrincipal == 1
-            "Históricas" -> moto.esPrincipal == 0
+            "Motos" -> moto.tipoVehiculo == TipoVehiculo.MOTO || moto.tipoVehiculo == null
+            "Coches" -> moto.tipoVehiculo == TipoVehiculo.COCHE
             else -> true
         }
         coincideBusqueda && coincideFiltro
@@ -128,9 +129,9 @@ fun VistaListaGaraje() {
                         modifier = Modifier.padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        item { FiltroChip(stringResource(R.string.filter_all_bikes), estaSeleccionado = filtroActivo == "Todas", onClick = { filtroActivo = "Todas" }) }
-                        item { FiltroChip(stringResource(R.string.filter_in_use), estaSeleccionado = filtroActivo == "En Uso", onClick = { filtroActivo = "En Uso" }) }
-                        item { FiltroChip(stringResource(R.string.filter_historical), estaSeleccionado = filtroActivo == "Históricas", onClick = { filtroActivo = "Históricas" }) }
+                        item { FiltroChip(stringResource(R.string.filter_all_bikes), estaSeleccionado = filtroActivo == "Todos", onClick = { filtroActivo = "Todos" }) }
+                        item { FiltroChip(stringResource(R.string.filter_motorcycles), estaSeleccionado = filtroActivo == "Motos", onClick = { filtroActivo = "Motos" }) }
+                        item { FiltroChip(stringResource(R.string.filter_cars), estaSeleccionado = filtroActivo == "Coches", onClick = { filtroActivo = "Coches" }) }
                     }
                 }
 
@@ -144,7 +145,7 @@ fun VistaListaGaraje() {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(
-                                    Icons.Default.Motorcycle,
+                                    Icons.Default.DirectionsCar,
                                     contentDescription = null,
                                     tint = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f),
                                     modifier = Modifier.size(72.dp)
@@ -296,7 +297,7 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Default.Motorcycle,
+                    imageVector = if (moto.tipoVehiculo == TipoVehiculo.COCHE) Icons.Default.DirectionsCar else Icons.Default.Motorcycle,
                     contentDescription = null,
                     modifier = Modifier.size(64.dp),
                     tint = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f)

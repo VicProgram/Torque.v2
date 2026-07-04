@@ -2,37 +2,9 @@
 
 ## 🔴 Alta prioridad
 
-- [ ] **`MotoDetalle.kt` — 11 usos de `!!`** (`moto!!`, etc.) — Aunque hay null-check previo, en recomposición puede crashear. Usar `?.let` o `requireNotNull()`.
-- [ ] **`PerfilActivity.kt` — 4 usos de `!!`** — `nombre!!`, `email!!`, `telefono!!`, `fechaNacimiento!!`.
-- [ ] **`MantenimientoHistorial.kt` — 2 usos de `!!`** — `itemSeleccionado!!`, `itemAEliminar!!`.
-- [ ] **`TorqueDashboardViewModel.kt:183` — `as Application` (unsafe cast)** — Usar `as?` con fallback.
-- [ ] **`NotificacionSalud.kt:33` — `as NotificationManager` (unsafe cast)** — Usar `as?` con fallback.
-
-## 🟡 Media prioridad
-
 - [ ] **Galería de fotos — carrusel automático** — Que las fotos cambien cada X segundos en el dashboard.
 - [ ] **Galería de fotos — mejorar gestión** — Ver, eliminar y reordenar fotos desde detalle de moto.
-- [ ] **`AjustesActivity.kt` — extraer ~15 strings hardcoded** a `strings.xml` (toasts, botones, títulos, confirmación restore).
-- [ ] **`PerfilActivity.kt` — extraer ~12 strings hardcoded** a `strings.xml` (títulos, placeholders, labels).
-- [ ] **`OpcionesMantenimiento.kt` — extraer ~7 strings hardcoded** a `strings.xml`.
-- [ ] **`MantenimientoHistorial.kt` — extraer 7 strings de filtros** a `strings.xml` (`"Todos"`, `"Aceite"`, etc.).
-- [ ] **`RegistroMantenimiento.kt` — extraer ~11 strings de chips/secciones** a `strings.xml`.
-- [ ] **`NotificacionSalud.kt` — extraer ~5 strings de notificaciones** a `strings.xml`.
-- [ ] **`MotoDetalle.kt:391` — `File.delete()` en main thread** — Envolver en `withContext(Dispatchers.IO)`.
-- [ ] **`NotificacionSalud.kt:40` — parámetro `kmActuales` no usado** — Eliminar o implementar.
-- [ ] **`TorqueDashboardScreen.kt:525` — `scopeExportar.launch` on Main** — Aunque BackupManager usa IO, código previo corre en Main. Mover toda la lógica a `viewModelScope`.
-
-## 🟢 Baja prioridad
-
-- [ ] **Separar `ColoresTorque.kt` (~400 líneas)** — Mover colores a un archivo, UI Components a otro.
-- [ ] **`MarcasModelos.kt` (~678 líneas)** — Mover datos estáticos a JSON en `res/raw/`.
-- [ ] **`TorqueDashboardScreen.kt` (~763 líneas)** — Dividir en archivos más pequeños (CabeceraDashboard, TarjetaProximoServicio, TarjetaAccionRapida).
-- [ ] **`MotoDetalle.kt` (~426 líneas) — función `VistaMotoDetalle` (~340 líneas)** — Extraer secciones en composables hijos.
-- [ ] **`AnadirMotoActivity.kt` — función `VistaAnadirMoto` (~303 líneas)** — Dividir en composables más pequeños.
-- [ ] **`RegistroMantenimiento.kt` — función `PantallaRegistroMantenimiento` (~240 líneas)** — Dividir en composables.
-- [ ] **`PerfilActivity.kt` — función `PerfilScreen` (~213 líneas)** — Dividir.
-- [ ] **`AjustesActivity.kt` — función `AjustesScreen` (~200 líneas)** — Dividir.
-- [ ] **Strings hardcoded en `ListaGaraje.kt`, `FormularioMantenimiento.kt`, `TorqueDashboardScreen.kt`** — Extraer a `strings.xml`.
+- [ ] **Strings hardcoded** — ~50+ strings en 8+ archivos sin extraer a `strings.xml`. Archivos: `AjustesActivity.kt`, `PerfilActivity.kt`, `OpcionesMantenimiento.kt`, `MantenimientoHistorial.kt`, `RegistroMantenimiento.kt`, `NotificacionSalud.kt`, `ListaGaraje.kt`, `FormularioMantenimiento.kt`, `TorqueDashboardScreen.kt`, `CabeceraDashboard.kt`.
 - [ ] **Duplicación tareas: `RegistroMantenimiento.kt` vs `TiposMantenimiento.kt`** — Unificar fuentes de datos.
 - [ ] **Mover `ContextUtils.kt` y `FileUtils.kt` de `:data` a `:app`** — Tienen dependencias Android, violan clean architecture.
 - [ ] **Mover `PerfilRepository.kt` de `:app` a `:data`** — Es capa de datos, debería estar en módulo data.
@@ -40,17 +12,83 @@
 - [ ] **Package no estándar: `components.ui.dashboard`** — Mover a `ui.dashboard` (convención estándar).
 - [ ] **Nombres mixtos español/inglés** — Decidir idioma y unificar (ej: `DialogoKm` vs `DialogoActualizarKm`, `FiltroChip` mixto).
 - [ ] **`FileUtils.kt` en data acopla Android** — Mover a app o abstraer dependency inversion.
+- [ ] **Servidor: ordenes endpoint sin datos embebidos** — `/ordenes` devuelve UUIDs en vez de nombres de vehículo/mecánico. Añadir joins.
 
-## ✅ Completadas (todas las sesiones)
+## 🟢 Baja prioridad
 
-- [x] **`!!` en `TorqueDashboardScreen.kt`** — No hay ninguno.
-- [x] **`DialogoAjusteDesgaste` — 6→1 query** — Ahora recibe datos desde ViewModel, sin queries.
-- [x] **`DialogoAjusteDesgaste` carga datos propios** — Recibe `initialPorcentajes` del ViewModel.
+- [ ] **Separar `ColoresTorque.kt` (~400 líneas)** — Mover colores a un archivo, UI Components a otro.
+- [ ] **`MarcasModelos.kt` (~678 líneas)** — Mover datos estáticos a JSON en `res/raw/`.
+- [ ] **`TorqueDashboardScreen.kt` (~376 líneas)** — Dividir en archivos más pequeños.
+- [ ] **`MotoDetalle.kt` (~353 líneas) — función `VistaMotoDetalle` (~290 líneas)** — Extraer secciones en composables hijos.
+- [ ] **`AnadirMotoActivity.kt` — función `VistaAnadirMoto` (~303 líneas)** — Dividir en composables más pequeños.
+- [ ] **`RegistroMantenimiento.kt` — función `PantallaRegistroMantenimiento` (~240 líneas)** — Dividir en composables.
+- [ ] **`PerfilActivity.kt` — función `PerfilScreen` (~213 líneas)** — Dividir.
+- [ ] **`AjustesActivity.kt` — función `AjustesScreen` (~200 líneas)** — Dividir.
+- [ ] **`@Suppress("ExplicitGarbageCollectionCall")` en tests** — `SaludMotoCalculatorPerformanceTest.kt:134`. Aceptable pero monitorizar.
+
+## ✅ Completadas
+
+### 🔴 Crash/estabilidad
+- [x] **`!!` en `LoginActivity.kt:44`** — `response.body()!!` → `response.body() ?: return@launch`
+- [x] **`!!` en `MotoDetalle.kt` (11 usos)** — Ya no hay `!!`, se usa `requireNotNull()` y `?.let`.
+- [x] **`!!` en `PerfilActivity.kt` (4 usos)** — Eliminados.
+- [x] **`!!` en `MantenimientoHistorial.kt` (2 usos)** — Eliminados.
+- [x] **`TorqueDashboardViewModel.kt:183` — `as Application` unsafe cast** — Ahora usa `as?` con fallback.
+- [x] **`NotificacionSalud.kt:33` — `as NotificationManager` unsafe cast** — Ahora usa `as?` con fallback.
+
+### 🔧 Build/CI
+- [x] **`detekt.yml` — reglas desactivadas** — Activadas: `LongMethod`, `LongParameterList`, `LargeClass`, `MagicNumber`, `MaxLineLength`, `WildcardImport`, `FunctionNaming`, `UnusedPrivateMember`, `TooGenericExceptionCaught`. `maxIssues` cambiado a 10.
+- [x] **CI/CD pipeline** — Creado `.github/workflows/ci.yml` con jobs para Android (detekt + tests + assemble), server (pytest) y desktop (pytest).
+- [x] **`keystore.properties` parsing manual** — Reemplazado por `java.util.Properties.load()`.
+- [x] **Sentry DSN placeholder** — Ahora se lee de `SENTRY_DSN` env var.
+- [x] **`gradle.properties` paralelismo comentado** — Descomentado `org.gradle.parallel=true`.
+- [x] **`ExampleUnitTest.kt` boilerplate** — Eliminado.
+
+### 🧵 Corrutinas
+- [x] **`File.delete()` en main thread** — Ya está envuelto en `withContext(Dispatchers.IO)`.
+- [x] **`scopeExportar.launch` on Main** — `exportarBaseDeDatos` usa `withContext(IO/Main)` correctamente.
+- [x] **Corrutina `exportarBaseDeDatos`** — File I/O envuelto en `Dispatchers.IO`, Toasts en `Dispatchers.Main`.
+
+### 🧹 Limpieza
+- [x] **`NotificacionSalud.kt:40` — `kmActuales` no usado** — Parámetro ya eliminado.
+- [x] **`build/reports/problems/`** — Eliminado.
+
+### Desktop-python (fase 1)
+- [x] **C1: Faltaba `API.get_cita()`** — Añadido método en `api_client.py`.
+- [x] **C2: PIN login usaba `self.master.card` inexistente** — Guardado `self.card`.
+- [x] **C3: Facturas usaban `ordenes[0]`** — Añadido `FormCombo` dropdown.
+- [x] **C4: Token guardado con permisos 644** — Cambiado a `0o600`.
+- [x] **H2: Treeview style duplicado** — Centralizado en `configurar_estilo_treeview()`.
+- [x] **H4: Import `datetime` después de uso** — Movido al inicio.
+- [x] **H5: PIN login sin loading state** — Añadido.
+- [x] **H6: `callable` type hints** — Cambiados a `Optional[Callable[...]]`.
+- [x] **M2: Dashboard doble `load_data()`** — Eliminado.
+- [x] **M3: `FormDialog` dead code** — Eliminado.
+- [x] **M9: `vehiculos_cache` no usado** — Eliminado.
+
+### Desktop-python (fase 2 — funcionalidad)
+- [x] **Servidor: añadido `GET /citas/{cita_id}`** — Endpoint faltante en `citas.py`. Ahora `get_cita()` funciona.
+- [x] **Citas edit: formulario se rellena con datos** — Añadida población de todos los campos al editar.
+- [x] **Citas: columnas cliente/mecánico visibles** — Resuelve `id_cliente`/`id_mecanico` a nombres.
+- [x] **Citas: selector de mecánico** — Añadido `FormCombo` para asignar mecánico.
+- [x] **PIN login: actualiza URL del servidor** — Ahora configura `base_url` antes de llamar al API.
+- [x] **PIN login: botón "Volver"** — Para regresar a login por email.
+- [x] **Órdenes: vehículo legible** — Resuelve `id_vehiculo` a "Marca Modelo (Matrícula)".
+- [x] **Facturas: columna cliente** — Resuelve `id_orden_trabajo` para mostrar info legible.
+- [x] **Facturas crear: selector de orden con vehículo** — Resuelve `id_vehiculo` a datos reales.
+- [x] **Vehículos: carga clientes antes de datos** — Swap `_load_clientes()` / `_load_data()`.
+- [x] **Vehículos: campos numéricos envían `None` vs `0`** — `anio` y `kilometros` vacíos ya no resetean a 0.
+- [x] **Clientes: campo `dirección`** — Añadido al formulario.
+- [x] **Navegación: refresca datos al cambiar de vista** — `main.py` llama a `_load_data()`/`_load_caches()` en navegación.
+- [x] **Imports no usados** — Limpiados `FormDate`, `FormCombo` de imports.
+
+### Refactors anteriores
+- [x] **`DialogoAjusteDesgaste` — 6→1 query** — Ahora recibe datos desde ViewModel.
 - [x] **Unificar altura de cabeceras** — `ColoresTorque.ALTURA_CABECERA` (56dp) en 10 pantallas.
-- [x] **Crear `DialogoTorque` reutilizable** — Refactorizados `DialogoKm`, `DialogoAjusteDesgaste`, `DialogoNotificaciones`.
-- [x] **Extraer diálogos de `MotoDetalle.kt`** — Creados `DialogoActualizarKm`, `DialogoEliminarMoto`, `DialogoEliminarFoto`.
-- [x] **`SaludMotoCalculator.kt`** — Bucle cuadrático O(N×T) → O(N+23) con pre-agrupación.
-- [x] **`AppRepository.kt`** — Excepciones en escrituras críticas se relanzan tras loguear.
+- [x] **Crear `DialogoTorque` reutilizable** — Refactorizados 3 diálogos.
+- [x] **Extraer diálogos de `MotoDetalle.kt`** — Creados 3 diálogos separados.
+- [x] **`SaludMotoCalculator.kt`** — Bucle cuadrático O(N×T) → O(N+23).
+- [x] **`AppRepository.kt`** — Excepciones relanzadas tras loguear.
 - [x] **`SimpleDateFormat` a `companion object`** — En ViewModel y Calculator.
 - [x] **`withContext(Dispatchers.Main)` redundante** eliminado de `FormularioMantenimiento`.
 - [x] **`FiltroChip` duplicado** eliminado de `ColoresTorque.kt`.
@@ -62,22 +100,22 @@
 - **`com.example.torque` como package raíz** — Placeholder ok para desarrollo; cambiar solo para release.
 - **Nombres en español** — Decisión del proyecto original, aceptado como convención interna.
 
-## Resumen de hallazgos (análisis 2026-06-28)
+## Resumen final (análisis 2026-07-04)
 
-| Categoría | Cantidad | Severidad |
-|-----------|----------|-----------|
-| Archivos > 400 líneas | 4 (763, 678, 426, 400) | 🔴 Mantenibilidad |
-| `!!` en producción | 17 (11+4+2) | 🔴 Crash risk |
-| Strings hardcoded | ~50+ en 8+ archivos | 🟡 i18n |
-
-
-
-| Parámetros no usados | 1 (`kmActuales`) | 🟢 Low |
-| Unsafe casts | 2 | 🟡 Crash risk |
-| Clean arch violations | 3 archivos en módulo incorrecto | 🟡 Acoplamiento |
-| Coroutine issues | 2 | 🟡 ANR risk |
-| Package no estándar | 1 (`components.ui.dashboard`) | 🟢 Convención |
-
-
-separar las strings en español y las de inges por nombre.
-añadir selector de idioma
+| Categoría | Estado | 
+|-----------|--------|
+| `!!` en producción | ✅ 0 (arreglado) |
+| Unsafe casts | ✅ 0 (arreglado) |
+| Detekt config | ✅ Activado con reglas clave |
+| CI/CD pipeline | ✅ Creado (3 jobs) |
+| Keystore parsing | ✅ Usa `java.util.Properties` |
+| Sentry DSN | ✅ Externalizado a env var |
+| Coroutine issues | ✅ 0 (arreglado) |
+| Parallel build | ✅ Activado |
+| Test boilerplate | ✅ Eliminado |
+| Strings hardcoded | ⏳ ~50+ pendientes |
+| Clean arch violations | ⏳ 3 archivos pendientes |
+| Package rename | ⏳ Pendiente |
+| Galería de fotos | ⏳ Pendiente (2 features) |
+| Archivos grandes (>400) | ⏳ 3 pendientes de dividir |
+| Spanish/English naming | ⏳ Pendiente (baja prioridad) |
