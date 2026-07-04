@@ -120,6 +120,11 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // --- Networking ---
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+
     // --- Imágenes (Coil) ---
     implementation(libs.coil.compose)
 

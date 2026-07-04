@@ -3,6 +3,7 @@ package com.example.torque
 import android.app.Application
 import com.example.torque.ajustes.AjustesRepositorio
 import com.example.torque.ajustes.dataStore
+import com.example.torque.network.di.networkModule
 import com.example.torque.room.RepositorioApp
 import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
@@ -27,7 +28,7 @@ class TorqueApp : Application() {
 
         startKoin {
             androidContext(this@TorqueApp)
-            modules(appModule)
+            modules(appModule, networkModule)
         }
     }
 

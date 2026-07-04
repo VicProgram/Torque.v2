@@ -18,6 +18,8 @@ navigationCompose = "2.8.8"
 datastore = "1.1.2"
 room = "2.6.1"
 ksp = "2.1.20-1.0.32"
+retrofit = "2.11.0"
+okhttp = "4.12.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
@@ -46,6 +48,10 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentry" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

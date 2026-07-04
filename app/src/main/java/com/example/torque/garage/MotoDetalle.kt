@@ -163,7 +163,7 @@ private fun TarjetaEspecificaciones(m: MotoEntity) {
             m.tipoCarroceria?.let { FilaDetalle(stringResource(R.string.body_type), it) }
             m.tipoCombustible?.let { FilaDetalle(stringResource(R.string.fuel_type), it) }
             m.tipoTransmision?.let { FilaDetalle(stringResource(R.string.transmission_type), it) }
-            m.numeroPuertas?.let { FilaDetalle(stringResource(R.string.num_doors), it) }
+            m.numeroPuertas?.let { FilaDetalle(stringResource(R.string.num_doors), it.toString()) }
         }
     }
 }

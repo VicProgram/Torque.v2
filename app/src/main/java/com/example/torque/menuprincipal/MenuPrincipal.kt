@@ -2,23 +2,25 @@ package com.example.torque.menuprincipal
 
 import android.content.Intent
 import android.os.Bundle
-import com.example.torque.base.BaseActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.torque.ajustes.AjustesRepositorio
 import com.example.torque.ajustes.dataStore
+import com.example.torque.base.BaseActivity
 import com.example.torque.components.ui.dashboard.TorqueDashboardScreen
 import com.example.torque.garage.ListaGaraje
+import com.example.torque.login.LoginActivity
 import com.example.torque.maintenance.OpcionesMantenimiento
+import com.example.torque.network.AuthManager
 import com.example.torque.perfil.PerfilActivity
 import com.example.torque.ui.theme.TorqueTheme
 
@@ -26,6 +28,15 @@ class MenuPrincipal : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // Check authentication - redirect to login if not authenticated
+        val authManager = AuthManager.getInstance(this)
+        if (!kotlinx.coroutines.runBlocking { authManager.isLoggedIn() }) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         setContent {
             val repositorio = remember { AjustesRepositorio(this.dataStore) }
