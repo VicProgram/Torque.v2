@@ -6,7 +6,9 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-val keystoreProps = java.util.Properties().apply {
+import java.util.Properties
+
+val keystoreProps = Properties().apply {
     val f = rootProject.file("keystore.properties")
     if (f.exists()) load(f.inputStream())
 }
