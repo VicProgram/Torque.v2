@@ -26,6 +26,9 @@
 22. [Cómo Añadir una Nueva Pantalla](#22-cómo-añadir-una-nueva-pantalla)
 23. [Seguridad](#23-seguridad)
 24. [Convenciones de Código](#24-convenciones-de-código)
+25. [Módulo Servidor (`server/`)](#25-módulo-servidor-server)
+26. [Módulo Desktop Python (`desktop-python/`)](#26-módulo-desktop-python-desktop-python)
+27. [Scripts de desarrollo multiplataforma](#27-scripts-de-desarrollo-multiplataforma)
 
 ---
 
@@ -1242,3 +1245,210 @@ Todas las Activities internas (10 de 11) tienen `android:exported="false"`. Solo
 - `POST_NOTIFICATIONS`: solicitado en runtime (Android 13+) vía `rememberLauncherForActivityResult` en el dashboard
 - `READ_MEDIA_IMAGES`: declarado en manifest (para selección de fotos de galería, API 33+)
 - `READ_EXTERNAL_STORAGE`: eliminado — redundante desde API 33
+
+---
+
+## 25. Módulo Servidor (`server/`)
+
+### Stack
+
+| Tecnología | Propósito |
+|---|---|
+| **Python 3.12+** | Lenguaje |
+| **FastAPI** | Framework REST |
+| **SQLAlchemy 2.0** | ORM |
+| **Alembic** | Migraciones DB |
+| **SQLite** | Base de datos (desarrollo) |
+| **python-jose** | JWT |
+| **passlib + bcrypt** | Hash de contraseñas |
+| **pytest** | Tests |
+| **ReportLab** | Generación de PDF |
+
+### Estructura
+
+```
+server/
+├── app/
+│   ├── main.py              # Entry point FastAPI
+│   ├── config.py            # Settings desde variables de entorno
+│   ├── database.py          # SQLAlchemy engine + SessionLocal
+│   ├── models/
+│   │   ├── base.py          # DeclarativeBase + mixins (TimestampMixin)
+│   │   ├── taller.py        # Taller (multi-tenant)
+│   │   ├── usuario.py       # Usuarios con PIN
+│   │   ├── cliente.py       # Clientes
+│   │   ├── vehiculo.py      # Vehículos
+│   │   ├── orden_trabajo.py # Órdenes de trabajo (con estados)
+│   │   ├── detalle_trabajo.py
+│   │   ├── articulo.py      # Inventario
+│   │   ├── pieza_utilizada.py
+│   │   ├── cita.py          # Agenda
+│   │   ├── factura.py       # Facturación
+│   │   ├── configuracion.py # Configuración del taller
+│   │   └── archivo.py       # Archivos adjuntos
+│   ├── schemas/             # Pydantic (request/response)
+│   ├── api/v1/              # 8 routers REST
+│   ├── services/            # Lógica de negocio
+│   └── core/                # Security, WebSocket, exceptions
+├── alembic/                 # Migraciones
+├── tests/                   # pytest (16 tests)
+└── requirements.txt
+```
+
+### Base de datos: 12 tablas
+
+| Tabla | PK | Claves foráneas |
+|---|---|---|
+| `talleres` | id UUID | — |
+| `usuarios` | id UUID | taller_id → talleres |
+| `clientes` | id UUID | taller_id → talleres |
+| `vehiculos` | id UUID | taller_id, cliente_id |
+| `ordenes_trabajo` | id UUID | taller_id, cliente_id, vehiculo_id, mecanico_id |
+| `detalles_trabajo` | id UUID | orden_id → ordenes_trabajo |
+| `articulos` | id UUID | taller_id |
+| `piezas_utilizadas` | id UUID | detalle_id, articulo_id |
+| `citas` | id UUID | taller_id, cliente_id, vehiculo_id |
+| `facturas` | id UUID | taller_id, cliente_id, orden_id |
+| `configuracion_taller` | taller_id (PK) | taller_id |
+| `archivos` | id UUID | taller_id, orden_id |
+
+### Auth
+
+- `POST /auth/registro-taller` — crea taller + admin con hash bcrypt
+- `POST /auth/login` — email + password → JWT (sub=usuario.id, taller_id)
+- `POST /auth/login-pin` — PIN de 4 dígitos → JWT
+- `GET /auth/me` — perfil actual desde token
+- `PATCH /auth/me/pin` — asignar/cambiar PIN
+
+JWT configurable: access token (30 min default).
+
+### Tests
+
+```bash
+cd server && . venv/bin/activate && pytest tests/ -v
+```
+
+16 tests: auth (4), clientes (6), vehículos (5 + 1 búsqueda).
+
+### Ejecutar
+
+```bash
+cd server
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+# → http://localhost:8000
+# → http://localhost:8000/docs (Swagger)
+```
+
+---
+
+## 26. Módulo Desktop Python (`desktop-python/`)
+
+### Stack
+
+| Tecnología | Propósito |
+|---|---|
+| **Python 3.12+** | Lenguaje |
+| **CustomTkinter** | UI moderna con tema oscuro |
+| **httpx** | Cliente HTTP asíncrono |
+| **Pillow** | Procesamiento de imágenes |
+| **pytest** | Tests |
+
+### Estructura
+
+```
+desktop-python/
+├── app/
+│   ├── main.py              # Entry point (ventana + navegación)
+│   ├── config.py            # Config (token file, API URL)
+│   ├── api_client.py        # Cliente HTTP con JWT
+│   ├── state.py             # Estado global (AppState)
+│   ├── views/
+│   │   ├── login_view.py    # Login email + PIN
+│   │   ├── dashboard_view.py# KPIs del taller
+│   │   ├── clientes_view.py # CRUD con tabla
+│   │   ├── vehiculos_view.py# CRUD con tabla
+│   │   ├── ordenes_view.py  # CRUD con tabla y UUID resolution
+│   │   ├── citas_view.py    # CRUD con tabla
+│   │   ├── facturas_view.py # CRUD con selector de órdenes
+│   │   └── articulos_view.py# CRUD con stock
+│   ├── components/
+│   │   ├── sidebar.py       # Navegación lateral
+│   │   ├── table_widget.py  # Treeview con estilo centralizado
+│   │   ├── form_widgets.py  # Campos de formulario reutilizables
+│   │   └── dialogs.py       # Diálogos modales
+│   └── utils/
+│       └── helpers.py       # format_fecha, format_decimal
+│
+└── tests/
+    └── test_helpers.py      # 4 tests de utilidades
+```
+
+### Pantallas
+
+| Vista | Funcionalidad |
+|---|---|
+| **Login** | Email/password + PIN con selector de servidor |
+| **Dashboard** | KPIs: órdenes activas, clientes, vehículos, citas hoy, ingresos mes |
+| **Clientes** | Lista + crear/editar/eliminar con nombre, teléfono, email, dirección |
+| **Vehículos** | Lista + crear/editar/eliminar con marca, modelo, matrícula, cliente |
+| **Órdenes** | Lista + crear/editar/eliminar con estados, UUIDs resueltos a nombre |
+| **Citas** | Agenda con selector de cliente, vehículo, mecánico, fecha |
+| **Facturas** | Crear desde orden con selector de vehículo + cliente |
+| **Artículos** | Inventario con stock, precio, SKU |
+
+### Patrones
+
+- **AppState** global: almacena token, taller_id, usuario actual
+- **api_client.py**: métodos `get`, `post`, `put`, `delete` con JWT automático
+- **UUID resolution**: los UUIDs de cliente/vehículo se resuelven a nombres visibles en las tablas mediante caché local
+- **Treeview centralizado**: estilo común en `table_widget.py`
+
+### Tests
+
+```bash
+cd desktop-python && . .venv/bin/activate && pytest tests/ -v
+```
+
+4 tests de helpers (`format_fecha`, `format_decimal`).
+
+### Ejecutar
+
+```bash
+cd desktop-python
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+python -m app.main
+```
+
+> **Nota**: CustomTkinter requiere Tkinter. En Ubuntu: `sudo apt install python3-tk`. En Windows: marca "tcl/tk and IDLE" en el instalador de Python.
+
+---
+
+## 27. Scripts de desarrollo multiplataforma
+
+### Makefile (Linux / WSL)
+
+| Comando | Acción |
+|---|---|
+| `make install` | Crea venvs + pip install (server + desktop) |
+| `make server` | Arranca FastAPI con --reload |
+| `make desktop` | Arranca app CustomTkinter |
+| `make test` | Tests server + desktop |
+| `make seed` | Datos demo vía API |
+| `make lint` | Detekt (Android) |
+| `make clean` | Borra venvs, caches, builds |
+
+### dev.ps1 (Windows PowerShell)
+
+```
+.\dev.ps1 install | server | desktop | test | seed
+```
+
+### dev.bat (Windows CMD)
+
+```
+dev.bat install | server | desktop | test | seed
+```

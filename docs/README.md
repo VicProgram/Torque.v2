@@ -1,221 +1,195 @@
-# Torque
+# Torque v2
 
-Aplicación Android para la gestión del mantenimiento de motocicletas. Desarrollada con **Kotlin**, **Jetpack Compose** y **Room**.
-
----
-
-## Casos de Uso
-
-### Para el motero diario
-- Lleva el control del **cambio de aceite**, **filtros**, **cadena**, **neumáticos** y más
-- Recibe notificaciones cuando un mantenimiento está **próximo a vencer** o **vencido**
-- Consulta de un vistazo la **salud global** de tu moto (0–100%)
-- **Plan de mantenimiento** con todas las tareas recomendadas, su estado y próximos vencimientos
-- **Recordatorios de ITV y seguro** con avisos visuales en el panel
-
-### Para el taller
-- Gestiona el **garaje completo** con múltiples motos
-- Registra mantenimientos con **kilometraje**, **precio**, **tiempo**, **notas** y **fotos/facturas adjuntas**
-- Ajusta el **desgaste de consumibles** con sliders intuitivos
-- Exporta e importa **copias de seguridad** completas (DB + fotos + preferencias)
-- **Exporta el historial a PDF** para entregar al cliente
-
-### Para el propietario
-- Perfil con foto, nombre, email, teléfono y fecha de nacimiento
-- Carnets de conducir (AM, A1, A2, A)
-- **Modo oscuro** optimizado para uso en taller y carretera
-- **6 logos** seleccionables para personalizar la app
-- **Fechas ITV y Seguro** registradas por moto
+Sistema profesional de gestión de taller mecánico multi-dispositivo.
 
 ---
 
-## Características
+## Componentes
 
-| Funcionalidad | Descripción |
-|---|---|
-| **Panel de control** | Carrusel de motos con swipe, salud global, kilometraje, próximo servicio y acciones rápidas — impulsado por ViewModel + StateFlow |
-| **Gestión de garaje** | Añade, edita y elimina motos con foto, marca, modelo (~50 marcas con dropdown), año, matrícula, cilindrada y potencia |
-| **Registro de mantenimiento** | 23 tipos predefinidos en 6 categorías (Motor, Transmisión, Frenos, Neumáticos, Eléctrico, Suspensión) |
-| **Historial** | Búsqueda, filtros por categoría y detalle completo de cada registro |
-| **Control de desgaste** | Sliders para neumáticos, pastillas de freno y discos |
-| **Algoritmo de salud** | Cálculo ponderado (0–100%) basado en intervalos, peso y cumplimiento |
-| **Notificaciones** | Alertas locales cuando un mantenimiento está al 1–20% o vencido al 0% |
-| **Plan de Mantenimiento** | Vista completa de todas las tareas recomendadas con estado, cumplimiento y próximo vencimiento |
-| **ITV y Seguro** | Registro de fechas con indicadores visuales de vencimiento en el dashboard |
-| **Exportación a PDF** | Generación de PDF del historial de mantenimiento para entregar al cliente |
-| **Perfil de usuario** | Foto, nombre, email, teléfono, fecha de nacimiento y carnets |
-| **Backup completo** | Exportación/importación ZIP con DB + fotos + preferencias |
-| **Seguridad** | PII cifrada con AES-256-GCM via Android Keystore; backup deshabilitado; permisos mínimos |
-| **Modo oscuro** | Tema oscuro nativo optimizado para taller |
-| **Personalización** | 6 logos seleccionables desde ajustes |
+| Componente | Tecnología | Descripción |
+|---|---|---|
+| **Servidor API** | Python FastAPI + SQLite | Backend REST con auth JWT, WebSocket, PDF |
+| **Desktop (Taller)** | Python CustomTkinter | Gestión de clientes, vehículos, órdenes, citas, facturas, artículos |
+| **Android (Mecánico)** | Kotlin + Jetpack Compose | App de gestión de mantenimiento de vehículos con algoritmo de salud |
 
 ---
 
-## Stack Tecnológico
+## Cómo empezar
 
-| Tecnología | Versión |
-|---|---|
-| **Kotlin** | 2.1.20 |
-| **Jetpack Compose** | BOM 2025.05.01 |
-| **Material Design 3** | — |
-| **Room** | 2.6.1 |
-| **DataStore Preferences** | 1.1.2 |
-| **Android Keystore** | AES-256-GCM (cifrado PII) |
-| **Coil** | 2.7.0 |
-| **Koin** | 3.5.6 |
-| **Lifecycle ViewModel Compose** | 2.8.7 |
-| **Sentry** | 7.22.1 |
-| **KSP** | 2.1.20-1.0.32 |
-| **Gradle AGP** | 8.9.2 |
-| **Gradle** | 8.12.1 |
-| **Min SDK / Target** | 28 (Android 9) / 35 (Android 15) |
+### Requisitos
+
+- **Python 3.12+**
+- **JDK 17+** (para Android)
+- **Android SDK 35** (para Android)
+
+### Servidor
+
+```bash
+# Linux / WSL
+make install      # crear venv + instalar deps
+make server       # arrancar en http://localhost:8000
+make seed         # sembrar datos demo (con server corriendo)
+make test-server  # ejecutar tests
+
+# Windows (PowerShell)
+.\dev.ps1 install
+.\dev.ps1 server
+.\dev.ps1 seed
+
+# Windows (CMD)
+dev.bat install
+dev.bat server
+```
+
+### Desktop Python
+
+```bash
+# Linux / WSL
+make desktop      # lanza la app CustomTkinter
+make test-desktop # tests
+
+# Windows
+.\dev.ps1 desktop
+```
+
+> **Importante**: CustomTkinter necesita Tkinter. En Windows, marca "tcl/tk and IDLE" al instalar Python.
+
+### Android
+
+```bash
+./gradlew assembleDebug
+# APK → app/build/outputs/apk/debug/
+```
 
 ---
 
 ## Arquitectura
 
 ```
-┌──────────────────────────────────────────┐
-│               :app (UI)                   │
-│  Activities · Composables · Theme         │
-│  ViewModel + StateFlow en dashboard       │
-│  Depende de: :core, :data                 │
-└──────────────────┬───────────────────────┘
-                   │
-┌──────────────────▼───────────────────────┐
-│              :data (Data)                 │
-│  Room DB · DAOs · Entities · Repos       │
-│  BackupManager · SaludMotoCalculator     │
-│  Depende de: :core                        │
-└──────────────────┬───────────────────────┘
-                   │
-┌──────────────────▼───────────────────────┐
-│             :core (Domain)                │
-│  TiposMantenimiento · DateUtils          │
-│  Sin dependencias Android                 │
-└──────────────────────────────────────────┘
-```
-
-### Estructura del proyecto
-
-```
-Torque.v2/
-├── docs/                     # Documentación
-│   ├── README.md             # Este archivo
-│   └── GUIA_DEV.md           # Guía completa para desarrolladores
-├── core/                     # Módulo de dominio
-│   └── src/main/java/.../utils/
-│       ├── TiposMantenimiento.kt
-│       └── DateUtils.kt
-├── data/                     # Módulo de datos
-│   └── src/main/java/.../
-│       ├── room/
-│       │   ├── AppDatabase.kt
-│       │   ├── AppRepository.kt
-│       │   └── entity/
-│       │       ├── MotoEntity.kt
-│       │       ├── MantenimientoEntity.kt
-│       │       ├── FotoEntity.kt
-│       │       ├── MantenimientoPlanEntity.kt
-│       │       ├── MotoItvEntity.kt
-│       │       ├── MotoSeguroEntity.kt
-│       │       └── dao/
-│       │           ├── MotoDao.kt
-│       │           ├── MantenimientoDao.kt
-│       │           ├── FotoDao.kt
-│       │           ├── MantenimientoPlanDao.kt
-│       │           └── DatosAnualesDao.kt
-│       ├── ajustes/
-│       │   └── AjustesRepository.kt
-│       └── utils/
-│           ├── SaludMotoCalculator.kt
-│           ├── BackupManager.kt
-│           ├── FileUtils.kt
-│           ├── ContextUtils.kt
-│           └── PdfExporter.kt
-├── app/                      # Módulo de UI
-│   └── src/main/java/.../
-│       ├── TorqueApp.kt
-│       ├── menuprincipal/
-│       ├── pdf/                           # Exportación a PDF
-│       ├── plan/                          # Plan de mantenimiento
-│       ├── components/ui/dashboard/       # DashboardScreen + ViewModel + diálogos
-│       ├── garage/
-│       ├── maintenance/
-│       ├── perfil/
-│       ├── ajustes/
-│       ├── ui/theme/
-│       └── utils/
-└── config/detekt/            # Reglas de análisis estático
+┌─────────────────────────────────────────────────────┐
+│                   SERVIDOR (FastAPI)                  │
+│  SQLite ── REST API ── Auth JWT ── WebSocket ── PDF  │
+│  Multi-taller (tenant_id en cada tabla)              │
+└──────┬────────────────────────────────────┬──────────┘
+       │ REST + JWT                         │ REST + JWT
+       ▼                                    ▼
+┌──────────────────┐              ┌────────────────────┐
+│ Desktop (Taller)  │              │ Android (Mecánico) │
+│ CustomTkinter     │              │ Jetpack Compose    │
+│ Gestión completa  │              │ Room offline       │
+│ Clientes,órdenes, │              │ Algoritmo salud    │
+│ facturas,stock    │              │ Sync con servidor  │
+└──────────────────┘              └────────────────────┘
 ```
 
 ---
 
-## Cómo compilar
+## Estructura del proyecto
 
-```bash
-# APK de depuración
-./gradlew assembleDebug
-# → app/build/outputs/apk/debug/
-
-# APK de release (requiere keystore.properties)
-./gradlew assembleRelease
-# → app/build/outputs/apk/release/
-
-# Sincronizar Gradle manualmente
-./gradlew --refresh-dependencies
+```
+Torque.v2/
+├── server/                # Servidor Python FastAPI
+│   ├── app/
+│   │   ├── main.py        # Entry point
+│   │   ├── models/        # SQLAlchemy (12 entidades)
+│   │   ├── schemas/       # Pydantic request/response
+│   │   ├── api/v1/        # Endpoints REST
+│   │   ├── services/      # Lógica de negocio
+│   │   └── core/          # Security, WebSocket, exceptions
+│   ├── alembic/           # Migraciones DB
+│   └── tests/             # pytest (16 tests)
+│
+├── desktop-python/        # Cliente escritorio
+│   ├── app/
+│   │   ├── main.py        # Entry point
+│   │   ├── api_client.py  # Cliente HTTP
+│   │   ├── views/         # 8 pantallas (login, dashboard, clientes...)
+│   │   ├── components/    # Sidebar, table_widget, dialogs, form_widgets
+│   │   └── utils/         # Helpers
+│   └── tests/             # pytest (4 tests)
+│
+├── app/                   # Android UI (Jetpack Compose)
+├── data/                  # Android data layer (Room)
+├── core/                  # Android domain layer
+├── shared/                # Android shared module
+│
+├── Makefile               # Comandos Linux/WSL
+├── dev.ps1                # Comandos Windows PowerShell
+├── dev.bat                # Comandos Windows CMD
+│
+└── docs/                  # Documentación
 ```
 
-> **Requisitos**: Android Studio Hedgehog+ · JDK 17 · Android SDK 35
->
-> **Seguridad**: `android:allowBackup="false"` · solo 1 Activity exportada · `READ_EXTERNAL_STORAGE` eliminada · nombre/email/teléfono cifrados en reposo via Android Keystore (`AES/GCM/NoPadding`)
+---
+
+## Comandos rápidos
+
+| Acción | Linux/WSL | Windows |
+|--------|-----------|---------|
+| Instalar deps | `make install` | `.\dev.ps1 install` |
+| Arrancar server | `make server` | `.\dev.ps1 server` |
+| Arrancar desktop | `make desktop` | `.\dev.ps1 desktop` |
+| Tests server | `make test-server` | `.\dev.ps1 test` |
+| Tests desktop | `make test-desktop` | (incluido en test) |
+| Datos demo | `make seed` | `.\dev.ps1 seed` |
+| Compilar Android | `./gradlew assembleDebug` | `./gradlew assembleDebug` |
+| Análisis estático | `make lint` | `./gradlew detekt` |
+
+---
+
+## API Endpoints
+
+Con el servidor corriendo, abrir http://localhost:8000/docs para Swagger UI.
+
+### Auth
+- `POST /api/v1/auth/registro-taller` — Crear taller + admin
+- `POST /api/v1/auth/login` — Login (email/password)
+- `POST /api/v1/auth/login-pin` — Login por PIN
+- `GET /api/v1/auth/me` — Perfil actual
+- `PATCH /api/v1/auth/me/pin` — Asignar PIN
+
+### Gestión
+- `GET/POST /api/v1/clientes` — Listar / crear clientes
+- `GET/PUT/DELETE /api/v1/clientes/{id}` — CRUD cliente
+- `GET/POST /api/v1/vehiculos` — Listar / crear vehículos
+- `GET/PUT/DELETE /api/v1/vehiculos/{id}` — CRUD vehículo
+- `GET /api/v1/vehiculos/buscar-matricula/{matricula}` — Búsqueda
+- `GET/POST /api/v1/ordenes` — Listar / crear órdenes
+- `GET/PUT/DELETE /api/v1/ordenes/{id}` — CRUD orden
+- `GET/POST /api/v1/citas` — Listar / crear citas
+- `GET/PUT/DELETE /api/v1/citas/{id}` — CRUD cita
+- `GET/POST /api/v1/articulos` — Listar / crear artículos
+- `GET/PUT/DELETE /api/v1/articulos/{id}` — CRUD artículo
+- `GET/POST /api/v1/facturas` — Listar / crear facturas
+- `GET/DELETE /api/v1/facturas/{id}` — CRUD factura
+- `GET /api/v1/dashboard` — KPIs del taller
 
 ---
 
 ## Tests
 
 ```bash
-# Todos los tests unitarios
-./gradlew test
+# Servidor (16 tests)
+cd server && . venv/bin/activate && pytest tests/ -v
 
-# Solo tests de depuración
-./gradlew testDebugUnitTest
+# Desktop (4 tests)
+cd desktop-python && . .venv/bin/activate && pytest tests/ -v
 
-# Tests instrumentados (requiere dispositivo/emulador)
-./gradlew connectedCheck
-
-# Tests de performance del algoritmo de salud
-# (incluidos en testDebugUnitTest)
+# Android
+./gradlew testDebugUnitTest   # tests unitarios
+./gradlew connectedCheck      # tests instrumentados (requiere emulador)
+./gradlew detekt              # análisis estático
 ```
 
-**Cobertura**: 78 tests de algoritmo de salud + 20 tests de plan de mantenimiento + 7 tests de exportación PDF + 9 tests de performance + 1 test de humo (115 unitarios) + 2 tests instrumentados (117 en total).
-
 ---
 
-## Análisis estático
+## Demo
 
-```bash
-./gradlew detekt
-```
+Usuario: `admin@demo.com`
+Contraseña: `demo1234`
+PIN: `1234`
 
-Reglas personalizadas en `config/detekt/detekt.yml`.
-
----
-
-## Capturas de pantalla
-
-*(pendiente)*
-
----
-
-## Seguridad
-
-| Hallazgo | Estado | Solución |
-|---|---|---|
-| Backup sin restricciones | Corregido | `android:allowBackup="false"` |
-| PII en texto plano | Corregido | Cifrado AES-256-GCM via Android Keystore (`CifradorPerfil`) |
-| 10 Activities sin `exported` | Corregido | `android:exported="false"` (excepto launcher) |
-| `READ_EXTERNAL_STORAGE` redundante | Corregido | Eliminado (sobra `READ_MEDIA_IMAGES`) |
+O ejecutar `make seed` (o `.\dev.ps1 seed`) con el servidor corriendo para crear datos de ejemplo.
 
 ---
 

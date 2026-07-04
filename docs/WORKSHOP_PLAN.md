@@ -180,28 +180,28 @@ Torque.v2/
 | 0.15 | Tests | ✓ |
 | 0.16 | Migración de datos | ✓ |
 
-### Fase 1 — Cliente escritorio Python (pendiente)
+### Fase 1 — Cliente escritorio Python (√ COMPLETADA)
 
-| # | Tarea | Descripción |
-|---|-------|-------------|
-| 1.1 | Setup proyecto | Estructura, dependencias, config |
-| 1.2 | API Client | Cliente HTTP para conectarse al servidor |
-| 1.3 | Login screen | Autenticación con JWT |
-| 1.4 | Dashboard | KPIs desde el servidor |
-| 1.5 | Clientes screen | Lista + detalle + formulario |
-| 1.6 | Vehículos screen | Lista + detalle + formulario |
-| 1.7 | Órdenes screen | Lista + detalle + seguimiento |
-| 1.8 | Agenda screen | Calendario de citas |
+| # | Tarea | Estado |
+|---|-------|--------|
+| 1.1 | Setup proyecto | ✓ |
+| 1.2 | API Client | ✓ |
+| 1.3 | Login screen (email + PIN) | ✓ |
+| 1.4 | Dashboard KPIs | ✓ |
+| 1.5 | Clientes screen + CRUD | ✓ |
+| 1.6 | Vehículos screen + CRUD | ✓ |
+| 1.7 | Órdenes screen + CRUD con estados | ✓ |
+| 1.8 | Agenda screen (citas) | ✓ |
 
-### Fase 2 — Desktop funcionalidades avanzadas (pendiente)
+### Fase 2 — Desktop funcionalidades avanzadas (√ COMPLETADA)
 
-| # | Tarea | Descripción |
-|---|-------|-------------|
-| 2.1 | Inventario screen | CRUD de artículos + stock |
-| 2.2 | Facturación | Generar factura desde orden |
-| 2.3 | PDF | Visualizar presupuestos/facturas |
-| 2.4 | Dashboard KPIs | Órdenes activas, ingresos, carga |
-| 2.5 | Informes | Histórico cliente, rentabilidad |
+| # | Tarea | Estado |
+|---|-------|--------|
+| 2.1 | Inventario screen (artículos + stock) | ✓ |
+| 2.2 | Facturación desde orden | ✓ |
+| 2.3 | PDF (generado por servidor) | ✓ |
+| 2.4 | Dashboard KPIs | ✓ |
+| 2.5 | UUID resolution en tablas | ✓ |
 
 ### Fase 3 — Mobile como herramienta de mecánico (pendiente)
 
@@ -280,11 +280,11 @@ Torque.v2/
 
 ## 9. Estado Actual del Código
 
-### Completado (Fase 0)
+### Completado (Fases 0, 1 y 2)
 
-- `server/` — Servidor Python FastAPI completo con 12 modelos, CRUD completo, auth JWT, WebSocket, PDF, dashboard KPIs, tests
+- `server/` — Servidor Python FastAPI completo con 12 modelos, CRUD completo, auth JWT, WebSocket, PDF, dashboard KPIs, tests (16/16)
+- `desktop-python/` — Cliente de escritorio Python completo con 8 vistas (login, dashboard, clientes, vehículos, órdenes, citas, facturas, artículos), UUID resolution, CustomTkinter
 
-### Por hacer (Fase 1+)
+### Por hacer (Fase 3+)
 
-- `desktop-python/` — Cliente de escritorio Python
-- `app/ android` — Conectar app Android al servidor (sync, login PIN, etc.)
+- `app/ android` — Conectar app Android al servidor (sync, login PIN, órdenes asignadas, diagnosis con fotos)
