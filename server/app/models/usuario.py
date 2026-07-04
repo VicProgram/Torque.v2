@@ -1,0 +1,38 @@
+import uuid
+from datetime import datetime, timezone
+
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from app.database import Base
+from app.models.base import UUIDMixin
+
+
+class Usuario(UUIDMixin, Base):
+    __tablename__ = "usuarios"
+
+    id_taller = Column(
+        UUID(as_uuid=True),
+        ForeignKey("talleres.id"),
+        nullable=False,
+    )
+    nombre = Column(String(100), nullable=False)
+    email = Column(String(200), unique=True, nullable=False, index=True)
+    password_hash = Column(String(200), nullable=False)
+    pin_code = Column(String(6), nullable=True)
+    rol = Column(
+        String(20),
+        nullable=False,
+        default="MECANICO",
+    )
+    telefono = Column(String(20), default="")
+    activo = Column(Boolean, default=True)
+    creado_en = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+    ultimo_acceso = Column(DateTime(timezone=True), nullable=True)
+
+    taller = relationship("Taller", backref="usuarios")
