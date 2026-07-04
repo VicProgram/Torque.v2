@@ -12,7 +12,8 @@ class LoginView(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        card = ctk.CTkFrame(self, corner_radius=15, width=400)
+        self.card = ctk.CTkFrame(self, corner_radius=15, width=400)
+        card = self.card
         card.grid(row=0, column=0)
         card.grid_columnconfigure(0, weight=1)
 
@@ -60,14 +61,15 @@ class LoginView(ctk.CTkFrame):
         )
         self.error_label.grid(row=6, column=0, pady=(0, 20))
 
-        ctk.CTkButton(
+        self.pin_btn = ctk.CTkButton(
             card,
             text="Entrar con PIN",
             fg_color="transparent",
             text_color="gray",
             hover_color="#2D3748",
             command=self._show_pin_login,
-        ).grid(row=7, column=0, pady=(0, 20))
+        )
+        self.pin_btn.grid(row=7, column=0, pady=(0, 20))
 
         self.bind("<Return>", lambda e: self._do_login())
         self.email_entry.focus()
@@ -104,26 +106,50 @@ class LoginView(ctk.CTkFrame):
         self.login_btn.configure(text="Entrar con PIN", command=self._do_pin_login)
 
         self.pin_entry = ctk.CTkEntry(
-            self.master.card if hasattr(self, "master") else self,
+            self.card,
             placeholder_text="PIN de mecánico",
             height=40,
             show="*",
         )
-        if self.email_entry.grid_info():
-            self.pin_entry.grid(
-                row=3, column=0, padx=30, pady=(0, 20), sticky="ew"
-            )
+        self.pin_entry.grid(
+            row=3, column=0, padx=30, pady=(0, 20), sticky="ew"
+        )
         self.pin_entry.focus()
+
+        ctk.CTkButton(
+            self.card,
+            text="Volver",
+            fg_color="transparent",
+            text_color="gray",
+            hover_color="#2D3748",
+            command=self._show_email_login,
+        ).grid(row=7, column=0, pady=(0, 5))
+
+    def _show_email_login(self):
+        if hasattr(self, "pin_entry"):
+            self.pin_entry.grid_remove()
+        self.email_entry.grid()
+        self.password_entry.grid()
+        self.login_btn.configure(text="Iniciar Sesión", command=self._do_login)
+        self.pin_btn.grid()
 
     def _do_pin_login(self):
         pin = self.pin_entry.get().strip()
         if not pin:
             self.error_label.configure(text="Introduce el PIN")
             return
+        server_url = self.server_entry.get().strip()
+        if not server_url:
+            self.error_label.configure(text="Introduce la URL del servidor")
+            return
+        CONFIG.server_url = server_url
+        API.client.base_url = f"{server_url}/api/v1"
+        self.login_btn.configure(text="Conectando...", state="disabled")
         result = API.login_pin(pin)
+        self.login_btn.configure(text="Entrar con PIN", state="normal")
         if result:
             CONFIG.save_token(result)
-            STATE.login(result, self.server_entry.get().strip())
+            STATE.login(result, server_url)
             self.on_login_success()
         else:
             self.error_label.configure(text="PIN inválido")

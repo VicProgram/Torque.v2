@@ -1,6 +1,33 @@
-from typing import Any
+from typing import Any, Callable, Optional
 import customtkinter as ctk
 from tkinter import ttk
+
+
+def configurar_estilo_treeview():
+    style = ttk.Style()
+    style.theme_use("clam")
+    style.configure(
+        "Treeview",
+        background="#1C2331",
+        foreground="white",
+        rowheight=30,
+        fieldbackground="#1C2331",
+        borderwidth=0,
+    )
+    style.configure(
+        "Treeview.Heading",
+        background="#135BEC",
+        foreground="white",
+        relief="flat",
+    )
+    style.map(
+        "Treeview",
+        background=[("selected", "#135BEC")],
+        foreground=[("selected", "white")],
+    )
+
+
+configurar_estilo_treeview()
 
 
 class TableWidget(ctk.CTkFrame):
@@ -8,8 +35,8 @@ class TableWidget(ctk.CTkFrame):
         self,
         master,
         columns: list[tuple[str, int]],
-        on_select: callable = None,
-        on_double_click: callable = None,
+        on_select: Optional[Callable[[dict], None]] = None,
+        on_double_click: Optional[Callable[[str], None]] = None,
         **kwargs,
     ):
         super().__init__(master, **kwargs)
@@ -24,28 +51,6 @@ class TableWidget(ctk.CTkFrame):
             columns=[c[0] for c in columns],
             show="headings",
             selectmode="browse",
-        )
-
-        style = ttk.Style()
-        style.theme_use("clam")
-        style.configure(
-            "Treeview",
-            background="#1C2331",
-            foreground="white",
-            rowheight=30,
-            fieldbackground="#1C2331",
-            borderwidth=0,
-        )
-        style.configure(
-            "Treeview.Heading",
-            background="#135BEC",
-            foreground="white",
-            relief="flat",
-        )
-        style.map(
-            "Treeview",
-            background=[("selected", "#135BEC")],
-            foreground=[("selected", "white")],
         )
 
         for col_id, width in columns:

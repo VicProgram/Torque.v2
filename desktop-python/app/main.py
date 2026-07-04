@@ -90,6 +90,10 @@ class TorqueDesktop(ctk.CTk):
             view = self.views[view_key]
             if hasattr(view, "load_data"):
                 view.load_data()
+            elif hasattr(view, "_load_data"):
+                view._load_data()
+            if hasattr(view, "_load_caches"):
+                view._load_caches()
 
     def _logout(self):
         CONFIG.clear_token()

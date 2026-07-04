@@ -1,8 +1,10 @@
+from datetime import datetime
+
 import customtkinter as ctk
 
 from app.api_client import API
 from app.components.table_widget import TableWidget
-from app.components.form_widgets import FormEntry, FormCombo, FormDate
+from app.components.form_widgets import FormEntry, FormCombo
 from app.utils.helpers import format_fecha, format_decimal, ESTADOS_FACTURA
 
 
@@ -70,13 +72,20 @@ class FacturasView(ctk.CTkFrame):
         filtro = self.estado_filter.get_value()
         estado = "" if filtro in ("", "Todas") else filtro
         data = API.list_facturas(estado)
+        ordenes = API.list_ordenes()
+        orden_map = {o["id"]: o for o in ordenes if "id" in o}
         display = []
         for f in data:
+            id_orden = f.get("id_orden_trabajo", "")
+            cliente_str = id_orden[:8] if id_orden else ""
+            if id_orden in orden_map:
+                vehiculo_id = orden_map[id_orden].get("id_vehiculo", "")
+                cliente_str = f"Orden {id_orden[:8]}"
             display.append({
                 "id": f.get("id", ""),
                 "numero_factura": f.get("numero_factura", ""),
                 "fecha_emision": format_fecha(f.get("fecha_emision", "")),
-                "cliente": f.get("id_orden_trabajo", "")[:8] if f.get("id_orden_trabajo") else "",
+                "cliente": cliente_str,
                 "base_imponible": format_decimal(f.get("base_imponible")),
                 "total": format_decimal(f.get("total")),
                 "estado": f.get("estado", ""),
@@ -88,14 +97,26 @@ class FacturasView(ctk.CTkFrame):
         if not ordenes:
             return
 
+        vehiculos = API.list_vehiculos()
+        vehiculo_map = {v["id"]: v for v in vehiculos if "id" in v}
+
         dialog = ctk.CTkToplevel(self)
         dialog.title("Nueva Factura")
-        dialog.geometry("450x350")
+        dialog.geometry("500x400")
         dialog.transient(self)
         dialog.grab_set()
 
         frame = ctk.CTkFrame(dialog)
         frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        orden_opts = []
+        for o in ordenes:
+            vid = o.get("id_vehiculo", "")
+            veh = vehiculo_map.get(vid, {})
+            label = f"{o.get('id', '')[:8]} — {veh.get('marca', '')} {veh.get('modelo', '')} ({veh.get('matricula', vid[:8])})"
+            orden_opts.append(label)
+        orden_w = FormCombo(frame, "Orden de Trabajo *", orden_opts)
+        orden_w.pack(fill="x", pady=2)
 
         num = FormEntry(frame, "Número Factura *")
         num.pack(fill="x", pady=2)
@@ -107,11 +128,14 @@ class FacturasView(ctk.CTkFrame):
 
         def save():
             try:
+                idx = orden_opts.index(orden_w.get_value()) if orden_w.get_value() in orden_opts else -1
+                if idx < 0 or not num.get_value() or not base.get_value():
+                    return
                 base_val = float(base.get_value())
                 iva_val = float(iva.get_value()) if iva.get_value() else 21.0
                 total = base_val * (1 + iva_val / 100)
                 payload = {
-                    "id_orden_trabajo": ordenes[0]["id"],
+                    "id_orden_trabajo": ordenes[idx]["id"],
                     "numero_factura": num.get_value(),
                     "fecha_emision": datetime.now().strftime("%Y-%m-%d"),
                     "base_imponible": base_val,
@@ -124,7 +148,6 @@ class FacturasView(ctk.CTkFrame):
             except ValueError:
                 pass
 
-        from datetime import datetime
         btn_frame = ctk.CTkFrame(frame, fg_color="transparent")
         btn_frame.pack(pady=(15, 0))
         ctk.CTkButton(

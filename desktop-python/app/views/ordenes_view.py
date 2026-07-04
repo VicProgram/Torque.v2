@@ -4,7 +4,7 @@ from tkinter import ttk
 from app.api_client import API
 from app.components.table_widget import TableWidget
 from app.components.form_widgets import FormEntry, FormCombo, FormText
-from app.components.dialogs import ConfirmDialog, FormDialog
+from app.components.dialogs import ConfirmDialog
 from app.utils.helpers import (
     ESTADOS_ORDEN, COLOR_ESTADOS, format_fecha, format_decimal,
 )
@@ -15,6 +15,8 @@ class OrdenesView(ctk.CTkFrame):
         super().__init__(master, **kwargs)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
+        self.vehiculos_cache: list[dict] = []
+        self.mecanicos_cache: dict[str, str] = {}
 
         top = ctk.CTkFrame(self, fg_color="transparent")
         top.grid(row=0, column=0, sticky="ew", pady=(0, 15))
@@ -75,7 +77,17 @@ class OrdenesView(ctk.CTkFrame):
         )
         self.estado_btn.grid(row=0, column=1, padx=5)
 
+        self._load_caches()
         self._load_data()
+
+    def _load_caches(self):
+        self.vehiculos_cache = API.list_vehiculos()
+        resumen = API.dashboard_resumen()
+        if resumen:
+            ordenes = API.dashboard_ordenes_activas()
+            for o in ordenes:
+                if o.get("mecanico") and o.get("mecanico") not in self.mecanicos_cache.values():
+                    pass  # keep using raw name from server
 
     def _on_select(self, row: dict):
         self.detalle_btn.configure(state="normal")
@@ -87,9 +99,14 @@ class OrdenesView(ctk.CTkFrame):
         data = API.list_ordenes(estado=estado)
         display = []
         for o in data:
+            vehiculo_str = o.get("id_vehiculo", "")[:8]
+            for v in self.vehiculos_cache:
+                if v.get("id") == o.get("id_vehiculo"):
+                    vehiculo_str = f"{v.get('marca', '')} {v.get('modelo', '')} ({v.get('matricula', '')})"
+                    break
             display.append({
                 "id": o.get("id", ""),
-                "vehiculo": o.get("id_vehiculo", "")[:8] + "...",
+                "vehiculo": vehiculo_str,
                 "estado": o.get("estado", ""),
                 "problema": (o.get("descripcion_problema", "") or "")[:50],
                 "mecanico": o.get("id_mecanico_asignado", "") or "",
@@ -199,22 +216,11 @@ class OrdenesView(ctk.CTkFrame):
         detalles = orden.get("detalles", [])
         if detalles:
             columns = [("descripcion", 300), ("estado", 100), ("precio", 100)]
+            from app.components.table_widget import configurar_estilo_treeview
             tree = ttk.Treeview(
                 frame, columns=[c[0] for c in columns], show="headings", height=5
             )
-            style = ttk.Style()
-            style.configure(
-                "Treeview",
-                background="#1C2331",
-                foreground="white",
-                rowheight=25,
-                fieldbackground="#1C2331",
-            )
-            style.configure(
-                "Treeview.Heading",
-                background="#135BEC",
-                foreground="white",
-            )
+            configurar_estilo_treeview()
             for col_id, width in columns:
                 tree.column(col_id, width=width)
                 tree.heading(col_id, text=col_id)

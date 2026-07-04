@@ -65,13 +65,20 @@ class CitasView(ctk.CTkFrame):
         self.delete_btn.grid(row=0, column=1, padx=5)
 
         self.clientes_cache: list[dict] = []
-        self.vehiculos_cache: list[dict] = []
-        self._load_data()
+        self.mecanicos_cache: list[dict] = []
         self._load_caches()
+        self._load_data()
 
     def _load_caches(self):
         self.clientes_cache = API.list_clientes()
-        self.vehiculos_cache = API.list_vehiculos()
+        resumen = API.dashboard_resumen()
+        if resumen:
+            ordenes = API.dashboard_ordenes_activas()
+            mecanicos = set()
+            for o in ordenes:
+                if o.get("mecanico"):
+                    mecanicos.add(o["mecanico"])
+            self.mecanicos_cache = [{"nombre": m} for m in sorted(mecanicos)]
 
     def _on_select(self, row: dict):
         self.edit_btn.configure(state="normal")
@@ -83,13 +90,20 @@ class CitasView(ctk.CTkFrame):
         data = API.list_citas(fecha_desde=today, fecha_hasta=month_end)
         display = []
         for c in data:
+            cliente_nombre = ""
+            if c.get("id_cliente"):
+                for cl in self.clientes_cache:
+                    if cl.get("id") == str(c["id_cliente"]):
+                        cliente_nombre = cl.get("nombre", "")
+                        break
+            mecanico_nombre = c.get("mecanico") or ""
             display.append({
                 "id": c.get("id", ""),
                 "fecha_hora": format_fecha(c.get("fecha_hora", "")),
-                "cliente": "",
+                "cliente": cliente_nombre,
                 "motivo": c.get("motivo", ""),
                 "estado": c.get("estado", ""),
-                "mecanico": "",
+                "mecanico": mecanico_nombre,
             })
         self.table.load(display)
 
@@ -122,7 +136,7 @@ class CitasView(ctk.CTkFrame):
     def _open_form(self, cita_id: str | None = None):
         data = None
         if cita_id:
-            data = API.get_cita(cita_id) if hasattr(API, 'get_cita') else None
+            data = API.get_cita(cita_id)
 
         dialog = ctk.CTkToplevel(self)
         dialog.title("Editar Cita" if data else "Nueva Cita")
@@ -149,6 +163,30 @@ class CitasView(ctk.CTkFrame):
         notas = FormText(frame, "Notas", height=60)
         notas.pack(fill="x", pady=2)
 
+        mecanico_opts = [""] + [
+            m.get("nombre", "") for m in self.mecanicos_cache if m.get("nombre")
+        ]
+        mecanico_w = FormCombo(frame, "Mecánico", mecanico_opts)
+        mecanico_w.pack(fill="x", pady=2)
+
+        if data:
+            if data.get("id_cliente"):
+                for c in self.clientes_cache:
+                    if c.get("id") == str(data["id_cliente"]):
+                        cliente_w.set_value(c.get("nombre", ""))
+                        break
+            if data.get("fecha_hora"):
+                try:
+                    dt = datetime.fromisoformat(str(data["fecha_hora"]).replace("Z", "+00:00"))
+                    fecha.set_value(dt.strftime("%Y-%m-%d"))
+                    hora.set_value(dt.strftime("%H:%M"))
+                except (ValueError, TypeError):
+                    pass
+            motivo.set_value(data.get("motivo", ""))
+            notas.set_value(data.get("notas", ""))
+            if data.get("id_mecanico"):
+                mecanico_w.set_value(str(data["id_mecanico"])[:8])
+
         def save():
             cliente_nombre = cliente_w.get_value()
             id_cliente = None
@@ -164,11 +202,17 @@ class CitasView(ctk.CTkFrame):
             except (ValueError, TypeError):
                 return
 
+            mecanico_val = mecanico_w.get_value()
+            id_mecanico = None
+            if mecanico_val:
+                id_mecanico = mecanico_val
+
             payload = {
                 "id_cliente": id_cliente,
                 "fecha_hora": dt.isoformat(),
                 "motivo": motivo.get_value(),
                 "notas": notas.get_value(),
+                "id_mecanico": id_mecanico,
                 "duracion_estimada": 60,
             }
             if cita_id:

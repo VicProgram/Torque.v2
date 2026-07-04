@@ -18,6 +18,21 @@ router = APIRouter()
 ESTADOS_CITA = {"PENDIENTE", "CONFIRMADA", "EN_TALLER", "COMPLETADA", "CANCELADA"}
 
 
+@router.get("/{cita_id}", response_model=CitaResponse)
+def obtener_cita(
+    cita_id: str,
+    user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    cita = db.query(Cita).filter(
+        Cita.id == cita_id,
+        Cita.id_taller == user.id_taller,
+    ).first()
+    if not cita:
+        raise NotFoundException("Cita")
+    return cita
+
+
 @router.get("", response_model=list[CitaResponse])
 def listar_citas(
     fecha_desde: str | None = None,

@@ -324,6 +324,13 @@ class ApiClient:
         except httpx.RequestError:
             return None
 
+    def get_cita(self, cita_id: str) -> dict | None:
+        try:
+            resp = self._request("GET", f"/citas/{cita_id}")
+            return resp.json() if resp.status_code == 200 else None
+        except httpx.RequestError:
+            return None
+
     def delete_cita(self, cita_id: str) -> bool:
         try:
             resp = self._request("DELETE", f"/citas/{cita_id}")

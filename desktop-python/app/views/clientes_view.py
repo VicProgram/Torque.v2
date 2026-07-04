@@ -139,6 +139,8 @@ class ClientesView(ctk.CTkFrame):
         email_w.pack(fill="x", pady=2)
         nif = FormEntry(frame, "NIF")
         nif.pack(fill="x", pady=2)
+        direccion = FormEntry(frame, "Dirección")
+        direccion.pack(fill="x", pady=2)
         notas = FormText(frame, "Notas", height=60)
         notas.pack(fill="x", pady=2)
 
@@ -147,6 +149,7 @@ class ClientesView(ctk.CTkFrame):
             telefono.set_value(data.get("telefono", ""))
             email_w.set_value(data.get("email", ""))
             nif.set_value(data.get("nif", ""))
+            direccion.set_value(data.get("direccion", ""))
             notas.set_value(data.get("notas", ""))
 
         def save():
@@ -155,6 +158,7 @@ class ClientesView(ctk.CTkFrame):
                 "telefono": telefono.get_value(),
                 "email": email_w.get_value(),
                 "nif": nif.get_value(),
+                "direccion": direccion.get_value(),
                 "notas": notas.get_value(),
             }
             if not payload["nombre"]:

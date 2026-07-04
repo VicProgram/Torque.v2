@@ -72,8 +72,8 @@ class VehiculosView(ctk.CTkFrame):
         self.delete_btn.grid(row=0, column=1, padx=5)
 
         self.clientes_cache: list[dict] = []
-        self._load_data()
         self._load_clientes()
+        self._load_data()
 
     def _load_clientes(self):
         self.clientes_cache = API.list_clientes()
@@ -213,7 +213,7 @@ class VehiculosView(ctk.CTkFrame):
                 "matricula": matricula.get_value(),
                 "marca": marca.get_value(),
                 "modelo": modelo.get_value(),
-                "anio": int(anio.get_value()) if anio.get_value().isdigit() else 0,
+                "anio": int(anio.get_value()) if anio.get_value().isdigit() else None,
                 "tipo_vehiculo": tipo.get_value(),
                 "bastidor": bastidor.get_value(),
                 "tipo_combustible": combustible.get_value(),
@@ -221,7 +221,7 @@ class VehiculosView(ctk.CTkFrame):
                 "cilindrada": cilindrada.get_value(),
                 "caballos": caballos.get_value(),
                 "color": color.get_value(),
-                "kilometros": int(kilometros.get_value()) if kilometros.get_value().isdigit() else 0,
+                "kilometros": int(kilometros.get_value()) if kilometros.get_value().isdigit() else None,
             }
             if not payload["marca"] or not payload["modelo"]:
                 return

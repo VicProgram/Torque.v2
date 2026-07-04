@@ -1,32 +1,41 @@
 build:
-  maxIssues: 0
+  maxIssues: 10
 
 complexity:
   CyclomaticComplexMethod:
     threshold: 20
   LongMethod:
-    active: false
+    active: true
+    threshold: 60
   LongParameterList:
-    active: false
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 10
   LargeClass:
-    active: false
+    active: true
+    threshold: 600
 
 style:
   MagicNumber:
-    active: false
+    active: true
+    ignoreNumbers: "-1,0,1,2,100,1000"
   MaxLineLength:
-    active: false
+    active: true
+    maxLineLength: 140
   UnusedPrivateMember:
-    active: false
+    active: true
   WildcardImport:
-    active: false
+    active: true
+    excludeImports:
+      - "org.junit.Assert.*"
+      - "org.mockito.kotlin.*"
 
 naming:
   FunctionNaming:
-    active: false
+    active: true
   TopLevelPropertyNaming:
-    active: false
+    active: true
 
 exceptions:
   TooGenericExceptionCaught:
-    active: false
+    active: true

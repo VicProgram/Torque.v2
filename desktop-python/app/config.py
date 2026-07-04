@@ -17,7 +17,8 @@ class Config:
 
     def save_token(self, token_data: dict):
         os.makedirs(os.path.dirname(self.token_file), exist_ok=True)
-        with open(self.token_file, "w") as f:
+        fd = os.open(self.token_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w") as f:
             json.dump(token_data, f)
 
     def load_token(self) -> dict | None:

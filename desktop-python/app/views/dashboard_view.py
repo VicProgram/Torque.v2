@@ -3,6 +3,7 @@ from tkinter import ttk
 
 from app.api_client import API
 from app.state import STATE
+from app.components.table_widget import configurar_estilo_treeview
 from app.utils.helpers import format_decimal
 
 
@@ -74,24 +75,7 @@ class DashboardView(ctk.CTkFrame):
         self.tree = ttk.Treeview(
             bottom, columns=[c[0] for c in columns], show="headings", height=8
         )
-        style = ttk.Style()
-        style.configure(
-            "Treeview",
-            background="#1C2331",
-            foreground="white",
-            rowheight=30,
-            fieldbackground="#1C2331",
-        )
-        style.configure(
-            "Treeview.Heading",
-            background="#135BEC",
-            foreground="white",
-        )
-        style.map(
-            "Treeview",
-            background=[("selected", "#135BEC")],
-            foreground=[("selected", "white")],
-        )
+        configurar_estilo_treeview()
 
         for col_id, width in columns:
             self.tree.column(col_id, width=width)
@@ -105,8 +89,6 @@ class DashboardView(ctk.CTkFrame):
         scrollbar.grid(row=1, column=1, sticky="ns")
 
         self.tree.bind("<Double-1>", lambda e: on_navigate("ordenes"))
-
-        self.load_data()
 
     def load_data(self):
         resumen = API.dashboard_resumen()

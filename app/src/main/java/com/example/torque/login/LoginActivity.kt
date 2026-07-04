@@ -41,7 +41,7 @@ class LoginActivity : ComponentActivity() {
                                 val api = ApiClient.create(normalised, authManager)
                                 val response = api.loginPin(PinLoginRequest(pin))
                                 if (response.isSuccessful) {
-                                    val data = response.body()!!
+                                    val data = response.body() ?: return@launch
                                     authManager.saveLogin(
                                         token = data.accessToken,
                                         idUsuario = data.idUsuario,
