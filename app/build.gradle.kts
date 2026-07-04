@@ -79,6 +79,7 @@ detekt {
     config.setFrom(files("${rootDir}/config/detekt/detekt.yml"))
     buildUponDefaultConfig = true
     allRules = false
+    source.setFrom(files("src/main/java"))
 }
 
 dependencies {

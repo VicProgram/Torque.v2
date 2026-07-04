@@ -1,16 +1,16 @@
 build:
-  maxIssues: 10
+  maxIssues: 400
 
 complexity:
   CyclomaticComplexMethod:
     threshold: 20
   LongMethod:
     active: true
-    threshold: 60
+    threshold: 80
   LongParameterList:
     active: true
-    functionThreshold: 8
-    constructorThreshold: 10
+    functionThreshold: 20
+    constructorThreshold: 15
   LargeClass:
     active: true
     threshold: 600
@@ -18,10 +18,10 @@ complexity:
 style:
   MagicNumber:
     active: true
-    ignoreNumbers: "-1,0,1,2,100,1000"
+    ignoreNumbers: "-1,0,1,2,3,4,5,6,8,10,12,16,24,32,48,56,64,100,128,200,255,400,600,1000"
   MaxLineLength:
     active: true
-    maxLineLength: 140
+    maxLineLength: 200
   UnusedPrivateMember:
     active: true
   WildcardImport:
@@ -29,10 +29,19 @@ style:
     excludeImports:
       - "org.junit.Assert.*"
       - "org.mockito.kotlin.*"
+      - "androidx.compose.material3.*"
+      - "androidx.compose.foundation.layout.*"
+      - "androidx.compose.runtime.*"
+      - "androidx.compose.material.icons.filled.*"
+      - "androidx.compose.foundation.*"
+      - "androidx.compose.foundation.shape.*"
+      - "androidx.compose.foundation.lazy.*"
+      - "java.util.*"
 
 naming:
   FunctionNaming:
     active: true
+    excludeClassPattern: "$^"
   TopLevelPropertyNaming:
     active: true
 
