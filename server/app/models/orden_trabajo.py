@@ -1,33 +1,32 @@
 from sqlalchemy import (
     Column, String, Text, Integer, Date, DECIMAL, ForeignKey, DateTime,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin
+from app.models.base import UUIDMixin, TimestampMixin, GUID
 
 
 class OrdenTrabajo(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "ordenes_trabajo"
 
     id_taller = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("talleres.id"),
         nullable=False,
     )
     id_vehiculo = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("vehiculos.id"),
         nullable=False,
     )
     id_cliente = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("clientes.id"),
         nullable=True,
     )
     id_mecanico_asignado = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("usuarios.id"),
         nullable=True,
     )
@@ -56,7 +55,7 @@ class OrdenTrabajo(UUIDMixin, TimestampMixin, Base):
     mecanico = relationship("Usuario", backref="ordenes_asignadas")
     detalles = relationship(
         "DetalleTrabajo",
-        backref="orden",
+        backref="orden_trabajo_rel",
         cascade="all, delete-orphan",
         order_by="DetalleTrabajo.orden",
     )

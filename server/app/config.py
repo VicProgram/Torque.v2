@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql://torque:torque@localhost:5432/torque"
+    database_url: str = "sqlite:///./torque.db"
     redis_url: str = "redis://localhost:6379/0"
     secret_key: str = "change-me-to-a-random-secret-key-at-least-32-chars"
     algorithm: str = "HS256"

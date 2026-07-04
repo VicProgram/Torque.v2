@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from pydantic import BaseModel
 
@@ -25,8 +26,8 @@ class ClienteUpdate(BaseModel):
 
 
 class ClienteResponse(ClienteBase):
-    id: str
-    id_taller: str
+    id: uuid.UUID
+    id_taller: uuid.UUID
     creado_en: datetime
     actualizado_en: datetime
 

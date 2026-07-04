@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from decimal import Decimal
 from pydantic import BaseModel
@@ -34,8 +35,8 @@ class AjusteStockRequest(BaseModel):
 
 
 class ArticuloResponse(ArticuloBase):
-    id: str
-    id_taller: str
+    id: uuid.UUID
+    id_taller: uuid.UUID
     creado_en: datetime
     actualizado_en: datetime
 

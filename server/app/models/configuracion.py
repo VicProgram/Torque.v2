@@ -1,16 +1,15 @@
 from sqlalchemy import Column, String, Text, DECIMAL, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin
+from app.models.base import UUIDMixin, GUID
 
 
 class ConfiguracionTaller(UUIDMixin, Base):
     __tablename__ = "configuracion_taller"
 
     id_taller = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("talleres.id"),
         unique=True,
         nullable=False,

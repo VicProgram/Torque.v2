@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from pydantic import BaseModel
 
@@ -28,8 +29,11 @@ class CitaUpdate(BaseModel):
 
 
 class CitaResponse(CitaBase):
-    id: str
-    id_taller: str
+    id: uuid.UUID
+    id_taller: uuid.UUID
+    id_cliente: uuid.UUID | None = None
+    id_vehiculo: uuid.UUID | None = None
+    id_mecanico: uuid.UUID | None = None
     estado: str
     creado_en: datetime
     actualizado_en: datetime

@@ -1,18 +1,17 @@
 from sqlalchemy import (
     Column, String, Text, Integer, DECIMAL, ForeignKey,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin
+from app.models.base import UUIDMixin, GUID
 
 
 class DetalleTrabajo(UUIDMixin, Base):
     __tablename__ = "detalles_trabajo"
 
     id_orden_trabajo = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("ordenes_trabajo.id"),
         nullable=False,
     )

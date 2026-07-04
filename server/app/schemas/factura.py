@@ -1,3 +1,4 @@
+import uuid
 from datetime import date, datetime
 from decimal import Decimal
 from pydantic import BaseModel
@@ -26,8 +27,9 @@ class FacturaUpdate(BaseModel):
 
 
 class FacturaResponse(FacturaBase):
-    id: str
-    id_taller: str
+    id: uuid.UUID
+    id_taller: uuid.UUID
+    id_orden_trabajo: uuid.UUID | None = None
     estado: str
     pdf_url: str = ""
     creado_en: datetime

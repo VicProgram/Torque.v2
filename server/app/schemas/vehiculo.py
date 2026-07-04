@@ -1,3 +1,4 @@
+import uuid
 from datetime import date, datetime
 from pydantic import BaseModel
 
@@ -48,9 +49,9 @@ class VehiculoUpdate(BaseModel):
 
 
 class VehiculoResponse(VehiculoBase):
-    id: str
-    id_taller: str
-    id_cliente: str | None = None
+    id: uuid.UUID
+    id_taller: uuid.UUID
+    id_cliente: uuid.UUID | None = None
     creado_en: datetime
     actualizado_en: datetime
 
@@ -58,9 +59,9 @@ class VehiculoResponse(VehiculoBase):
 
 
 class BuscarMatriculaResponse(BaseModel):
-    id: str
+    id: uuid.UUID
     matricula: str
     marca: str
     modelo: str
     cliente_nombre: str = ""
-    cliente_id: str | None = None
+    cliente_id: uuid.UUID | None = None

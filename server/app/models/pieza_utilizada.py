@@ -1,21 +1,20 @@
 from sqlalchemy import Column, Integer, DECIMAL, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin
+from app.models.base import UUIDMixin, GUID
 
 
 class PiezaUtilizada(UUIDMixin, Base):
     __tablename__ = "piezas_utilizadas"
 
     id_detalle_trabajo = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("detalles_trabajo.id"),
         nullable=False,
     )
     id_articulo = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("articulos.id"),
         nullable=False,
     )

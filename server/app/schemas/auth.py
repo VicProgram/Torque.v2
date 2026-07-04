@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -27,7 +29,7 @@ class RegistroTallerRequest(BaseModel):
 
 
 class UsuarioResponse(BaseModel):
-    id: str
+    id: uuid.UUID
     nombre: str
     email: str
     rol: str

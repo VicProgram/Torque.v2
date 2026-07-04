@@ -1,7 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date, timedelta
+from decimal import Decimal
+
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.database import get_db
 from app.models.orden_trabajo import OrdenTrabajo
@@ -9,8 +12,6 @@ from app.models.cita import Cita
 from app.models.factura import Factura
 from app.models.usuario import Usuario
 from app.api.deps import get_current_user
-from pydantic import BaseModel
-from decimal import Decimal
 
 
 class ResumenDashboard(BaseModel):
@@ -42,6 +43,11 @@ def resumen(
 ):
     id_taller = user.id_taller
     now = datetime.now(timezone.utc)
+    today = date.today()
+    today_start = datetime(today.year, today.month, today.day, tzinfo=timezone.utc)
+    today_end = today_start + timedelta(days=1)
+    month_start = datetime(today.year, today.month, 1, tzinfo=timezone.utc)
+    next_month = month_start.replace(month=month_start.month % 12 + 1) if month_start.month < 12 else month_start.replace(year=month_start.year + 1, month=1)
 
     activas = db.query(func.count(OrdenTrabajo.id)).filter(
         OrdenTrabajo.id_taller == id_taller,
@@ -61,7 +67,8 @@ def resumen(
     completadas_hoy = db.query(func.count(OrdenTrabajo.id)).filter(
         OrdenTrabajo.id_taller == id_taller,
         OrdenTrabajo.estado == "COMPLETADO",
-        func.date(OrdenTrabajo.fecha_completado) == func.current_date(),
+        OrdenTrabajo.fecha_completado >= today_start,
+        OrdenTrabajo.fecha_completado < today_end,
     ).scalar() or 0
 
     proximas = db.query(func.count(Cita.id)).filter(
@@ -72,7 +79,8 @@ def resumen(
 
     hoy = db.query(func.count(Cita.id)).filter(
         Cita.id_taller == id_taller,
-        func.date(Cita.fecha_hora) == func.current_date(),
+        Cita.fecha_hora >= today_start,
+        Cita.fecha_hora < today_end,
     ).scalar() or 0
 
     pendientes = db.query(func.count(Factura.id)).filter(
@@ -83,10 +91,8 @@ def resumen(
     ingresos = db.query(func.coalesce(func.sum(Factura.total), 0)).filter(
         Factura.id_taller == id_taller,
         Factura.estado == "PAGADA",
-        func.extract("month", Factura.fecha_emision)
-        == func.extract("month", func.current_date()),
-        func.extract("year", Factura.fecha_emision)
-        == func.extract("year", func.current_date()),
+        Factura.fecha_emision >= month_start,
+        Factura.fecha_emision < next_month,
     ).scalar() or Decimal("0")
 
     return ResumenDashboard(

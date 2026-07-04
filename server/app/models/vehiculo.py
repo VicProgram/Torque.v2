@@ -1,23 +1,22 @@
 from sqlalchemy import (
     Column, String, Integer, Date, Text, ForeignKey, UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin
+from app.models.base import UUIDMixin, TimestampMixin, GUID
 
 
 class Vehiculo(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "vehiculos"
 
     id_taller = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("talleres.id"),
         nullable=False,
     )
     id_cliente = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("clientes.id"),
         nullable=True,
     )

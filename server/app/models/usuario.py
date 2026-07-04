@@ -2,18 +2,17 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin
+from app.models.base import UUIDMixin, GUID
 
 
 class Usuario(UUIDMixin, Base):
     __tablename__ = "usuarios"
 
     id_taller = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("talleres.id"),
         nullable=False,
     )

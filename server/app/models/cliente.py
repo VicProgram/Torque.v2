@@ -1,16 +1,15 @@
 from sqlalchemy import Column, String, Text, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin
+from app.models.base import UUIDMixin, TimestampMixin, GUID
 
 
 class Cliente(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "clientes"
 
     id_taller = Column(
-        UUID(as_uuid=True),
+        GUID(),
         ForeignKey("talleres.id"),
         nullable=False,
     )

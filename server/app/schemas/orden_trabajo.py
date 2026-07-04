@@ -1,3 +1,4 @@
+import uuid
 from datetime import date, datetime
 from decimal import Decimal
 from pydantic import BaseModel
@@ -30,8 +31,8 @@ class DetalleTrabajoUpdate(BaseModel):
 
 
 class DetalleTrabajoResponse(DetalleTrabajoBase):
-    id: str
-    id_orden_trabajo: str
+    id: uuid.UUID
+    id_orden_trabajo: uuid.UUID
     estado: str
 
     model_config = {"from_attributes": True}
@@ -71,8 +72,11 @@ class CambioEstadoRequest(BaseModel):
 
 
 class OrdenTrabajoResponse(OrdenTrabajoBase):
-    id: str
-    id_taller: str
+    id: uuid.UUID
+    id_taller: uuid.UUID
+    id_vehiculo: uuid.UUID
+    id_cliente: uuid.UUID | None = None
+    id_mecanico_asignado: uuid.UUID | None = None
     estado: str
     diagnostico: str = ""
     presupuesto_total: Decimal | None = None

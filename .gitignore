@@ -34,3 +34,6 @@ env/
 dist/
 *.sqlite3
 test_torque.db
+.env
+*.db-shm
+*.db-wal
