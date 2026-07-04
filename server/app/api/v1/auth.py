@@ -8,6 +8,7 @@ from app.models.usuario import Usuario
 from app.schemas.auth import (
     LoginRequest,
     PinLoginRequest,
+    SetPinRequest,
     TokenResponse,
     RegistroTallerRequest,
     UsuarioResponse,
@@ -126,3 +127,14 @@ def me(user: Usuario = Depends(get_current_user)):
         rol=user.rol,
         activo=user.activo,
     )
+
+
+@router.patch("/me/pin")
+def set_pin(
+    req: SetPinRequest,
+    user: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    user.pin_code = req.pin_code
+    db.commit()
+    return {"mensaje": "PIN actualizado"}

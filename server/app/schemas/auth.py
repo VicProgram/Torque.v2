@@ -1,6 +1,6 @@
 import uuid
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class LoginRequest(BaseModel):
@@ -10,6 +10,10 @@ class LoginRequest(BaseModel):
 
 class PinLoginRequest(BaseModel):
     pin_code: str
+
+
+class SetPinRequest(BaseModel):
+    pin_code: str = Field(min_length=4, max_length=6)
 
 
 class TokenResponse(BaseModel):
