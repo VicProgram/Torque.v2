@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.base.BaseActivity
-import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.ColoresTorque
 import com.example.torque.maintenance.MantenimientoHistorial
 import com.example.torque.maintenance.PlanMantenimiento
 import com.example.torque.maintenance.RegistroMantenimiento

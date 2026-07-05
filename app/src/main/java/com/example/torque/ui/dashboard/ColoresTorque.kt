@@ -1,4 +1,4 @@
-package com.example.torque.components.ui.dashboard
+package com.example.torque.ui.dashboard
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp

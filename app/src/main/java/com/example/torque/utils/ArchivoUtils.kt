@@ -9,6 +9,8 @@ import java.io.File
 import java.io.FileOutputStream
 
 object ArchivoUtils {
+    private const val CALIDAD_COMPRESION_JPEG = 75
+
     fun copiarImagenAInterno(contexto: Context, uri: Uri, comprimir: Boolean = true): String? {
         return try {
             val nombreArchivo = obtenerNombreArchivo(contexto, uri) ?: "img_${System.currentTimeMillis()}.jpg"
@@ -26,7 +28,7 @@ object ArchivoUtils {
             val bitmap = BitmapFactory.decodeStream(entrada)
             if (bitmap != null) {
                 FileOutputStream(archivo).use { salida ->
-                    bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 75, salida)
+                    bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, CALIDAD_COMPRESION_JPEG, salida)
                 }
                 bitmap.recycle()
             } else {

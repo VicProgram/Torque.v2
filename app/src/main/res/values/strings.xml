@@ -402,6 +402,18 @@
     <!-- Units -->
     <string name="km_unit"> km</string>
 
+    <!-- Server Connection -->
+    <string name="server_section">CONEXIÓN AL SERVIDOR</string>
+    <string name="server_url">URL del servidor</string>
+    <string name="server_url_subtitle">Dirección del servidor del taller</string>
+    <string name="server_test_connection">Probar conexión</string>
+    <string name="server_test_connection_subtitle">Verificar que el servidor responde</string>
+    <string name="dialog_server_title">Configurar servidor</string>
+    <string name="dialog_server_url_label">URL del servidor</string>
+    <string name="toast_server_test_success">Conexión exitosa ✔</string>
+    <string name="toast_server_test_error">Error de conexión: %s</string>
+    <string name="btn_test">Probar</string>
+
     <!-- Shared -->
     <string name="pdf_dash">—</string>
 

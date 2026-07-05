@@ -12,7 +12,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Torque"
         android:theme="@style/Theme.TorqueLight"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="false">
 
         <!-- Desactivar auto-init de Sentry (lo inicializamos manualmente en TorqueApp) -->
         <meta-data

@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.cita import Cita
+from app.models.vehiculo import Vehiculo
+from app.models.cliente import Cliente
 from app.models.usuario import Usuario
 from app.schemas.cita import (
     CitaCreate,
@@ -18,6 +20,47 @@ router = APIRouter()
 ESTADOS_CITA = {"PENDIENTE", "CONFIRMADA", "EN_TALLER", "COMPLETADA", "CANCELADA"}
 
 
+def _cita_to_response(cita: Cita, db: Session) -> CitaResponse:
+    cliente_nombre = ""
+    vehiculo_matricula = ""
+    vehiculo_marca = ""
+    vehiculo_modelo = ""
+    mecanico_nombre = ""
+    if cita.id_cliente:
+        c = db.query(Cliente).filter(Cliente.id == cita.id_cliente).first()
+        if c:
+            cliente_nombre = c.nombre or ""
+    if cita.id_vehiculo:
+        v = db.query(Vehiculo).filter(Vehiculo.id == cita.id_vehiculo).first()
+        if v:
+            vehiculo_matricula = v.matricula or ""
+            vehiculo_marca = v.marca or ""
+            vehiculo_modelo = v.modelo or ""
+    if cita.id_mecanico:
+        m = db.query(Usuario).filter(Usuario.id == cita.id_mecanico).first()
+        if m:
+            mecanico_nombre = m.nombre or ""
+    return CitaResponse(
+        id=cita.id,
+        id_taller=cita.id_taller,
+        id_cliente=cita.id_cliente,
+        id_vehiculo=cita.id_vehiculo,
+        id_mecanico=cita.id_mecanico,
+        cliente_nombre=cliente_nombre,
+        vehiculo_matricula=vehiculo_matricula,
+        vehiculo_marca=vehiculo_marca,
+        vehiculo_modelo=vehiculo_modelo,
+        mecanico_nombre=mecanico_nombre,
+        fecha_hora=cita.fecha_hora,
+        duracion_estimada=cita.duracion_estimada,
+        motivo=cita.motivo or "",
+        notas=cita.notas or "",
+        estado=cita.estado,
+        creado_en=cita.creado_en,
+        actualizado_en=cita.actualizado_en,
+    )
+
+
 @router.get("/{cita_id}", response_model=CitaResponse)
 def obtener_cita(
     cita_id: str,
@@ -30,7 +73,7 @@ def obtener_cita(
     ).first()
     if not cita:
         raise NotFoundException("Cita")
-    return cita
+    return _cita_to_response(cita, db)
 
 
 @router.get("", response_model=list[CitaResponse])
@@ -56,7 +99,7 @@ def listar_citas(
     query = query.order_by(Cita.fecha_hora).offset(
         (pagina - 1) * por_pagina
     ).limit(por_pagina)
-    return query.all()
+    return [_cita_to_response(c, db) for c in query.all()]
 
 
 @router.post("", response_model=CitaResponse, status_code=201)
@@ -69,7 +112,7 @@ def crear_cita(
     db.add(cita)
     db.commit()
     db.refresh(cita)
-    return cita
+    return _cita_to_response(cita, db)
 
 
 @router.put("/{cita_id}", response_model=CitaResponse)
@@ -89,7 +132,7 @@ def actualizar_cita(
         setattr(cita, key, value)
     db.commit()
     db.refresh(cita)
-    return cita
+    return _cita_to_response(cita, db)
 
 
 @router.patch("/{cita_id}/estado", response_model=CitaResponse)
@@ -115,7 +158,7 @@ def cambiar_estado_cita(
     cita.estado = estado
     db.commit()
     db.refresh(cita)
-    return cita
+    return _cita_to_response(cita, db)
 
 
 @router.delete("/{cita_id}", response_model=Mensaje)

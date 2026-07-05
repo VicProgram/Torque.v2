@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.ColoresTorque
 
 @Composable
 fun FilaAjusteConSwitch(

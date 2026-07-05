@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.orden_trabajo import OrdenTrabajo
 from app.models.detalle_trabajo import DetalleTrabajo
+from app.models.vehiculo import Vehiculo
+from app.models.cliente import Cliente
 from app.models.usuario import Usuario
 from app.schemas.orden_trabajo import (
     OrdenTrabajoCreate,
@@ -28,7 +30,7 @@ ESTADOS_VALIDOS = {
 }
 
 
-def _orden_to_response(orden: OrdenTrabajo) -> OrdenTrabajoResponse:
+def _orden_to_response(orden: OrdenTrabajo, db: Session | None = None) -> OrdenTrabajoResponse:
     detalles = [
         DetalleTrabajoResponse(
             id=str(d.id),
@@ -45,12 +47,40 @@ def _orden_to_response(orden: OrdenTrabajo) -> OrdenTrabajoResponse:
         )
         for d in orden.detalles
     ]
+
+    vehiculo_matricula = ""
+    vehiculo_marca = ""
+    vehiculo_modelo = ""
+    cliente_nombre = ""
+    mecanico_nombre = ""
+
+    if db:
+        if orden.id_vehiculo:
+            v = db.query(Vehiculo).filter(Vehiculo.id == orden.id_vehiculo).first()
+            if v:
+                vehiculo_matricula = v.matricula or ""
+                vehiculo_marca = v.marca or ""
+                vehiculo_modelo = v.modelo or ""
+        if orden.id_cliente:
+            c = db.query(Cliente).filter(Cliente.id == orden.id_cliente).first()
+            if c:
+                cliente_nombre = c.nombre or ""
+        if orden.id_mecanico_asignado:
+            m = db.query(Usuario).filter(Usuario.id == orden.id_mecanico_asignado).first()
+            if m:
+                mecanico_nombre = m.nombre or ""
+
     return OrdenTrabajoResponse(
         id=str(orden.id),
         id_taller=str(orden.id_taller),
         id_vehiculo=str(orden.id_vehiculo),
         id_cliente=str(orden.id_cliente) if orden.id_cliente else None,
         id_mecanico_asignado=str(orden.id_mecanico_asignado) if orden.id_mecanico_asignado else None,
+        vehiculo_matricula=vehiculo_matricula,
+        vehiculo_marca=vehiculo_marca,
+        vehiculo_modelo=vehiculo_modelo,
+        cliente_nombre=cliente_nombre,
+        mecanico_nombre=mecanico_nombre,
         estado=orden.estado,
         descripcion_problema=orden.descripcion_problema or "",
         diagnostico=orden.diagnostico or "",
@@ -90,7 +120,7 @@ def listar_ordenes(
     query = query.order_by(OrdenTrabajo.creado_en.desc()).offset(
         (pagina - 1) * por_pagina
     ).limit(por_pagina)
-    return [_orden_to_response(o) for o in query.all()]
+    return [_orden_to_response(o, db) for o in query.all()]
 
 
 @router.post("", response_model=OrdenTrabajoResponse, status_code=201)
@@ -107,7 +137,7 @@ def crear_orden(
     db.add(orden)
     db.commit()
     db.refresh(orden)
-    return _orden_to_response(orden)
+    return _orden_to_response(orden, db)
 
 
 @router.get("/{orden_id}", response_model=OrdenTrabajoResponse)
@@ -122,7 +152,7 @@ def obtener_orden(
     ).first()
     if not orden:
         raise NotFoundException("Orden de trabajo")
-    return _orden_to_response(orden)
+    return _orden_to_response(orden, db)
 
 
 @router.put("/{orden_id}", response_model=OrdenTrabajoResponse)
@@ -142,7 +172,7 @@ def actualizar_orden(
         setattr(orden, key, value)
     db.commit()
     db.refresh(orden)
-    return _orden_to_response(orden)
+    return _orden_to_response(orden, db)
 
 
 @router.patch("/{orden_id}/estado", response_model=OrdenTrabajoResponse)
@@ -191,7 +221,7 @@ def cambiar_estado_orden(
     except RuntimeError:
         pass
 
-    return _orden_to_response(orden)
+    return _orden_to_response(orden, db)
 
 
 @router.post("/{orden_id}/detalles", response_model=DetalleTrabajoResponse, status_code=201)

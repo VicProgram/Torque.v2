@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 
 import com.example.torque.R
-import com.example.torque.components.ui.dashboard.ColoresTorque
-import com.example.torque.components.ui.dashboard.FiltroChip
+import com.example.torque.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme

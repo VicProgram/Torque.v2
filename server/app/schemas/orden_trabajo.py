@@ -77,6 +77,11 @@ class OrdenTrabajoResponse(OrdenTrabajoBase):
     id_vehiculo: uuid.UUID
     id_cliente: uuid.UUID | None = None
     id_mecanico_asignado: uuid.UUID | None = None
+    vehiculo_matricula: str = ""
+    vehiculo_marca: str = ""
+    vehiculo_modelo: str = ""
+    cliente_nombre: str = ""
+    mecanico_nombre: str = ""
     estado: str
     diagnostico: str = ""
     presupuesto_total: Decimal | None = None

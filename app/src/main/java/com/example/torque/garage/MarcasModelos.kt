@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.ColoresTorque
 import com.example.torque.utils.TipoVehiculo
 
 object MarcasModelos {

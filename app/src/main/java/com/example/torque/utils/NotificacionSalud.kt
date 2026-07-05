@@ -20,6 +20,7 @@ object NotificacionSalud {
 
     private const val CANAL_MANTENIMIENTO = "mantenimiento_vencimiento"
     private const val TAG_NOTIFICADOS = "notificaciones_enviadas"
+    private const val UMBRAL_PORCENTAJE_WARNING = 20
 
     private val ClaveNotificados = stringPreferencesKey(TAG_NOTIFICADOS)
 
@@ -80,7 +81,7 @@ object NotificacionSalud {
         val claveWarning = "${tipoId}_warning"
         val claveExpired = "${tipoId}_expired"
 
-        if (cumplimiento in 1..20 && claveWarning !in yaNotificados) {
+        if (cumplimiento in 1..UMBRAL_PORCENTAJE_WARNING && claveWarning !in yaNotificados) {
             mostrarNotificacion(
                 contexto = contexto,
                 id = (tipoId * 10 + 1).toInt(),

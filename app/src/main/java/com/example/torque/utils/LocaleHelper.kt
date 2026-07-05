@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import java.util.Locale
 
-object LocaleHelper {
+object AyudaIdioma {
 
     private const val PREFS_NAME = "locale_prefs"
     private const val KEY_LANGUAGE = "language_code"

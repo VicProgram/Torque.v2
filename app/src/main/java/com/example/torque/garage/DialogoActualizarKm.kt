@@ -11,8 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.example.torque.R
-import com.example.torque.components.ui.dashboard.ColoresTorque
-import com.example.torque.components.ui.dashboard.DialogoTorque
+import com.example.torque.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.DialogoTorque
 
 @Composable
 fun DialogoActualizarKm(

@@ -34,6 +34,11 @@ class CitaResponse(CitaBase):
     id_cliente: uuid.UUID | None = None
     id_vehiculo: uuid.UUID | None = None
     id_mecanico: uuid.UUID | None = None
+    cliente_nombre: str = ""
+    vehiculo_matricula: str = ""
+    vehiculo_marca: str = ""
+    vehiculo_modelo: str = ""
+    mecanico_nombre: str = ""
     estado: str
     creado_en: datetime
     actualizado_en: datetime

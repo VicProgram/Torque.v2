@@ -30,8 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.torque.components.ui.dashboard.ColoresTorque
-import com.example.torque.components.ui.dashboard.EncabezadoDeSeccion
+import com.example.torque.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.EncabezadoDeSeccion
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity

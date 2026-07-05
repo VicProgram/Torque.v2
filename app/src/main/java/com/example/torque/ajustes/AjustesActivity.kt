@@ -25,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
@@ -55,11 +57,13 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import com.example.torque.R
 import com.example.torque.base.BaseActivity
-import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.network.ApiClient
+import com.example.torque.network.AuthManager
+import com.example.torque.ui.dashboard.ColoresTorque
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.ajustes.AjustesRepositorio
 import com.example.torque.utils.BackupManager
-import com.example.torque.utils.LocaleHelper
+import com.example.torque.utils.AyudaIdioma
 
 class AjustesActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,11 +83,14 @@ fun AjustesScreen(onBack: () -> Unit) {
     val repo = AjustesRepositorio(context.dataStore)
     val coroutineScope = rememberCoroutineScope()
 
+    val authManager = remember { AuthManager.getInstance(context) }
     val notificacionesActivadas by repo.notificacionesActivadasFlow.collectAsState(initial = true)
     val modoOscuroActivado by repo.modoOscuroActivadoFlow.collectAsState(initial = true)
     val idiomaActual by repo.idiomaFlow.collectAsState(initial = "es")
+    val serverUrl by authManager.serverUrlFlow.collectAsState(initial = AuthManager.DEFAULT_SERVER_URL)
     var mostrarDialogoIdioma by remember { mutableStateOf(false) }
     var mostrarDialogoRestaurar by remember { mutableStateOf(false) }
+    var mostrarDialogoServer by remember { mutableStateOf(false) }
     var uriRestaurar by remember { mutableStateOf<Uri?>(null) }
     var restaurando by remember { mutableStateOf(false) }
 
@@ -199,6 +206,45 @@ fun AjustesScreen(onBack: () -> Unit) {
                     onClick = { seleccionarBackup.launch(arrayOf("application/zip")) },
                     habilitado = !restaurando
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.server_section),
+                    color = ColoresTorque.Primary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
+                )
+
+                FilaAjusteConValor(
+                    icono = Icons.Default.Computer,
+                    titulo = stringResource(R.string.server_url),
+                    subtitulo = stringResource(R.string.server_url_subtitle),
+                    valor = serverUrl.removePrefix("http://").removePrefix("https://").take(25),
+                    onClick = { mostrarDialogoServer = true }
+                )
+
+                FilaAjusteAccion(
+                    icono = Icons.Default.CheckCircle,
+                    titulo = stringResource(R.string.server_test_connection),
+                    subtitulo = stringResource(R.string.server_test_connection_subtitle),
+                    onClick = {
+                        coroutineScope.launch {
+                            val normalised = serverUrl.trimEnd('/') + "/"
+                            val api = ApiClient.create(normalised, authManager)
+                            try {
+                                val response = api.getMe()
+                                if (response.isSuccessful) {
+                                    Toast.makeText(context, context.getString(R.string.toast_server_test_success), Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.toast_server_test_error, "HTTP ${response.code()}"), Toast.LENGTH_LONG).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(context, context.getString(R.string.toast_server_test_error, e.localizedMessage ?: "Error"), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                )
             }
         }
 
@@ -210,7 +256,7 @@ fun AjustesScreen(onBack: () -> Unit) {
                     mostrarDialogoIdioma = false
                     coroutineScope.launch {
                         repo.establecerIdioma(codigo)
-                        LocaleHelper.setLanguage(context, codigo)
+                        AyudaIdioma.setLanguage(context, codigo)
                         Toast.makeText(context, context.getString(if (codigo == "es") R.string.language_spanish else R.string.language_english), Toast.LENGTH_SHORT).show()
                         (context as? android.app.Activity)?.recreate()
                     }
@@ -235,6 +281,19 @@ fun AjustesScreen(onBack: () -> Unit) {
                                 restaurando = false
                             }
                         }
+                    }
+                }
+            )
+        }
+
+        if (mostrarDialogoServer) {
+            DialogoConfigurarServidor(
+                urlActual = serverUrl,
+                onDismiss = { mostrarDialogoServer = false },
+                onConfirmar = { nuevaUrl ->
+                    mostrarDialogoServer = false
+                    coroutineScope.launch {
+                        authManager.saveServerUrl(nuevaUrl.trimEnd('/'))
                     }
                 }
             )

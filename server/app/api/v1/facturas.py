@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.factura import Factura
+from app.models.orden_trabajo import OrdenTrabajo
+from app.models.vehiculo import Vehiculo
+from app.models.cliente import Cliente
 from app.models.usuario import Usuario
 from app.schemas.factura import (
     FacturaCreate,
@@ -14,6 +17,42 @@ from app.api.deps import get_current_user
 from app.core.exceptions import NotFoundException
 
 router = APIRouter()
+
+
+def _factura_to_response(factura: Factura, db: Session) -> FacturaResponse:
+    orden_vehiculo = ""
+    orden_cliente = ""
+    if factura.id_orden_trabajo:
+        orden = db.query(OrdenTrabajo).filter(
+            OrdenTrabajo.id == factura.id_orden_trabajo
+        ).first()
+        if orden:
+            if orden.id_vehiculo:
+                v = db.query(Vehiculo).filter(Vehiculo.id == orden.id_vehiculo).first()
+                if v:
+                    orden_vehiculo = f"{v.matricula} {v.marca} {v.modelo}".strip()
+            if orden.id_cliente:
+                c = db.query(Cliente).filter(Cliente.id == orden.id_cliente).first()
+                if c:
+                    orden_cliente = c.nombre or ""
+    return FacturaResponse(
+        id=factura.id,
+        id_taller=factura.id_taller,
+        id_orden_trabajo=factura.id_orden_trabajo,
+        orden_vehiculo=orden_vehiculo,
+        orden_cliente=orden_cliente,
+        numero_factura=factura.numero_factura,
+        fecha_emision=factura.fecha_emision,
+        fecha_vencimiento=factura.fecha_vencimiento,
+        base_imponible=factura.base_imponible,
+        iva=factura.iva,
+        total=factura.total,
+        metodo_pago=factura.metodo_pago or "",
+        notas=factura.notas or "",
+        estado=factura.estado,
+        pdf_url=factura.pdf_url or "",
+        creado_en=factura.creado_en,
+    )
 
 
 @router.get("", response_model=list[FacturaResponse])
@@ -30,7 +69,7 @@ def listar_facturas(
     query = query.order_by(Factura.fecha_emision.desc()).offset(
         (pagina - 1) * por_pagina
     ).limit(por_pagina)
-    return query.all()
+    return [_factura_to_response(f, db) for f in query.all()]
 
 
 @router.post("", response_model=FacturaResponse, status_code=201)
@@ -43,7 +82,7 @@ def crear_factura(
     db.add(factura)
     db.commit()
     db.refresh(factura)
-    return factura
+    return _factura_to_response(factura, db)
 
 
 @router.get("/{factura_id}", response_model=FacturaResponse)
@@ -58,7 +97,7 @@ def obtener_factura(
     ).first()
     if not factura:
         raise NotFoundException("Factura")
-    return factura
+    return _factura_to_response(factura, db)
 
 
 @router.patch("/{factura_id}", response_model=FacturaResponse)
@@ -78,4 +117,4 @@ def actualizar_factura(
         setattr(factura, key, value)
     db.commit()
     db.refresh(factura)
-    return factura
+    return _factura_to_response(factura, db)

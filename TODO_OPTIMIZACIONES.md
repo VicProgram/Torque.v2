@@ -6,22 +6,22 @@
 - [ ] **Galería de fotos — mejorar gestión** — Ver, eliminar y reordenar fotos desde detalle de moto.
 - [ ] **Strings hardcoded** — ~50+ strings en 8+ archivos sin extraer a `strings.xml`. Archivos: `AjustesActivity.kt`, `PerfilActivity.kt`, `OpcionesMantenimiento.kt`, `MantenimientoHistorial.kt`, `RegistroMantenimiento.kt`, `NotificacionSalud.kt`, `ListaGaraje.kt`, `FormularioMantenimiento.kt`, `TorqueDashboardScreen.kt`, `CabeceraDashboard.kt`.
 - [ ] **Duplicación tareas: `RegistroMantenimiento.kt` vs `TiposMantenimiento.kt`** — Unificar fuentes de datos.
-- [ ] **Mover `ContextUtils.kt` y `FileUtils.kt` de `:data` a `:app`** — Tienen dependencias Android, violan clean architecture.
+- [x] **Mover `ContextUtils.kt` y `FileUtils.kt` de `:data` a `:app`** — Tienen dependencias Android, violan clean architecture. ✅ Ya están en `:app`.
 - [ ] **Mover `PerfilRepository.kt` de `:app` a `:data`** — Es capa de datos, debería estar en módulo data.
 - [ ] **Mover `Context.dataStore` de `AjustesRepository.kt` a `:app`** — Extension property con contexto Android.
-- [ ] **Package no estándar: `components.ui.dashboard`** — Mover a `ui.dashboard` (convención estándar).
-- [ ] **Nombres mixtos español/inglés** — Decidir idioma y unificar (ej: `DialogoKm` vs `DialogoActualizarKm`, `FiltroChip` mixto).
-- [ ] **`FileUtils.kt` en data acopla Android** — Mover a app o abstraer dependency inversion.
-- [ ] **Servidor: ordenes endpoint con datos embebidos** — `/ordenes` devuelve UUIDs en vez de nombres de vehículo/mecánico. Añadir joins/serializers.
+- [x] **Package no estándar: `components.ui.dashboard`** — Mover a `ui.dashboard` (convención estándar). ✅ Hecho.
+- [x] **Nombres mixtos español/inglés** — Unificado (`LocaleHelper` → `AyudaIdioma`). El resto (ViewModel, Dashboard) son convenciones estándar. ✅
+- [x] **`FileUtils.kt` en data acopla Android** — Mover a app o abstraer dependency inversion. ✅ Ya está en `:app`.
+- [x] **Servidor: ordenes endpoint con datos embebidos** — Añadidos campos resueltos (`vehiculo_matricula`, `cliente_nombre`, `mecanico_nombre`, etc.) en /ordenes, /citas, /facturas. ✅
 
 ## 🟡 Media prioridad
 
-- [ ] **Limpiar 6 warnings de detekt** — Quedan 6 issues menores:
-  - `MarcasModelosCoche.kt:34` — MaxLineLength (>200)
-  - `AnadirMotoActivity.kt:36` — WildcardImport (`components.ui.dashboard.*`)
-  - `AnadirMotoActivity.kt:254,378` — MaxLineLength (>200)
-  - `NotificacionSalud.kt:83` — MagicNumber
-  - `ArchivoUtils.kt:29` — MagicNumber
+- [x] **Limpiar 6 warnings de detekt** — ✅ Resueltos:
+  - `MarcasModelosCoche.kt:34` — MaxLineBreak aplicado
+  - `AnadirMotoActivity.kt:36` — WildcardImport reemplazado por imports explícitos
+  - `AnadirMotoActivity.kt:254,378` — Líneas partidas en múltiples
+  - `NotificacionSalud.kt:83` — MagicNumber extraído a constante
+  - `ArchivoUtils.kt:29` — MagicNumber extraído a constante
 - [ ] **Sentry DSN: placeholder en `.env.example`** — Actualizar con instrucciones claras.
 - [ ] **Documentar `SENTRY_DSN` en README/dev guide** — Para que otros desarrolladores sepan configurarlo.
 

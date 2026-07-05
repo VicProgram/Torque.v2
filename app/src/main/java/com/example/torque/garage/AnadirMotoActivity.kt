@@ -33,7 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
-import com.example.torque.components.ui.dashboard.*
+import com.example.torque.ui.dashboard.BotonTorque
+import com.example.torque.ui.dashboard.ColoresTorque
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
@@ -251,7 +252,11 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
     var tipoTransmision by remember { mutableStateOf("") }
     var numeroPuertas by remember { mutableStateOf("") }
 
-    val hayCambios = hayCambiosEnFormulario(marca, modelo, anio, matricula, cilindrada, caballos, estilo, kilometros, uriImagen, esPrincipal, fechaItv, fechaSeguro, tipoCarroceria, tipoCombustible, tipoTransmision, numeroPuertas)
+    val hayCambios = hayCambiosEnFormulario(
+        marca, modelo, anio, matricula, cilindrada, caballos, estilo,
+        kilometros, uriImagen, esPrincipal, fechaItv, fechaSeguro,
+        tipoCarroceria, tipoCombustible, tipoTransmision, numeroPuertas
+    )
 
     LaunchedEffect(idMoto) {
         if (editando && idMoto != -1L) {
@@ -375,7 +380,14 @@ fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
                         return@BotonTorque
                     }
                     scope.launch {
-                        guardarMoto(editando, idMoto, contexto, repositorio, marca, modelo, anio, matricula, kilometros, cilindrada, caballos, estilo, uriImagen, fotoActual, esPrincipal, fechaItv, fechaSeguro, tipoVehiculo, tipoCarroceria, tipoCombustible, tipoTransmision, numeroPuertas)
+                        guardarMoto(
+                            editando, idMoto, contexto, repositorio,
+                            marca, modelo, anio, matricula, kilometros,
+                            cilindrada, caballos, estilo, uriImagen,
+                            fotoActual, esPrincipal, fechaItv, fechaSeguro,
+                            tipoVehiculo, tipoCarroceria, tipoCombustible,
+                            tipoTransmision, numeroPuertas
+                        )
                     }
                 }
             )

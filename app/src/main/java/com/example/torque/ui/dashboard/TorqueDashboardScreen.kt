@@ -1,4 +1,4 @@
-package com.example.torque.components.ui.dashboard
+package com.example.torque.ui.dashboard
 
 import android.Manifest
 import android.content.Intent

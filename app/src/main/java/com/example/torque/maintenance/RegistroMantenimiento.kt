@@ -31,7 +31,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.torque.R
-import com.example.torque.components.ui.dashboard.*
+import com.example.torque.ui.dashboard.BotonTorque
+import com.example.torque.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.ElementoCheckMotoKeep
+import com.example.torque.ui.dashboard.EncabezadoDeSeccion
+import com.example.torque.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.TipoVehiculo

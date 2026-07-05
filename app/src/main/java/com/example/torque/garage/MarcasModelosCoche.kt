@@ -31,7 +31,12 @@ object MarcasModelosCoche {
         "Suzuki" to listOf("Swift", "Swift Sport", "Baleno", "Ignis", "S-Cross", "Vitara", "Jimny", "Across", "Swace", "Splash", "Alto"),
         "Tesla" to listOf("Model 3", "Model Y", "Model S", "Model X", "Roadster", "Cybertruck"),
         "Toyota" to listOf("Aygo", "Aygo X", "Yaris", "Yaris Cross", "Corolla", "Corolla Cross", "Prius", "C-HR", "bZ4X", "Rav4", "Highlander", "Land Cruiser", "Hilux", "Proace", "Supra", "GR86", "Mirai", "Camry", "Celica", "MR2"),
-        "Volkswagen" to listOf("Polo", "Golf", "ID.3", "ID.4", "ID.5", "ID.7", "ID. Buzz", "T-Cross", "T-Roc", "Taigo", "Tiguan", "Touareg", "Passat", "Arteon", "Scirocco", "Beetle", "Sharan", "Touran", "Caddy", "Multivan", "Amarok", "Lupo", "Up!"),
+        "Volkswagen" to listOf(
+            "Polo", "Golf", "ID.3", "ID.4", "ID.5", "ID.7", "ID. Buzz",
+            "T-Cross", "T-Roc", "Taigo", "Tiguan", "Touareg", "Passat",
+            "Arteon", "Scirocco", "Beetle", "Sharan", "Touran", "Caddy",
+            "Multivan", "Amarok", "Lupo", "Up!"
+        ),
         "Volvo" to listOf("XC40", "C40", "XC60", "XC90", "S60", "S90", "V60", "V90", "EX30", "EX90", "C30", "S40", "V40", "V50", "850"),
     )
 

@@ -1,4 +1,4 @@
-package com.example.torque.components.ui.dashboard
+package com.example.torque.ui.dashboard
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

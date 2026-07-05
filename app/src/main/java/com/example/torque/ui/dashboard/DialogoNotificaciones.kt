@@ -1,4 +1,4 @@
-package com.example.torque.components.ui.dashboard
+package com.example.torque.ui.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

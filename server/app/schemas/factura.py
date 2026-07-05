@@ -30,6 +30,8 @@ class FacturaResponse(FacturaBase):
     id: uuid.UUID
     id_taller: uuid.UUID
     id_orden_trabajo: uuid.UUID | None = None
+    orden_vehiculo: str = ""
+    orden_cliente: str = ""
     estado: str
     pdf_url: str = ""
     creado_en: datetime

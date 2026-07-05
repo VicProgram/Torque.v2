@@ -1,4 +1,4 @@
-package com.example.torque.components.ui.dashboard
+package com.example.torque.ui.dashboard
 
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults

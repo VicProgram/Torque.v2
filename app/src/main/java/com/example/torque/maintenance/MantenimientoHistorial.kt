@@ -50,8 +50,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
-import com.example.torque.components.ui.dashboard.ColoresTorque
-import com.example.torque.components.ui.dashboard.FiltroChip
+import com.example.torque.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.FiltroChip
 import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.FotoMantenimientoEntity
 import com.example.torque.room.entity.MantenimientoEntity

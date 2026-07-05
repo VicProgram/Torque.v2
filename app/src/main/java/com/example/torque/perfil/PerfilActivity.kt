@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.vector.ImageVector
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.ajustes.dataStore
-import com.example.torque.components.ui.dashboard.ColoresTorque
-import com.example.torque.components.ui.dashboard.CampoTextoTorque
+import com.example.torque.ui.dashboard.ColoresTorque
+import com.example.torque.ui.dashboard.CampoTextoTorque
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.utils.ArchivoUtils
 import kotlinx.coroutines.launch

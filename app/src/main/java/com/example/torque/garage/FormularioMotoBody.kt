@@ -25,7 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
-import com.example.torque.components.ui.dashboard.*
+import com.example.torque.ui.dashboard.CampoTextoTorque
+import com.example.torque.ui.dashboard.ColoresTorque
 import com.example.torque.utils.TipoVehiculo
 
 @Composable
