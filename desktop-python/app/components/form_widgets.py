@@ -52,6 +52,9 @@ class FormCombo(FormField):
         elif self.combo.cget("values"):
             self.combo.set(self.combo.cget("values")[0])
 
+    def configure(self, **kwargs):
+        self.combo.configure(**kwargs)
+
 
 class FormText(FormField):
     def __init__(self, master, label: str, height: int = 80, **kwargs):

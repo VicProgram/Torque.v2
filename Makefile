@@ -13,6 +13,7 @@ help:
 	@echo "║ make lint         ─ Analizar código (detek)║"
 	@echo "║ make clean        ─ Limpiar archivos temp ║"
 	@echo "║ make seed         ─ Sembrar datos demo    ║"
+	@echo "║ make seed-marcas  ─ Catálogo marcas/modelos║"
 	@echo "╚══════════════════════════════════════════╝"
 
 install:
@@ -50,6 +51,11 @@ seed:
 	[requests.post(f'{BASE}/clientes', headers=h, json=c) for c in [{'nombre':'Juan Pérez','telefono':'612345678'},{'nombre':'María García','telefono':'611111111'}]]; \
 	[requests.post(f'{BASE}/articulos', headers=h, json=a) for a in [{'nombre':'Aceite 10W40','sku':'ACE-001','cantidad_stock':20,'precio_venta':12.5},{'nombre':'Filtro Aceite','sku':'FIL-001','cantidad_stock':15,'precio_venta':8.0}]]; \
 	print('Datos demo creados')"
+
+seed-marcas:
+	@echo "==> Sembrando catálogo de marcas y modelos..."
+	cd server && . venv/bin/activate && python3 scripts/seed_marcas.py
+	@echo "OK"
 
 lint:
 	@echo "==> Ejecutando detekt..."

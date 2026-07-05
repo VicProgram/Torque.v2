@@ -11,6 +11,7 @@ from app.models.cita import Cita
 from app.models.factura import Factura
 from app.models.configuracion import ConfiguracionTaller
 from app.models.archivo import Archivo
+from app.models.marca_modelo import MarcaVehiculo, ModeloVehiculo
 
 __all__ = [
     "Base",
@@ -26,4 +27,6 @@ __all__ = [
     "Factura",
     "ConfiguracionTaller",
     "Archivo",
+    "MarcaVehiculo",
+    "ModeloVehiculo",
 ]

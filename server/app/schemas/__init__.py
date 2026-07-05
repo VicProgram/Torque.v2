@@ -6,3 +6,4 @@ from app.schemas.articulo import *
 from app.schemas.cita import *
 from app.schemas.factura import *
 from app.schemas.common import *
+from app.schemas.marca_modelo import *

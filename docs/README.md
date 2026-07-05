@@ -132,6 +132,7 @@ Torque.v2/
 | Tests server | `make test-server` | `.\dev.ps1 test` |
 | Tests desktop | `make test-desktop` | (incluido en test) |
 | Datos demo | `make seed` | `.\dev.ps1 seed` |
+| Sembrar marcas/modelos | `make seed-marcas` | `python server/scripts/seed_marcas.py` |
 | Compilar Android | `./gradlew assembleDebug` | `./gradlew assembleDebug` |
 | Análisis estático | `make lint` | `./gradlew detekt` |
 
@@ -164,6 +165,10 @@ Con el servidor corriendo, abrir http://localhost:8000/docs para Swagger UI.
 - `GET/DELETE /api/v1/facturas/{id}` — CRUD factura
 - `GET /api/v1/dashboard` — KPIs del taller
 
+### Catálogo de Vehículos
+- `GET /api/v1/marcas?tipo=MOTO|COCHE` — Lista marcas disponibles (47 moto, 31 coche)
+- `GET /api/v1/marcas/{id}/modelos` — Lista modelos de una marca (1383 modelos total)
+
 ---
 
 ## Tests
@@ -190,6 +195,8 @@ Contraseña: `demo1234`
 PIN: `1234`
 
 O ejecutar `make seed` (o `.\dev.ps1 seed`) con el servidor corriendo para crear datos de ejemplo.
+
+Para sembrar el catálogo de marcas y modelos de vehículos, ejecutar `make seed-marcas` (idempotente — no duplica datos).
 
 ---
 

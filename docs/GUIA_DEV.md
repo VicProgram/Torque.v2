@@ -1285,9 +1285,10 @@ server/
 │   │   ├── cita.py          # Agenda
 │   │   ├── factura.py       # Facturación
 │   │   ├── configuracion.py # Configuración del taller
-│   │   └── archivo.py       # Archivos adjuntos
+│   │   ├── archivo.py       # Archivos adjuntos
+│   │   └── marca_modelo.py  # Marcas y modelos de vehículos (catálogo global)
 │   ├── schemas/             # Pydantic (request/response)
-│   ├── api/v1/              # 8 routers REST
+│   ├── api/v1/              # 9 routers REST
 │   ├── services/            # Lógica de negocio
 │   └── core/                # Security, WebSocket, exceptions
 ├── alembic/                 # Migraciones
@@ -1295,7 +1296,7 @@ server/
 └── requirements.txt
 ```
 
-### Base de datos: 12 tablas
+### Base de datos: 14 tablas
 
 | Tabla | PK | Claves foráneas |
 |---|---|---|
@@ -1311,6 +1312,8 @@ server/
 | `facturas` | id UUID | taller_id, cliente_id, orden_id |
 | `configuracion_taller` | taller_id (PK) | taller_id |
 | `archivos` | id UUID | taller_id, orden_id |
+| `marcas_vehiculo` | id UUID | — (catálogo global, no multi-taller) |
+| `modelos_vehiculo` | id UUID | id_marca → marcas_vehiculo |
 
 ### Auth
 
@@ -1337,10 +1340,19 @@ cd server
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
+python3 scripts/seed_marcas.py   # opcional: sembrar catálogo de marcas/modelos
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 # → http://localhost:8000
 # → http://localhost:8000/docs (Swagger)
 ```
+
+### Tests
+
+```bash
+cd server && . venv/bin/activate && pytest tests/ -v
+```
+
+16 tests: auth (4), clientes (6), vehículos (5 + 1 búsqueda).
 
 ---
 
@@ -1393,7 +1405,7 @@ desktop-python/
 | **Login** | Email/password + PIN con selector de servidor |
 | **Dashboard** | KPIs: órdenes activas, clientes, vehículos, citas hoy, ingresos mes |
 | **Clientes** | Lista + crear/editar/eliminar con nombre, teléfono, email, dirección |
-| **Vehículos** | Lista + crear/editar/eliminar con marca, modelo, matrícula, cliente |
+| **Vehículos** | Lista + crear/editar/eliminar con marca, modelo (dropdowns desde API), matrícula, cliente |
 | **Órdenes** | Lista + crear/editar/eliminar con estados, UUIDs resueltos a nombre |
 | **Citas** | Agenda con selector de cliente, vehículo, mecánico, fecha |
 | **Facturas** | Crear desde orden con selector de vehículo + cliente |
@@ -1404,6 +1416,7 @@ desktop-python/
 - **AppState** global: almacena token, taller_id, usuario actual
 - **api_client.py**: métodos `get`, `post`, `put`, `delete` con JWT automático
 - **UUID resolution**: los UUIDs de cliente/vehículo se resuelven a nombres visibles en las tablas mediante caché local
+- **Caché de marcas**: `api_client.list_marcas()` cachea la respuesta; llamar `API.invalidate_marcas_cache()` si cambian en runtime
 - **Treeview centralizado**: estilo común en `table_widget.py`
 
 ### Tests
@@ -1438,6 +1451,7 @@ python -m app.main
 | `make desktop` | Arranca app CustomTkinter |
 | `make test` | Tests server + desktop |
 | `make seed` | Datos demo vía API |
+| `make seed-marcas` | Sembrar catálogo de marcas/modelos (78 marcas, 1383 modelos) |
 | `make lint` | Detekt (Android) |
 | `make clean` | Borra venvs, caches, builds |
 

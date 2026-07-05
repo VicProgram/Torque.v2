@@ -157,10 +157,55 @@ class VehiculosView(ctk.CTkFrame):
         cliente_w.pack(fill="x", pady=2)
         matricula = FormEntry(scroll, "Matrícula")
         matricula.pack(fill="x", pady=2)
-        marca = FormEntry(scroll, "Marca *")
-        marca.pack(fill="x", pady=2)
-        modelo = FormEntry(scroll, "Modelo *")
-        modelo.pack(fill="x", pady=2)
+
+        marcas_moto = [m["nombre"] for m in API.list_marcas("MOTO")]
+        marcas_coche = [m["nombre"] for m in API.list_marcas("COCHE")]
+        self._modelos_cache: dict[str, list[str]] = {}
+
+        def cargar_modelos(marca_id: str | None) -> list[str]:
+            if not marca_id:
+                return []
+            if marca_id in self._modelos_cache:
+                return self._modelos_cache[marca_id]
+            modelos = [m["nombre"] for m in API.list_modelos(marca_id)]
+            self._modelos_cache[marca_id] = modelos
+            return modelos
+
+        tipo = FormCombo(scroll, "Tipo Vehículo", TIPO_VEHICULO)
+        tipo.pack(fill="x", pady=2)
+
+        marca_w = FormCombo(scroll, "Marca *", marcas_moto)
+        marca_w.pack(fill="x", pady=2)
+
+        modelo_w = FormCombo(scroll, "Modelo *", [])
+        modelo_w.pack(fill="x", pady=2)
+
+        def on_tipo_change(tipo_val: str):
+            if tipo_val == "MOTO":
+                opts = marcas_moto
+            elif tipo_val == "COCHE":
+                opts = marcas_coche
+            else:
+                opts = sorted(set(marcas_moto + marcas_coche))
+            marca_w.configure(values=opts)
+            if opts:
+                marca_w.set_value(opts[0])
+
+        def on_marca_change(marca_nombre: str):
+            tipo_val = tipo.get_value()
+            marca_id = None
+            for m in API.list_marcas(tipo_val):
+                if m["nombre"] == marca_nombre:
+                    marca_id = m["id"]
+                    break
+            modelos = cargar_modelos(marca_id) if marca_id else []
+            modelo_w.configure(values=modelos)
+            if modelos:
+                modelo_w.set_value(modelos[0])
+
+        tipo.configure(command=on_tipo_change)
+        marca_w.configure(command=on_marca_change)
+
         anio = FormEntry(scroll, "Año")
         anio.pack(fill="x", pady=2)
         tipo = FormCombo(scroll, "Tipo Vehículo", TIPO_VEHICULO)
@@ -187,10 +232,17 @@ class VehiculosView(ctk.CTkFrame):
                         cliente_w.set_value(c.get("nombre", ""))
                         break
             matricula.set_value(data.get("matricula", ""))
-            marca.set_value(data.get("marca", ""))
-            modelo.set_value(data.get("modelo", ""))
             anio.set_value(data.get("anio", ""))
-            tipo.set_value(data.get("tipo_vehiculo", "MOTO"))
+            # Set tipo first so brand/model dropdowns populate
+            tipo_val = data.get("tipo_vehiculo", "MOTO")
+            tipo.set_value(tipo_val)
+            on_tipo_change(tipo_val)
+            # Then set brand (triggers model list update)
+            marca_val = data.get("marca", "")
+            marca_w.set_value(marca_val)
+            on_marca_change(marca_val)
+            # Then set model
+            modelo_w.set_value(data.get("modelo", ""))
             bastidor.set_value(data.get("bastidor", ""))
             combustible.set_value(data.get("tipo_combustible", ""))
             transmision.set_value(data.get("transmision", "MANUAL"))
@@ -211,8 +263,8 @@ class VehiculosView(ctk.CTkFrame):
             payload = {
                 "id_cliente": id_cliente,
                 "matricula": matricula.get_value(),
-                "marca": marca.get_value(),
-                "modelo": modelo.get_value(),
+                "marca": marca_w.get_value(),
+                "modelo": modelo_w.get_value(),
                 "anio": int(anio.get_value()) if anio.get_value().isdigit() else None,
                 "tipo_vehiculo": tipo.get_value(),
                 "bastidor": bastidor.get_value(),

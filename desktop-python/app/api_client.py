@@ -394,5 +394,30 @@ class ApiClient:
         except httpx.RequestError:
             return []
 
+    _marcas_cache: dict[str, list[dict]] = {}
+
+    def list_marcas(self, tipo: str = "MOTO") -> list[dict]:
+        if tipo in self._marcas_cache:
+            return self._marcas_cache[tipo]
+        try:
+            resp = self._request("GET", "/marcas", params={"tipo": tipo})
+            if resp.status_code == 200:
+                data = resp.json()
+                self._marcas_cache[tipo] = data
+                return data
+            return []
+        except httpx.RequestError:
+            return []
+
+    def invalidate_marcas_cache(self):
+        self._marcas_cache.clear()
+
+    def list_modelos(self, marca_id: str) -> list[dict]:
+        try:
+            resp = self._request("GET", f"/marcas/{marca_id}/modelos")
+            return resp.json() if resp.status_code == 200 else []
+        except httpx.RequestError:
+            return []
+
 
 API = ApiClient()
