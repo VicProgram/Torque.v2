@@ -71,7 +71,7 @@ make test-desktop # tests
 ┌─────────────────────────────────────────────────────┐
 │                   SERVIDOR (FastAPI)                  │
 │  SQLite ── REST API ── Auth JWT ── WebSocket ── PDF  │
-│  Multi-taller (tenant_id en cada tabla)              │
+│  Multi-taller (registros aislados por id_taller)     │
 └──────┬────────────────────────────────────┬──────────┘
        │ REST + JWT                         │ REST + JWT
        ▼                                    ▼
@@ -80,7 +80,7 @@ make test-desktop # tests
 │ CustomTkinter     │              │ Jetpack Compose    │
 │ Gestión completa  │              │ Room offline       │
 │ Clientes,órdenes, │              │ Algoritmo salud    │
-│ facturas,stock    │              │ Sync con servidor  │
+│ facturas,stock    │              │ Historial local    │
 └──────────────────┘              └────────────────────┘
 ```
 
@@ -93,7 +93,7 @@ Torque.v2/
 ├── server/                # Servidor Python FastAPI
 │   ├── app/
 │   │   ├── main.py        # Entry point
-│   │   ├── models/        # SQLAlchemy (12 entidades)
+│   │   ├── models/        # SQLAlchemy (14 tablas)
 │   │   ├── schemas/       # Pydantic request/response
 │   │   ├── api/v1/        # Endpoints REST
 │   │   ├── services/      # Lógica de negocio
@@ -183,8 +183,8 @@ cd server && . venv/bin/activate && pytest tests/ -v
 cd desktop-python && . .venv/bin/activate && pytest tests/ -v
 
 # Android
-./gradlew testDebugUnitTest   # tests unitarios
-./gradlew connectedCheck      # tests instrumentados (requiere emulador)
+./gradlew testDebugUnitTest :shared:test   # tests unitarios (app + shared)
+./gradlew connectedCheck                    # tests instrumentados (requiere emulador)
 ./gradlew detekt              # análisis estático
 ```
 

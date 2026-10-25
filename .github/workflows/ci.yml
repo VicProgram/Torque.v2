@@ -31,8 +31,8 @@ jobs:
       - name: Static analysis (detekt)
         run: ./gradlew detekt
 
-      - name: Unit tests
-        run: ./gradlew testDebugUnitTest
+      - name: Unit tests (app + shared)
+        run: ./gradlew testDebugUnitTest :shared:test
 
       - name: Assemble debug APK
         run: ./gradlew assembleDebug

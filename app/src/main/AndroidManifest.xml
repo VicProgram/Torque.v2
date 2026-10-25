@@ -6,13 +6,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- El backend de taller se sirve por HTTP en la red local (ver AuthManager). -->
     <application
         android:name=".TorqueApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="Torque"
         android:theme="@style/Theme.TorqueLight"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="true">
 
         <!-- Desactivar auto-init de Sentry (lo inicializamos manualmente en TorqueApp) -->
         <meta-data

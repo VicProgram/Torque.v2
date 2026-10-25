@@ -43,15 +43,7 @@ test-desktop:
 
 seed:
 	@echo "==> Sembrando datos demo..."
-	cd server && . venv/bin/activate && python3 -c "import requests, json; \
-	BASE = 'http://localhost:8000/api/v1'; \
-	r = requests.post(f'{BASE}/auth/login', json={'email': 'admin@demo.com', 'password': 'demo1234'}); \
-	r = requests.post(f'{BASE}/auth/registro-taller', json={'nombre_taller': 'Taller Demo', 'nombre_admin': 'Admin', 'email_admin': 'admin@demo.com', 'password': 'demo1234'}) if r.status_code != 200 else r; \
-	token = r.json()['access_token']; \
-	h = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}; \
-	[requests.post(f'{BASE}/clientes', headers=h, json=c) for c in [{'nombre':'Juan Pérez','telefono':'612345678'},{'nombre':'María García','telefono':'611111111'}]]; \
-	[requests.post(f'{BASE}/articulos', headers=h, json=a) for a in [{'nombre':'Aceite 10W40','sku':'ACE-001','cantidad_stock':20,'precio_venta':12.5},{'nombre':'Filtro Aceite','sku':'FIL-001','cantidad_stock':15,'precio_venta':8.0}]]; \
-	print('Datos demo creados')"
+	cd server && . venv/bin/activate && python3 scripts/seed_demo.py
 
 seed-marcas:
 	@echo "==> Sembrando catálogo de marcas y modelos..."
