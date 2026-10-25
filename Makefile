@@ -1,4 +1,4 @@
-.PHONY: help install server desktop test test-server test-desktop lint clean seed
+.PHONY: help install server desktop test test-server test-desktop lint lint-python clean seed seed-marcas
 
 help:
 	@echo "╔══════════════════════════════════════════╗"
@@ -10,7 +10,8 @@ help:
 	@echo "║ make test         ─ Ejecutar tests        ║"
 	@echo "║ make test-server  ─ Tests del servidor    ║"
 	@echo "║ make test-desktop ─ Tests del desktop     ║"
-	@echo "║ make lint         ─ Analizar código (detek)║"
+	@echo "║ make lint         ─ detekt + Ruff         ║"
+	@echo "║ make lint-python  ─ Ruff (server/desktop) ║"
 	@echo "║ make clean        ─ Limpiar archivos temp ║"
 	@echo "║ make seed         ─ Sembrar datos demo    ║"
 	@echo "║ make seed-marcas  ─ Catálogo marcas/modelos║"
@@ -57,9 +58,14 @@ seed-marcas:
 	cd server && . venv/bin/activate && python3 scripts/seed_marcas.py
 	@echo "OK"
 
-lint:
+lint: lint-python
 	@echo "==> Ejecutando detekt..."
 	./gradlew detekt 2>/dev/null || echo "(detekt solo disponible en proyecto Android con Gradle)"
+
+lint-python:
+	@echo "==> Ejecutando Ruff..."
+	cd server && . venv/bin/activate && ruff check .
+	cd desktop-python && . .venv/bin/activate && ruff check .
 
 clean:
 	rm -rf server/venv desktop-python/.venv
