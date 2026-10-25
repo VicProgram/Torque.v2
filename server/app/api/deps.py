@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import NotFoundException
 from app.core.security import decode_access_token
 from app.database import get_db
 from app.models.usuario import Usuario
@@ -37,6 +38,19 @@ def get_current_user(
             detail="Usuario no encontrado o inactivo",
         )
     return user
+
+
+def require_taller_record(db: Session, model, record_id: str | None, taller_id, entity: str):
+    """Return a record owned by the workshop, or 404 if it belongs to another tenant."""
+    if record_id is None:
+        return None
+    record = db.query(model).filter(
+        model.id == record_id,
+        model.id_taller == taller_id,
+    ).first()
+    if record is None:
+        raise NotFoundException(entity)
+    return record
 
 
 def require_rol(*roles: str):

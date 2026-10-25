@@ -51,20 +51,18 @@ def client() -> Generator:
     Base.metadata.drop_all(bind=engine)
 
 
-@pytest.fixture
-def auth_headers(client, db_session):
-    """Create a test taller + admin and return auth headers."""
+def _create_taller_admin(db_session, nombre: str, email: str, admin_nombre: str) -> dict:
     from app.models.taller import Taller
     from app.models.usuario import Usuario
 
-    taller = Taller(nombre="Test Taller")
+    taller = Taller(nombre=nombre)
     db_session.add(taller)
     db_session.flush()
 
     admin = Usuario(
         id_taller=taller.id,
-        nombre="Admin Test",
-        email="admin@test.com",
+        nombre=admin_nombre,
+        email=email,
         password_hash=hash_password("test123"),
         rol="ADMIN",
     )
@@ -82,3 +80,15 @@ def auth_headers(client, db_session):
         "Authorization": f"Bearer {token}",
         "X-Taller-ID": str(taller.id),
     }
+
+
+@pytest.fixture
+def auth_headers(client, db_session):
+    """Create a test taller + admin and return auth headers."""
+    return _create_taller_admin(db_session, "Test Taller", "admin@test.com", "Admin Test")
+
+
+@pytest.fixture
+def other_auth_headers(client, db_session):
+    """Create a second taller + admin to check tenant isolation."""
+    return _create_taller_admin(db_session, "Other Taller", "other@test.com", "Admin Other")

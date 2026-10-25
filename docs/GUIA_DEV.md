@@ -1292,7 +1292,7 @@ server/
 │   ├── services/            # Lógica de negocio
 │   └── core/                # Security, WebSocket, exceptions
 ├── alembic/                 # Migraciones
-├── tests/                   # pytest (16 tests)
+├── tests/                   # pytest (32 tests)
 └── requirements.txt
 ```
 
@@ -1331,7 +1331,7 @@ JWT configurable: access token (30 min default).
 cd server && . venv/bin/activate && pytest tests/ -v
 ```
 
-16 tests: auth (4), clientes (6), vehículos (5 + 1 búsqueda).
+32 tests: auth (4), clientes (6), vehículos (6) y aislamiento multi-taller (16).
 
 ### Ejecutar
 
@@ -1352,7 +1352,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 cd server && . venv/bin/activate && pytest tests/ -v
 ```
 
-16 tests: auth (4), clientes (6), vehículos (5 + 1 búsqueda).
+32 tests: auth (4), clientes (6), vehículos (6) y aislamiento multi-taller (16).
 
 ---
 

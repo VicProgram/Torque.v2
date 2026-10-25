@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_taller_record
 from app.core.exceptions import NotFoundException
 from app.database import get_db
 from app.models.cliente import Cliente
@@ -23,15 +23,22 @@ def _factura_to_response(factura: Factura, db: Session) -> FacturaResponse:
     orden_cliente = ""
     if factura.id_orden_trabajo:
         orden = db.query(OrdenTrabajo).filter(
-            OrdenTrabajo.id == factura.id_orden_trabajo
+            OrdenTrabajo.id == factura.id_orden_trabajo,
+            OrdenTrabajo.id_taller == factura.id_taller,
         ).first()
         if orden:
             if orden.id_vehiculo:
-                v = db.query(Vehiculo).filter(Vehiculo.id == orden.id_vehiculo).first()
+                v = db.query(Vehiculo).filter(
+                    Vehiculo.id == orden.id_vehiculo,
+                    Vehiculo.id_taller == factura.id_taller,
+                ).first()
                 if v:
                     orden_vehiculo = f"{v.matricula} {v.marca} {v.modelo}".strip()
             if orden.id_cliente:
-                c = db.query(Cliente).filter(Cliente.id == orden.id_cliente).first()
+                c = db.query(Cliente).filter(
+                    Cliente.id == orden.id_cliente,
+                    Cliente.id_taller == factura.id_taller,
+                ).first()
                 if c:
                     orden_cliente = c.nombre or ""
     return FacturaResponse(
@@ -50,7 +57,6 @@ def _factura_to_response(factura: Factura, db: Session) -> FacturaResponse:
         notas=factura.notas or "",
         estado=factura.estado,
         pdf_url=factura.pdf_url or "",
-        creado_en=factura.creado_en,
     )
 
 
@@ -77,6 +83,9 @@ def crear_factura(
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_taller_record(
+        db, OrdenTrabajo, data.id_orden_trabajo, user.id_taller, "Orden de trabajo"
+    )
     factura = Factura(id_taller=user.id_taller, **data.model_dump())
     db.add(factura)
     db.commit()

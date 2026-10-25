@@ -135,7 +135,7 @@
 | Coroutine issues | ✅ 0 (arreglado) |
 | Parallel build | ✅ Activado |
 | Test boilerplate | ✅ Eliminado |
-| Server endpoints | ✅ 100% funcionales (16 tests) |
+| Server endpoints | ✅ 100% funcionales (32 tests) |
 | Desktop-python bugs | ✅ 0 (25 bugs corregidos en 2 fases) |
 | Desktop-python tests | ⏳ Solo 4 — pendiente ampliar |
 | Desktop-python error handling | ⏳ Pendiente (tracebacks en fallos de red) |

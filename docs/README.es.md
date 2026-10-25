@@ -99,7 +99,7 @@ Torque.v2/
 │   │   ├── services/      # Lógica de negocio
 │   │   └── core/          # Security, WebSocket, exceptions
 │   ├── alembic/           # Migraciones DB
-│   └── tests/             # pytest (16 tests)
+│   └── tests/             # pytest (32 tests)
 │
 ├── desktop-python/        # Cliente escritorio
 │   ├── app/
@@ -176,7 +176,7 @@ Con el servidor corriendo, abrir http://localhost:8000/docs para Swagger UI.
 ## Tests
 
 ```bash
-# Servidor (16 tests)
+# Servidor (32 tests)
 cd server && . venv/bin/activate && pytest tests/ -v
 
 # Desktop (4 tests)
