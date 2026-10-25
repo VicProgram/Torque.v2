@@ -282,7 +282,7 @@ Torque.v2/
 
 ### Completado (Fases 0, 1 y 2)
 
-- `server/` — Servidor Python FastAPI completo con 12 modelos, CRUD completo, auth JWT, WebSocket, PDF, dashboard KPIs, tests (16/16)
+- `server/` — Servidor Python FastAPI completo con 14 tablas, CRUD completo, auth JWT, WebSocket, PDF, dashboard KPIs, tests (32/32)
 - `desktop-python/` — Cliente de escritorio Python completo con 8 vistas (login, dashboard, clientes, vehículos, órdenes, citas, facturas, artículos), UUID resolution, CustomTkinter
 
 ### Por hacer (Fase 3+)

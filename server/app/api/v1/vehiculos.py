@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_taller_record
 from app.core.exceptions import NotFoundException
 from app.database import get_db
 from app.models.cliente import Cliente
@@ -48,6 +48,7 @@ def crear_vehiculo(
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_taller_record(db, Cliente, data.id_cliente, user.id_taller, "Cliente")
     vehiculo = Vehiculo(id_taller=user.id_taller, **data.model_dump())
     db.add(vehiculo)
     db.commit()
@@ -71,7 +72,10 @@ def buscar_por_matricula(
         cliente_nombre = ""
         cliente_id = None
         if v.id_cliente:
-            cliente = db.query(Cliente).filter(Cliente.id == v.id_cliente).first()
+            cliente = db.query(Cliente).filter(
+                Cliente.id == v.id_cliente,
+                Cliente.id_taller == user.id_taller,
+            ).first()
             if cliente:
                 cliente_nombre = cliente.nombre
                 cliente_id = str(cliente.id)
@@ -114,6 +118,7 @@ def actualizar_vehiculo(
     ).first()
     if not vehiculo:
         raise NotFoundException("Vehículo")
+    require_taller_record(db, Cliente, data.id_cliente, user.id_taller, "Cliente")
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(vehiculo, key, value)
     db.commit()

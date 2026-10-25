@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_taller_record
 from app.core.exceptions import NotFoundException
 from app.database import get_db
 from app.models.cita import Cita
@@ -27,17 +27,26 @@ def _cita_to_response(cita: Cita, db: Session) -> CitaResponse:
     vehiculo_modelo = ""
     mecanico_nombre = ""
     if cita.id_cliente:
-        c = db.query(Cliente).filter(Cliente.id == cita.id_cliente).first()
+        c = db.query(Cliente).filter(
+            Cliente.id == cita.id_cliente,
+            Cliente.id_taller == cita.id_taller,
+        ).first()
         if c:
             cliente_nombre = c.nombre or ""
     if cita.id_vehiculo:
-        v = db.query(Vehiculo).filter(Vehiculo.id == cita.id_vehiculo).first()
+        v = db.query(Vehiculo).filter(
+            Vehiculo.id == cita.id_vehiculo,
+            Vehiculo.id_taller == cita.id_taller,
+        ).first()
         if v:
             vehiculo_matricula = v.matricula or ""
             vehiculo_marca = v.marca or ""
             vehiculo_modelo = v.modelo or ""
     if cita.id_mecanico:
-        m = db.query(Usuario).filter(Usuario.id == cita.id_mecanico).first()
+        m = db.query(Usuario).filter(
+            Usuario.id == cita.id_mecanico,
+            Usuario.id_taller == cita.id_taller,
+        ).first()
         if m:
             mecanico_nombre = m.nombre or ""
     return CitaResponse(
@@ -108,6 +117,9 @@ def crear_cita(
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_taller_record(db, Cliente, data.id_cliente, user.id_taller, "Cliente")
+    require_taller_record(db, Vehiculo, data.id_vehiculo, user.id_taller, "Vehículo")
+    require_taller_record(db, Usuario, data.id_mecanico, user.id_taller, "Mecánico")
     cita = Cita(id_taller=user.id_taller, **data.model_dump())
     db.add(cita)
     db.commit()
@@ -128,6 +140,9 @@ def actualizar_cita(
     ).first()
     if not cita:
         raise NotFoundException("Cita")
+    require_taller_record(db, Cliente, data.id_cliente, user.id_taller, "Cliente")
+    require_taller_record(db, Vehiculo, data.id_vehiculo, user.id_taller, "Vehículo")
+    require_taller_record(db, Usuario, data.id_mecanico, user.id_taller, "Mecánico")
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(cita, key, value)
     db.commit()

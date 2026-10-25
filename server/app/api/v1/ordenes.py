@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_taller_record
 from app.core.exceptions import NotFoundException
 from app.core.websocket import manager
 from app.database import get_db
@@ -57,17 +57,26 @@ def _orden_to_response(orden: OrdenTrabajo, db: Session | None = None) -> OrdenT
 
     if db:
         if orden.id_vehiculo:
-            v = db.query(Vehiculo).filter(Vehiculo.id == orden.id_vehiculo).first()
+            v = db.query(Vehiculo).filter(
+                Vehiculo.id == orden.id_vehiculo,
+                Vehiculo.id_taller == orden.id_taller,
+            ).first()
             if v:
                 vehiculo_matricula = v.matricula or ""
                 vehiculo_marca = v.marca or ""
                 vehiculo_modelo = v.modelo or ""
         if orden.id_cliente:
-            c = db.query(Cliente).filter(Cliente.id == orden.id_cliente).first()
+            c = db.query(Cliente).filter(
+                Cliente.id == orden.id_cliente,
+                Cliente.id_taller == orden.id_taller,
+            ).first()
             if c:
                 cliente_nombre = c.nombre or ""
         if orden.id_mecanico_asignado:
-            m = db.query(Usuario).filter(Usuario.id == orden.id_mecanico_asignado).first()
+            m = db.query(Usuario).filter(
+                Usuario.id == orden.id_mecanico_asignado,
+                Usuario.id_taller == orden.id_taller,
+            ).first()
             if m:
                 mecanico_nombre = m.nombre or ""
 
@@ -130,6 +139,11 @@ def crear_orden(
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_taller_record(db, Vehiculo, data.id_vehiculo, user.id_taller, "Vehículo")
+    require_taller_record(db, Cliente, data.id_cliente, user.id_taller, "Cliente")
+    require_taller_record(
+        db, Usuario, data.id_mecanico_asignado, user.id_taller, "Mecánico"
+    )
     orden = OrdenTrabajo(
         id_taller=user.id_taller,
         fecha_entrada=datetime.now(UTC),
@@ -169,6 +183,11 @@ def actualizar_orden(
     ).first()
     if not orden:
         raise NotFoundException("Orden de trabajo")
+    require_taller_record(db, Vehiculo, data.id_vehiculo, user.id_taller, "Vehículo")
+    require_taller_record(db, Cliente, data.id_cliente, user.id_taller, "Cliente")
+    require_taller_record(
+        db, Usuario, data.id_mecanico_asignado, user.id_taller, "Mecánico"
+    )
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(orden, key, value)
     db.commit()

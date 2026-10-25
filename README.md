@@ -168,7 +168,7 @@ Auth is JWT-based. Every workshop-owned record is filtered by `id_taller`, so ea
 ## Tests and quality
 
 ```bash
-# Backend — 16 tests
+# Backend — 32 tests
 cd server && pytest
 
 # Desktop — 4 tests

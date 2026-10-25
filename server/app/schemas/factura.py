@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 
 from pydantic import BaseModel
@@ -35,6 +35,5 @@ class FacturaResponse(FacturaBase):
     orden_cliente: str = ""
     estado: str
     pdf_url: str = ""
-    creado_en: datetime
 
     model_config = {"from_attributes": True}
