@@ -70,7 +70,7 @@ goto end
 :seed
 echo ==^> Sembrando datos demo...
 cd server
-call venv\Scripts\python -c "import requests, json; BASE = 'http://localhost:8000/api/v1'; r = requests.post(f'{BASE}/auth/login', json={'email': 'admin@demo.com', 'password': 'demo1234'}); token = r.json()['access_token']; h = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}; [requests.post(f'{BASE}/clientes', headers=h, json=c) for c in [{'nombre':'Juan Pérez','telefono':'612345678'}]]; [requests.post(f'{BASE}/articulos', headers=h, json=a) for a in [{'nombre':'Aceite 10W40','sku':'ACE-001','cantidad_stock':20,'precio_venta':12.5}]]; print('OK')"
+call venv\Scripts\python scripts\seed_demo.py
 cd ..
 goto end
 

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.network.AuthManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +26,7 @@ fun LoginScreen(
     errorMessage: String?,
 ) {
     var pin by remember { mutableStateOf("") }
-    var serverUrl by remember { mutableStateOf("http://172.23.238.95:8000") }
+    var serverUrl by remember { mutableStateOf(AuthManager.DEFAULT_SERVER_URL) }
     var showServerConfig by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 

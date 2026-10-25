@@ -23,7 +23,7 @@ class AuthManager(private val context: Context) {
         private val KEY_NOMBRE = stringPreferencesKey("nombre")
         private val KEY_ROL = stringPreferencesKey("rol")
         private val KEY_SERVER_URL = stringPreferencesKey("server_url")
-        const val DEFAULT_SERVER_URL = "http://172.23.238.95:8000"
+        const val DEFAULT_SERVER_URL = "http://10.0.2.2:8000"
 
         @Volatile
         private var instance: AuthManager? = null

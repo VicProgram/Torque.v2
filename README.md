@@ -17,9 +17,9 @@ Torque connects the workshop office and the mechanic's phone around a single bac
 
 Torque started as a motorcycle-maintenance app and grew into a multi-device workshop platform. It is a full-stack playground for the things I care about as a developer:
 
-- **Offline-first mobile data** with Room, plus background sync against a REST API.
+- **Local-first mobile data**: Room keeps the maintenance history available offline, while Retrofit talks to the REST API when the server is reachable.
 - **A real domain algorithm**: vehicle health is computed from maintenance intervals and wear percentages, weighted per component.
-- **A typed backend** with FastAPI, SQLAlchemy, JWT auth, multi-tenant isolation and WebSocket notifications.
+- **A typed backend** with FastAPI, SQLAlchemy, JWT auth, multi-tenant isolation and a WebSocket channel for order events.
 - **A desktop client** built with CustomTkinter that consumes the same API as the Android app.
 - **CI that actually runs**: detekt, unit tests and APK assembly for Android; pytest for both Python projects.
 
@@ -29,7 +29,7 @@ Torque started as a motorcycle-maintenance app and grew into a multi-device work
 |---|---|---|---|
 | Customers | — | CRUD, search, contact details | ✅ |
 | Vehicles | Garage list, detail, photos, maintenance history | CRUD, plate search, 47 bike / 31 car brands | ✅ |
-| Work orders | — | Kanban-style states, line items, PDF export | ✅ |
+| Work orders | — | State workflow, line items, PDF export | ✅ |
 | Appointments | — | Agenda with states | ✅ |
 | Invoices | — | Issue from work order, PDF | ✅ |
 | Inventory | — | Stock, minimum stock, supplier, sale/cost price | ✅ |
@@ -62,8 +62,8 @@ flowchart LR
         DB[("SQLite / PostgreSQL<br/>SQLAlchemy + Alembic")]
     end
 
-    A -- "HTTPS + JWT" --> R
-    D -- "HTTPS + JWT" --> R
+    A -- "REST + JWT" --> R
+    D -- "REST + JWT" --> R
     R --- DB
     R --- W
     R --- P
@@ -153,7 +153,7 @@ Swagger UI is served at `http://localhost:8000/docs`. The API exposes 45 endpoin
 | Dashboard | workshop KPIs |
 | Catalogue | brands by vehicle type, models per brand |
 
-Auth is JWT-based. Every query is scoped by `id_taller`, so one deployment can host several workshops without data leaking between them.
+Auth is JWT-based. Every workshop-owned record is filtered by `id_taller`, so each workshop can only list and edit its own data. The vehicle brand/model catalogue is global and intentionally shared.
 
 ## Screenshots
 
@@ -175,7 +175,7 @@ cd server && pytest
 cd desktop-python && pytest
 
 # Android — 114 unit tests (debug) + 24 shared-module tests
-./gradlew testDebugUnitTest
+./gradlew testDebugUnitTest :shared:test
 ./gradlew detekt
 ```
 
