@@ -16,6 +16,7 @@ app/build/
 *.keystore
 *.jks
 keystore.properties
+google-services.json
 torque.db
 *.db
 *.db-shm
