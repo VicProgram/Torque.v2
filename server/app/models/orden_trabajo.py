@@ -1,10 +1,17 @@
 from sqlalchemy import (
-    Column, String, Text, Integer, Date, DECIMAL, ForeignKey, DateTime,
+    DECIMAL,
+    Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
 )
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin, GUID
+from app.models.base import GUID, TimestampMixin, UUIDMixin
 
 
 class OrdenTrabajo(UUIDMixin, TimestampMixin, Base):

@@ -1,6 +1,6 @@
 from typing import Any
+
 import customtkinter as ctk
-from datetime import date
 
 
 class FormField(ctk.CTkFrame):

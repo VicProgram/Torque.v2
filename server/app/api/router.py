@@ -1,6 +1,16 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, clientes, vehiculos, ordenes, articulos, citas, facturas, dashboard, marcas
+from app.api.v1 import (
+    articulos,
+    auth,
+    citas,
+    clientes,
+    dashboard,
+    facturas,
+    marcas,
+    ordenes,
+    vehiculos,
+)
 
 api_router = APIRouter()
 

@@ -1,17 +1,17 @@
-from datetime import datetime, timezone, date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
 
+from app.api.deps import get_current_user
 from app.database import get_db
-from app.models.orden_trabajo import OrdenTrabajo
 from app.models.cita import Cita
 from app.models.factura import Factura
+from app.models.orden_trabajo import OrdenTrabajo
 from app.models.usuario import Usuario
-from app.api.deps import get_current_user
 
 
 class ResumenDashboard(BaseModel):
@@ -42,11 +42,11 @@ def resumen(
     db: Session = Depends(get_db),
 ):
     id_taller = user.id_taller
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     today = date.today()
-    today_start = datetime(today.year, today.month, today.day, tzinfo=timezone.utc)
+    today_start = datetime(today.year, today.month, today.day, tzinfo=UTC)
     today_end = today_start + timedelta(days=1)
-    month_start = datetime(today.year, today.month, 1, tzinfo=timezone.utc)
+    month_start = datetime(today.year, today.month, 1, tzinfo=UTC)
     next_month = month_start.replace(month=month_start.month % 12 + 1) if month_start.month < 12 else month_start.replace(year=month_start.year + 1, month=1)
 
     activas = db.query(func.count(OrdenTrabajo.id)).filter(

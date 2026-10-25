@@ -1,25 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from sqlalchemy import or_
+from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_user
+from app.core.security import (
+    create_access_token,
+    create_pin_token,
+    hash_password,
+    verify_password,
+)
 from app.database import get_db
 from app.models.taller import Taller
 from app.models.usuario import Usuario
 from app.schemas.auth import (
     LoginRequest,
     PinLoginRequest,
+    RegistroTallerRequest,
     SetPinRequest,
     TokenResponse,
-    RegistroTallerRequest,
     UsuarioResponse,
 )
-from app.core.security import (
-    hash_password,
-    verify_password,
-    create_access_token,
-    create_pin_token,
-)
-from app.api.deps import get_current_user
 
 router = APIRouter()
 
@@ -97,7 +97,7 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/login-pin", response_model=TokenResponse)
 def login_pin(req: PinLoginRequest, db: Session = Depends(get_db)):
     user = db.query(Usuario).filter(
-        Usuario.pin_code == req.pin_code, Usuario.activo == True
+        Usuario.pin_code == req.pin_code, Usuario.activo.is_(True)
     ).first()
     if not user:
         raise HTTPException(

@@ -2,6 +2,8 @@
 
 Sistema profesional de gestión de taller mecánico multi-dispositivo.
 
+> 🇬🇧 [English README](../README.md)
+
 ---
 
 ## Componentes
@@ -202,4 +204,4 @@ Para sembrar el catálogo de marcas y modelos de vehículos, ejecutar `make seed
 
 ## Licencia
 
-Uso personal.
+[MIT](../LICENSE) © 2026 Victor Abad Romero

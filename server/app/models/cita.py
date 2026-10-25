@@ -1,10 +1,15 @@
 from sqlalchemy import (
-    Column, String, Text, Integer, ForeignKey, DateTime,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
 )
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin, GUID
+from app.models.base import GUID, TimestampMixin, UUIDMixin
 
 
 class Cita(UUIDMixin, TimestampMixin, Base):

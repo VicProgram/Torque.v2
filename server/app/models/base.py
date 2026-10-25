@@ -1,10 +1,12 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import Column, DateTime, CHAR, TypeDecorator
+from sqlalchemy import CHAR, Column, DateTime, TypeDecorator
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 from app.database import Base
+
+__all__ = ["Base", "GUID", "TimestampMixin", "UUIDMixin"]
 
 
 class GUID(TypeDecorator):
@@ -37,13 +39,13 @@ class GUID(TypeDecorator):
 class TimestampMixin:
     creado_en = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
     actualizado_en = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
 

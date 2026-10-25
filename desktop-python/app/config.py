@@ -1,6 +1,6 @@
-from dataclasses import dataclass, field
-import os
 import json
+import os
+from dataclasses import dataclass, field
 
 
 @dataclass

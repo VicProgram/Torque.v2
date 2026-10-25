@@ -1,11 +1,10 @@
-import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, GUID
+from app.models.base import GUID, UUIDMixin
 
 
 class Usuario(UUIDMixin, Base):
@@ -29,7 +28,7 @@ class Usuario(UUIDMixin, Base):
     activo = Column(Boolean, default=True)
     creado_en = Column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
     ultimo_acceso = Column(DateTime(timezone=True), nullable=True)

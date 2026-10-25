@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.models.cliente import Cliente
 from app.core.exceptions import NotFoundException
+from app.models.cliente import Cliente
 
 
 def get_cliente(db: Session, cliente_id: str, taller_id: str) -> Cliente:

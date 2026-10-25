@@ -1,9 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from sqlalchemy.orm import Session
 
-from app.models.orden_trabajo import OrdenTrabajo
-from app.models.detalle_trabajo import DetalleTrabajo
 from app.core.exceptions import NotFoundException
+from app.models.detalle_trabajo import DetalleTrabajo
+from app.models.orden_trabajo import OrdenTrabajo
 
 ESTADOS_VALIDOS = {
     "PRESUPUESTO", "APROBADO", "EN_CURSO", "COMPLETADO", "FACTURADO", "CANCELADO"
@@ -29,7 +30,7 @@ def cambiar_estado(
         )
     orden.estado = nuevo_estado
     if nuevo_estado == "COMPLETADO":
-        orden.fecha_completado = datetime.now(timezone.utc)
+        orden.fecha_completado = datetime.now(UTC)
     db.commit()
     db.refresh(orden)
     return orden

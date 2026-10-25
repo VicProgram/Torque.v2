@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, DECIMAL, ForeignKey
+from sqlalchemy import DECIMAL, Column, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, GUID
+from app.models.base import GUID, UUIDMixin
 
 
 class PiezaUtilizada(UUIDMixin, Base):

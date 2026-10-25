@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date, datetime
 
 
 def format_fecha(fecha_str: str | None, fmt: str = "%d/%m/%Y") -> str:

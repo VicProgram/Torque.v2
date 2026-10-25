@@ -1,8 +1,8 @@
-from sqlalchemy import Column, String, Text, ForeignKey
+from sqlalchemy import Column, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin, GUID
+from app.models.base import GUID, TimestampMixin, UUIDMixin
 
 
 class Cliente(UUIDMixin, TimestampMixin, Base):

@@ -3,9 +3,9 @@ from datetime import datetime
 import customtkinter as ctk
 
 from app.api_client import API
+from app.components.form_widgets import FormCombo, FormEntry
 from app.components.table_widget import TableWidget
-from app.components.form_widgets import FormEntry, FormCombo
-from app.utils.helpers import format_fecha, format_decimal, ESTADOS_FACTURA
+from app.utils.helpers import ESTADOS_FACTURA, format_decimal, format_fecha
 
 
 class FacturasView(ctk.CTkFrame):
@@ -79,7 +79,6 @@ class FacturasView(ctk.CTkFrame):
             id_orden = f.get("id_orden_trabajo", "")
             cliente_str = id_orden[:8] if id_orden else ""
             if id_orden in orden_map:
-                vehiculo_id = orden_map[id_orden].get("id_vehiculo", "")
                 cliente_str = f"Orden {id_orden[:8]}"
             display.append({
                 "id": f.get("id", ""),

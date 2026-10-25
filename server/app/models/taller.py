@@ -1,7 +1,7 @@
-from sqlalchemy import Column, String, Text, Boolean, DECIMAL
+from sqlalchemy import DECIMAL, Boolean, Column, String, Text
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin
+from app.models.base import TimestampMixin, UUIDMixin
 
 
 class Taller(UUIDMixin, TimestampMixin, Base):

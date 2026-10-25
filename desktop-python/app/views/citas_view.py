@@ -1,11 +1,12 @@
-import customtkinter as ctk
 from datetime import datetime, timedelta
 
+import customtkinter as ctk
+
 from app.api_client import API
-from app.components.table_widget import TableWidget
-from app.components.form_widgets import FormEntry, FormCombo, FormText
 from app.components.dialogs import ConfirmDialog
-from app.utils.helpers import ESTADOS_CITA, format_fecha
+from app.components.form_widgets import FormCombo, FormEntry, FormText
+from app.components.table_widget import TableWidget
+from app.utils.helpers import format_fecha
 
 
 class CitasView(ctk.CTkFrame):

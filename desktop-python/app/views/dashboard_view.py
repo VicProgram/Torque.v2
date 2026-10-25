@@ -1,9 +1,10 @@
-import customtkinter as ctk
 from tkinter import ttk
 
+import customtkinter as ctk
+
 from app.api_client import API
-from app.state import STATE
 from app.components.table_widget import configurar_estilo_treeview
+from app.state import STATE
 from app.utils.helpers import format_decimal
 
 

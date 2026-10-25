@@ -1,13 +1,14 @@
-from typing import Generator
+from collections.abc import Generator
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.main import app
+from app.core.security import create_access_token, hash_password
 from app.database import Base, get_db
-from app.core.security import hash_password, create_access_token
+from app.main import app
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_torque.db"
 engine = create_engine(

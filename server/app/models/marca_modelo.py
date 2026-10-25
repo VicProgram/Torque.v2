@@ -1,7 +1,9 @@
 import uuid
-from sqlalchemy import Column, String, ForeignKey, UniqueConstraint
+
+from sqlalchemy import Column, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.sqlite import CHAR
 from sqlalchemy.orm import relationship
+
 from app.models.base import Base
 
 

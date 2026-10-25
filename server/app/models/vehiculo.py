@@ -1,10 +1,16 @@
 from sqlalchemy import (
-    Column, String, Integer, Date, Text, ForeignKey, UniqueConstraint,
+    Column,
+    Date,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin, GUID
+from app.models.base import GUID, TimestampMixin, UUIDMixin
 
 
 class Vehiculo(UUIDMixin, TimestampMixin, Base):
