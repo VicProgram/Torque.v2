@@ -4,6 +4,7 @@ import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.utils.SaludMotoCalculator
 import com.example.torque.utils.TiposMantenimiento
 import com.example.torque.utils.DateUtils
+import com.example.torque.utils.TipoVehiculo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -197,14 +198,27 @@ class SaludMotoCalculatorTest {
     // ───── 13. WEAR_TIPOS contiene los esperados ─────
     @Test
     fun `wear tipos contiene las piezas de desgaste`() {
-        val nombres = TiposMantenimiento.WEAR_TIPOS.map { it.nombre }.toSet()
-        assertTrue("Pastillas de Freno Delantero" in nombres)
-        assertTrue("Pastillas de Freno Trasero" in nombres)
-        assertTrue("Discos de Freno Delanteros" in nombres)
-        assertTrue("Discos de Freno Traseros" in nombres)
-        assertTrue("Neumático Delantero" in nombres)
-        assertTrue("Neumático Trasero" in nombres)
-        assertEquals(6, nombres.size)
+        val moto = TiposMantenimiento.WEAR_TIPOS
+            .filter { it.tipoVehiculo == TipoVehiculo.MOTO }
+            .map { it.nombre }
+            .toSet()
+        assertEquals(
+            setOf(
+                "Pastillas de Freno Delantero",
+                "Pastillas de Freno Trasero",
+                "Discos de Freno Delanteros",
+                "Discos de Freno Traseros",
+                "Neumático Delantero",
+                "Neumático Trasero",
+            ),
+            moto,
+        )
+
+        val coche = TiposMantenimiento.WEAR_TIPOS
+            .filter { it.tipoVehiculo == TipoVehiculo.COCHE }
+            .map { it.nombre }
+            .toSet()
+        assertEquals(setOf("Pastillas de Freno", "Discos de Freno"), coche)
     }
 
     // ───── 14. Tipos sin intervalo ni desgaste no afectan notificaciones ─────
@@ -302,8 +316,14 @@ class SaludMotoCalculatorTest {
     // ───── 21. No hay nombres duplicados entre tipos ─────
     @Test
     fun `no hay nombres duplicados en TODOS`() {
-        val nombres = TiposMantenimiento.TODOS.map { it.nombre.lowercase() }
-        assertEquals(nombres.toSet().size, nombres.size)
+        // Moto y coche comparten nombres (Filtro de Aceite, Bujías...), así que
+        // la unicidad se comprueba dentro de cada tipo de vehículo.
+        for (vehiculo in TipoVehiculo.entries) {
+            val nombres = TiposMantenimiento.TODOS
+                .filter { it.tipoVehiculo == vehiculo }
+                .map { it.nombre.lowercase() }
+            assertEquals("Nombres duplicados en $vehiculo", nombres.toSet().size, nombres.size)
+        }
     }
 
     // ───── 22. Todos los tipos tienen peso positivo ─────
@@ -405,11 +425,12 @@ class SaludMotoCalculatorTest {
     // ───── 31. Existen los 25 tipos del 1 al 25 ─────
     @Test
     fun `existen los 25 tipos con ids 1 a 25`() {
-        val ids = TiposMantenimiento.TODOS.map { it.id }.toSet()
-        for (i in 1L..25L) {
-            assertTrue("Falta el tipo con id=$i", i in ids)
-        }
-        assertEquals(25, ids.size)
+        val moto = TiposMantenimiento.TODOS.filter { it.tipoVehiculo == TipoVehiculo.MOTO }
+        val coche = TiposMantenimiento.TODOS.filter { it.tipoVehiculo == TipoVehiculo.COCHE }
+
+        assertEquals(25, moto.size)
+        assertEquals((1L..25L).toSet(), moto.map { it.id }.toSet())
+        assertEquals((26L..45L).toSet(), coche.map { it.id }.toSet())
     }
 
     // ───── 32. Todos los tipos tienen peso en 1..10 ─────
@@ -440,10 +461,14 @@ class SaludMotoCalculatorTest {
     // ───── 35. Tipos de desgaste tienen intervaloKms=0 en su mayoría ─────
     @Test
     fun `tipos desgaste con intervalo diferente a 0 son excepcion`() {
-        val conIntervalo = TiposMantenimiento.WEAR_TIPOS.filter { it.intervaloKms > 0 }
-        for (tipo in conIntervalo) {
-            // Pastillas (5000), Discos (10000) tienen intervalo además de desgaste
-            assertTrue(tipo.intervaloKms in listOf(5000, 10000))
+        // Las piezas de desgaste pueden tener además un intervalo de km:
+        // pastillas/discos de moto (5000/10000) y de coche (30000/60000).
+        val permitidos = setOf(5000, 10000, 30000, 60000)
+        for (tipo in TiposMantenimiento.WEAR_TIPOS.filter { it.intervaloKms > 0 }) {
+            assertTrue(
+                "${tipo.nombre} tiene intervalo inesperado ${tipo.intervaloKms}",
+                tipo.intervaloKms in permitidos,
+            )
         }
     }
 
@@ -528,11 +553,13 @@ class SaludMotoCalculatorTest {
     // ───── 40. Todos los wear tipos con porcentaje vida 0% → cumplimiento 0 ─────
     @Test
     fun `todos los wear tipos con 0 por ciento dan cumplimiento 0`() {
-        val lista = TiposMantenimiento.WEAR_TIPOS.map { tipo ->
+        val wearMoto = TiposMantenimiento.WEAR_TIPOS
+            .filter { it.tipoVehiculo == TipoVehiculo.MOTO }
+        val lista = wearMoto.map { tipo ->
             mant(tipo.nombre, tipoId = tipo.id, porcentajeVida = 0)
         }
         val res = SaludMotoCalculator.calcular(lista, kmActuales = 0)
-        for (tipo in TiposMantenimiento.WEAR_TIPOS) {
+        for (tipo in wearMoto) {
             val detalle = res.desglose.find { it.tipo.id == tipo.id }
             assertEquals("${tipo.nombre} debería tener cumplimiento 0", 0, detalle!!.cumplimiento)
         }
@@ -541,11 +568,13 @@ class SaludMotoCalculatorTest {
     // ───── 41. Todos los wear tipos con porcentaje vida 100% → cumplimiento 100 ─────
     @Test
     fun `todos los wear tipos con 100 por ciento dan cumplimiento 100`() {
-        val lista = TiposMantenimiento.WEAR_TIPOS.map { tipo ->
+        val wearMoto = TiposMantenimiento.WEAR_TIPOS
+            .filter { it.tipoVehiculo == TipoVehiculo.MOTO }
+        val lista = wearMoto.map { tipo ->
             mant(tipo.nombre, tipoId = tipo.id, porcentajeVida = 100)
         }
         val res = SaludMotoCalculator.calcular(lista, kmActuales = 0)
-        for (tipo in TiposMantenimiento.WEAR_TIPOS) {
+        for (tipo in wearMoto) {
             val detalle = res.desglose.find { it.tipo.id == tipo.id }
             assertEquals("${tipo.nombre} debería tener cumplimiento 100", 100, detalle!!.cumplimiento)
         }
@@ -555,7 +584,7 @@ class SaludMotoCalculatorTest {
     @Test
     fun `wear tipos sin registro dan cumplimiento 100`() {
         val res = SaludMotoCalculator.calcular(emptyList(), kmActuales = 0)
-        for (tipo in TiposMantenimiento.WEAR_TIPOS) {
+        for (tipo in TiposMantenimiento.WEAR_TIPOS.filter { it.tipoVehiculo == TipoVehiculo.MOTO }) {
             val detalle = res.desglose.find { it.tipo.id == tipo.id }
             assertEquals("${tipo.nombre} sin registro debería ser 100", 100, detalle!!.cumplimiento)
         }
@@ -738,12 +767,14 @@ class SaludMotoCalculatorTest {
     // ───── 55. Todos los tipos con tipoId=0 (legacy) y nombre exacto ─────
     @Test
     fun `todos legacy con nombre exacto se emparejan`() {
-        val lista = TiposMantenimiento.TODOS.filter { it.intervaloKms > 0 }.map { tipo ->
+        val tiposMoto = TiposMantenimiento.TODOS
+            .filter { it.tipoVehiculo == TipoVehiculo.MOTO }
+        val lista = tiposMoto.filter { it.intervaloKms > 0 }.map { tipo ->
             mant(tipo.nombre, kms = 0, intervaloKms = tipo.intervaloKms, tareas = null)
         }
         val res = SaludMotoCalculator.calcular(lista, kmActuales = 999_999)
         val mapeados = res.desglose.count { it.cumplimiento == 0 }
-        val conIntervalo = TiposMantenimiento.TODOS.count { it.intervaloKms > 0 && !it.esDesgaste }
+        val conIntervalo = tiposMoto.count { it.intervaloKms > 0 && !it.esDesgaste }
         assertTrue("Deberían mapearse los tipos con intervalo", mapeados >= conIntervalo)
     }
 
@@ -846,6 +877,7 @@ class SaludMotoCalculatorTest {
     @Test
     fun `intervalo cero no afecta el cumplimiento`() {
         val idsConIntervaloCero = TiposMantenimiento.TODOS
+            .filter { it.tipoVehiculo == TipoVehiculo.MOTO }
             .filter { it.intervaloKms == 0 && it.intervaloDias == 0 && !it.esDesgaste }
         val lista = idsConIntervaloCero.map { tipo ->
             mant(tipo.nombre, kms = 1000, intervaloKms = 0, tipoId = tipo.id)
