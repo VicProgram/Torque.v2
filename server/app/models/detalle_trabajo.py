@@ -1,10 +1,15 @@
 from sqlalchemy import (
-    Column, String, Text, Integer, DECIMAL, ForeignKey,
+    DECIMAL,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
 )
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, GUID
+from app.models.base import GUID, UUIDMixin
 
 
 class DetalleTrabajo(UUIDMixin, Base):

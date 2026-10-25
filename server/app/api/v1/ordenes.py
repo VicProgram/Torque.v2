@@ -1,26 +1,27 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.database import get_db
-from app.models.orden_trabajo import OrdenTrabajo
-from app.models.detalle_trabajo import DetalleTrabajo
-from app.models.vehiculo import Vehiculo
-from app.models.cliente import Cliente
-from app.models.usuario import Usuario
-from app.schemas.orden_trabajo import (
-    OrdenTrabajoCreate,
-    OrdenTrabajoUpdate,
-    OrdenTrabajoResponse,
-    DetalleTrabajoCreate,
-    DetalleTrabajoUpdate,
-    DetalleTrabajoResponse,
-    CambioEstadoRequest,
-)
-from app.schemas.common import Mensaje
 from app.api.deps import get_current_user
 from app.core.exceptions import NotFoundException
 from app.core.websocket import manager
+from app.database import get_db
+from app.models.cliente import Cliente
+from app.models.detalle_trabajo import DetalleTrabajo
+from app.models.orden_trabajo import OrdenTrabajo
+from app.models.usuario import Usuario
+from app.models.vehiculo import Vehiculo
+from app.schemas.common import Mensaje
+from app.schemas.orden_trabajo import (
+    CambioEstadoRequest,
+    DetalleTrabajoCreate,
+    DetalleTrabajoResponse,
+    DetalleTrabajoUpdate,
+    OrdenTrabajoCreate,
+    OrdenTrabajoResponse,
+    OrdenTrabajoUpdate,
+)
 
 router = APIRouter()
 
@@ -131,7 +132,7 @@ def crear_orden(
 ):
     orden = OrdenTrabajo(
         id_taller=user.id_taller,
-        fecha_entrada=datetime.now(timezone.utc),
+        fecha_entrada=datetime.now(UTC),
         **data.model_dump(),
     )
     db.add(orden)
@@ -199,7 +200,7 @@ def cambiar_estado_orden(
     old_estado = orden.estado
     orden.estado = data.estado
     if data.estado == "COMPLETADO":
-        orden.fecha_completado = datetime.now(timezone.utc)
+        orden.fecha_completado = datetime.now(UTC)
     db.commit()
     db.refresh(orden)
 

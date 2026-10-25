@@ -1,20 +1,19 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.database import get_db
-from app.models.factura import Factura
-from app.models.orden_trabajo import OrdenTrabajo
-from app.models.vehiculo import Vehiculo
-from app.models.cliente import Cliente
-from app.models.usuario import Usuario
-from app.schemas.factura import (
-    FacturaCreate,
-    FacturaUpdate,
-    FacturaResponse,
-)
-from app.schemas.common import Mensaje
 from app.api.deps import get_current_user
 from app.core.exceptions import NotFoundException
+from app.database import get_db
+from app.models.cliente import Cliente
+from app.models.factura import Factura
+from app.models.orden_trabajo import OrdenTrabajo
+from app.models.usuario import Usuario
+from app.models.vehiculo import Vehiculo
+from app.schemas.factura import (
+    FacturaCreate,
+    FacturaResponse,
+    FacturaUpdate,
+)
 
 router = APIRouter()
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 """Seed the database with default vehicle brands and models."""
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from app.database import engine, SessionLocal, Base
-from app.models.marca_modelo import MarcaVehiculo, ModeloVehiculo
+from app.data.marcas import MARCAS_COCHE, MARCAS_MOTO
+from app.database import SessionLocal, engine
 from app.models.base import Base as AppBase
-from app.data.marcas import MARCAS_MOTO, MARCAS_COCHE
+from app.models.marca_modelo import MarcaVehiculo, ModeloVehiculo
 
 
 def seed():

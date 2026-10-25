@@ -1,8 +1,8 @@
-from sqlalchemy import Column, String, Text, DECIMAL, ForeignKey
+from sqlalchemy import DECIMAL, Column, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, GUID
+from app.models.base import GUID, UUIDMixin
 
 
 class ConfiguracionTaller(UUIDMixin, Base):

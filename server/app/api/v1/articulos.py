@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_user
+from app.core.exceptions import NotFoundException
 from app.database import get_db
 from app.models.articulo import Articulo
 from app.models.usuario import Usuario
 from app.schemas.articulo import (
-    ArticuloCreate,
-    ArticuloUpdate,
-    ArticuloResponse,
     AjusteStockRequest,
+    ArticuloCreate,
+    ArticuloResponse,
+    ArticuloUpdate,
 )
 from app.schemas.common import Mensaje
-from app.api.deps import get_current_user
-from app.core.exceptions import NotFoundException
 
 router = APIRouter()
 

@@ -1,8 +1,8 @@
 import customtkinter as ctk
 
+from app.api_client import API
 from app.config import CONFIG
 from app.state import STATE
-from app.api_client import API
 
 
 class LoginView(ctk.CTkFrame):

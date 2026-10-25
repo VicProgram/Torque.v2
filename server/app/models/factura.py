@@ -1,10 +1,16 @@
 from sqlalchemy import (
-    Column, String, Text, Date, DECIMAL, ForeignKey, UniqueConstraint,
+    DECIMAL,
+    Column,
+    Date,
+    ForeignKey,
+    String,
+    Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, GUID
+from app.models.base import GUID, UUIDMixin
 
 
 class Factura(UUIDMixin, Base):

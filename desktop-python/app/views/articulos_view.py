@@ -1,9 +1,9 @@
 import customtkinter as ctk
 
 from app.api_client import API
-from app.components.table_widget import TableWidget
-from app.components.form_widgets import FormEntry
 from app.components.dialogs import ConfirmDialog
+from app.components.form_widgets import FormEntry
+from app.components.table_widget import TableWidget
 from app.utils.helpers import format_decimal
 
 

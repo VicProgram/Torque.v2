@@ -1,8 +1,8 @@
-from sqlalchemy import Column, String, Integer, DECIMAL, ForeignKey
+from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.base import UUIDMixin, TimestampMixin, GUID
+from app.models.base import GUID, TimestampMixin, UUIDMixin
 
 
 class Articulo(UUIDMixin, TimestampMixin, Base):

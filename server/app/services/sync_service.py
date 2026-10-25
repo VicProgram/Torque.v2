@@ -3,15 +3,14 @@ Service for data migration from the legacy SQLite format to PostgreSQL.
 Used during initial setup when importing data from the existing Android/Desktop backup.
 """
 import sqlite3
-from uuid import UUID
-from datetime import datetime
+
 from sqlalchemy.orm import Session
 
-from app.models.taller import Taller
 from app.models.cliente import Cliente
-from app.models.vehiculo import Vehiculo
-from app.models.orden_trabajo import OrdenTrabajo
 from app.models.detalle_trabajo import DetalleTrabajo
+from app.models.orden_trabajo import OrdenTrabajo
+from app.models.taller import Taller
+from app.models.vehiculo import Vehiculo
 
 
 def importar_desde_sqlite(

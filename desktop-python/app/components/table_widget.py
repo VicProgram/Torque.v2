@@ -1,6 +1,7 @@
-from typing import Any, Callable, Optional
-import customtkinter as ctk
+from collections.abc import Callable
 from tkinter import ttk
+
+import customtkinter as ctk
 
 
 def configurar_estilo_treeview():
@@ -35,8 +36,8 @@ class TableWidget(ctk.CTkFrame):
         self,
         master,
         columns: list[tuple[str, int]],
-        on_select: Optional[Callable[[dict], None]] = None,
-        on_double_click: Optional[Callable[[str], None]] = None,
+        on_select: Callable[[dict], None] | None = None,
+        on_double_click: Callable[[str], None] | None = None,
         **kwargs,
     ):
         super().__init__(master, **kwargs)

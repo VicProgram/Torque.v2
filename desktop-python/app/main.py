@@ -1,17 +1,17 @@
 import customtkinter as ctk
 
-from app.config import CONFIG
-from app.state import STATE
 from app.api_client import API
 from app.components.sidebar import Sidebar
-from app.views.login_view import LoginView
-from app.views.dashboard_view import DashboardView
-from app.views.clientes_view import ClientesView
-from app.views.vehiculos_view import VehiculosView
-from app.views.ordenes_view import OrdenesView
+from app.config import CONFIG
+from app.state import STATE
 from app.views.articulos_view import ArticulosView
 from app.views.citas_view import CitasView
+from app.views.clientes_view import ClientesView
+from app.views.dashboard_view import DashboardView
 from app.views.facturas_view import FacturasView
+from app.views.login_view import LoginView
+from app.views.ordenes_view import OrdenesView
+from app.views.vehiculos_view import VehiculosView
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")

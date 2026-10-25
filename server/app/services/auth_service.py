@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import ConflictException
+from app.core.security import hash_password
 from app.models.taller import Taller
 from app.models.usuario import Usuario
-from app.core.security import hash_password
-from app.core.exceptions import ConflictException
 
 
 def registrar_taller(
