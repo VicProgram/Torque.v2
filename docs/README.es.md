@@ -93,13 +93,13 @@ Torque.v2/
 ├── server/                # Servidor Python FastAPI
 │   ├── app/
 │   │   ├── main.py        # Entry point
-│   │   ├── models/        # SQLAlchemy (14 tablas)
+│   │   ├── models/        # SQLAlchemy (15 tablas)
 │   │   ├── schemas/       # Pydantic request/response
 │   │   ├── api/v1/        # Endpoints REST
 │   │   ├── services/      # Lógica de negocio
 │   │   └── core/          # Security, WebSocket, exceptions
 │   ├── alembic/           # Migraciones DB
-│   └── tests/             # pytest (32 tests)
+│   └── tests/             # pytest (50 tests)
 │
 ├── desktop-python/        # Cliente escritorio
 │   ├── app/
@@ -149,7 +149,10 @@ Con el servidor corriendo, abrir http://localhost:8000/docs para Swagger UI.
 - `POST /api/v1/auth/login` — Login (email/password)
 - `POST /api/v1/auth/login-pin` — Login por PIN
 - `GET /api/v1/auth/me` — Perfil actual
-- `PATCH /api/v1/auth/me/pin` — Asignar PIN
+- `PATCH /api/v1/auth/me/pin` — Asignar PIN (6 dígitos)
+- `POST /api/v1/auth/me/password` — Cambiar contraseña
+- `POST /api/v1/auth/logout` — Revocar todos los tokens
+- `GET /api/v1/auditoria/eventos` — Auditoría (solo ADMIN, por taller)
 
 ### Gestión
 - `GET/POST /api/v1/clientes` — Listar / crear clientes
@@ -176,7 +179,7 @@ Con el servidor corriendo, abrir http://localhost:8000/docs para Swagger UI.
 ## Tests
 
 ```bash
-# Servidor (32 tests)
+# Servidor (50 tests)
 cd server && . venv/bin/activate && pytest tests/ -v
 
 # Desktop (4 tests)
@@ -194,7 +197,8 @@ cd desktop-python && . .venv/bin/activate && pytest tests/ -v
 
 Usuario: `admin@demo.com`
 Contraseña: `demo1234`
-PIN: `1234`
+
+El PIN se configura desde la app o con `PATCH /api/v1/auth/me/pin`. Los PIN nuevos tienen 6 dígitos; los PIN antiguos de 4 dígitos siguen funcionando y se migran a hash en el primer inicio de sesión.
 
 O ejecutar `make seed` (o `.\dev.ps1 seed`) con el servidor corriendo para crear datos de ejemplo.
 

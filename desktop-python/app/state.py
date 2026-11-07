@@ -24,7 +24,8 @@ class AppState:
         self._notify()
 
     def logout(self):
-        self.token = ""
+        # Clearing a session field, not a credential.
+        self.token = ""  # nosec B105
         self.id_usuario = ""
         self.id_taller = ""
         self.rol = ""

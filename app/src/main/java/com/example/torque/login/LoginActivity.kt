@@ -36,8 +36,13 @@ class LoginActivity : ComponentActivity() {
                             isLoading = true
                             errorMessage = null
                             try {
-                                authManager.saveServerUrl(serverUrl)
-                                val normalised = serverUrl.trimEnd('/') + "/"
+                                val trimmedUrl = serverUrl.trim()
+                                require(
+                                    trimmedUrl.startsWith("http://") ||
+                                        trimmedUrl.startsWith("https://"),
+                                ) { "URL del servidor no válida" }
+                                authManager.saveServerUrl(trimmedUrl)
+                                val normalised = trimmedUrl.trimEnd('/') + "/"
                                 val api = ApiClient.create(normalised, authManager)
                                 val response = api.loginPin(PinLoginRequest(pin))
                                 if (response.isSuccessful) {

@@ -1,5 +1,6 @@
 package com.example.torque.network
 
+import com.example.torque.data.BuildConfig
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -23,17 +24,23 @@ object ApiClient {
             chain.proceed(request)
         }
 
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
-        val okHttpClient = OkHttpClient.Builder()
+        val clientBuilder = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
-            .addInterceptor(logging)
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
-            .build()
+
+        // Never ship request/response logging in release builds. BASIC level keeps
+        // authorization headers, PINs and customer payloads out of debug logs too.
+        if (BuildConfig.DEBUG) {
+            clientBuilder.addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BASIC
+                },
+            )
+        }
+
+        val okHttpClient = clientBuilder.build()
 
         return Retrofit.Builder()
             .baseUrl(baseUrl)

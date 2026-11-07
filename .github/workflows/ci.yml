@@ -68,6 +68,19 @@ jobs:
       - name: Tests (pytest + coverage)
         run: pytest --cov=app --cov-report=term-missing
 
+      - name: Security static analysis (Bandit)
+        run: bandit -r app -q
+
+      - name: Dependency audit (pip-audit)
+        run: pip-audit -r requirements.txt
+
+      - name: Migrations match models
+        env:
+          DATABASE_URL: sqlite:////tmp/torque-ci.db
+        run: |
+          alembic upgrade head
+          alembic check
+
   desktop:
     name: Desktop (Python)
     runs-on: ubuntu-latest
@@ -91,3 +104,9 @@ jobs:
 
       - name: Tests (pytest + coverage)
         run: pytest --cov=app --cov-report=term-missing
+
+      - name: Security static analysis (Bandit)
+        run: bandit -r app -q
+
+      - name: Dependency audit (pip-audit)
+        run: pip-audit -r requirements.txt

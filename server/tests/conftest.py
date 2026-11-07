@@ -6,10 +6,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app import database
+from app.core.rate_limit import limiter
 from app.core.security import create_access_token, hash_password
 from app.database import Base, get_db
 from app.main import app
 
+TEST_PASSWORD = "Seguro1234"
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_torque.db"
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -30,6 +33,15 @@ def override_get_db():
 
 
 app.dependency_overrides[get_db] = override_get_db
+# The WebSocket authenticator opens its own session; point it at the test DB.
+database.SessionLocal = TestingSessionLocal
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    limiter.reset()
+    yield
+    limiter.reset()
 
 
 @pytest.fixture
@@ -63,7 +75,7 @@ def _create_taller_admin(db_session, nombre: str, email: str, admin_nombre: str)
         id_taller=taller.id,
         nombre=admin_nombre,
         email=email,
-        password_hash=hash_password("test123"),
+        password_hash=hash_password(TEST_PASSWORD),
         rol="ADMIN",
     )
     db_session.add(admin)
@@ -92,3 +104,33 @@ def auth_headers(client, db_session):
 def other_auth_headers(client, db_session):
     """Create a second taller + admin to check tenant isolation."""
     return _create_taller_admin(db_session, "Other Taller", "other@test.com", "Admin Other")
+
+
+@pytest.fixture
+def mecanico_headers(client, auth_headers, db_session):
+    """Create a mechanic in the default test workshop."""
+    from app.models.usuario import Usuario
+
+    taller_id = auth_headers["X-Taller-ID"]
+    mecanico = Usuario(
+        id_taller=taller_id,
+        nombre="Mecánico Test",
+        email="mecanico@test.com",
+        password_hash=hash_password(TEST_PASSWORD),
+        rol="MECANICO",
+    )
+    db_session.add(mecanico)
+    db_session.commit()
+    db_session.refresh(mecanico)
+
+    token = create_access_token(
+        data={
+            "sub": str(mecanico.id),
+            "id_taller": str(mecanico.id_taller),
+            "rol": mecanico.rol,
+        }
+    )
+    return {
+        "Authorization": f"Bearer {token}",
+        "X-Taller-ID": str(mecanico.id_taller),
+    }

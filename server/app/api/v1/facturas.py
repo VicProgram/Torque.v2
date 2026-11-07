@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, require_taller_record
+from app.api.deps import get_current_user, require_rol, require_taller_record
 from app.core.exceptions import NotFoundException
 from app.database import get_db
 from app.models.cliente import Cliente
@@ -80,7 +80,7 @@ def listar_facturas(
 @router.post("", response_model=FacturaResponse, status_code=201)
 def crear_factura(
     data: FacturaCreate,
-    user: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(require_rol("ADMIN")),
     db: Session = Depends(get_db),
 ):
     require_taller_record(
@@ -112,7 +112,7 @@ def obtener_factura(
 def actualizar_factura(
     factura_id: str,
     data: FacturaUpdate,
-    user: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(require_rol("ADMIN")),
     db: Session = Depends(get_db),
 ):
     factura = db.query(Factura).filter(

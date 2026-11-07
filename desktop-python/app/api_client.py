@@ -13,7 +13,13 @@ class ApiClient:
     @property
     def client(self) -> httpx.Client:
         if self._client is None:
-            self._client = httpx.Client(base_url=CONFIG.api_url, timeout=30)
+            # follow_redirects stays disabled so the bearer token is never
+            # forwarded to a host the configured server redirects us to.
+            self._client = httpx.Client(
+                base_url=CONFIG.api_url,
+                timeout=30,
+                follow_redirects=False,
+            )
         return self._client
 
     @property

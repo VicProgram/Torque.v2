@@ -29,7 +29,7 @@
 | Migraciones | Alembic | — | Control de versiones de DB |
 | Base de datos | PostgreSQL | 16+ | Base de datos central |
 | Cache / WS | Redis | 7+ | Sesiones + WebSocket pub/sub |
-| Auth | python-jose + passlib | — | JWT + hash de contraseñas |
+| Auth | PyJWT + bcrypt | — | JWT con revocación + hash de contraseñas/PIN |
 | PDF | ReportLab | — | Generación de facturas/presupuestos |
 | Testing | pytest | — | Tests del servidor |
 | **Desktop** | | | |
@@ -282,7 +282,7 @@ Torque.v2/
 
 ### Completado (Fases 0, 1 y 2)
 
-- `server/` — Servidor Python FastAPI completo con 14 tablas, CRUD completo, auth JWT, WebSocket, PDF, dashboard KPIs, tests (32/32)
+- `server/` — Servidor Python FastAPI completo con 15 tablas, CRUD completo, auth JWT, WebSocket autenticado, PDF, dashboard KPIs, auditoría, tests (50/50)
 - `desktop-python/` — Cliente de escritorio Python completo con 8 vistas (login, dashboard, clientes, vehículos, órdenes, citas, facturas, artículos), UUID resolution, CustomTkinter
 
 ### Por hacer (Fase 3+)

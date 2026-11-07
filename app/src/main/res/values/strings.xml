@@ -410,6 +410,8 @@
     <string name="server_test_connection_subtitle">Verificar que el servidor responde</string>
     <string name="dialog_server_title">Configurar servidor</string>
     <string name="dialog_server_url_label">URL del servidor</string>
+    <string name="server_url_invalid">La URL debe empezar por http:// o https://</string>
+    <string name="server_url_https_required">La versión de producción requiere HTTPS</string>
     <string name="toast_server_test_success">Conexión exitosa ✔</string>
     <string name="toast_server_test_error">Error de conexión: %s</string>
     <string name="btn_test">Probar</string>

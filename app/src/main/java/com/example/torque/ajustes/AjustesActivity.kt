@@ -230,9 +230,13 @@ fun AjustesScreen(onBack: () -> Unit) {
                     subtitulo = stringResource(R.string.server_test_connection_subtitle),
                     onClick = {
                         coroutineScope.launch {
-                            val normalised = serverUrl.trimEnd('/') + "/"
-                            val api = ApiClient.create(normalised, authManager)
                             try {
+                                require(
+                                    serverUrl.startsWith("http://") ||
+                                        serverUrl.startsWith("https://"),
+                                ) { context.getString(R.string.server_url_invalid) }
+                                val normalised = serverUrl.trimEnd('/') + "/"
+                                val api = ApiClient.create(normalised, authManager)
                                 val response = api.getMe()
                                 if (response.isSuccessful) {
                                     Toast.makeText(context, context.getString(R.string.toast_server_test_success), Toast.LENGTH_SHORT).show()

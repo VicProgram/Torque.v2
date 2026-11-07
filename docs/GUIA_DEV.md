@@ -1259,8 +1259,8 @@ Todas las Activities internas (10 de 11) tienen `android:exported="false"`. Solo
 | **SQLAlchemy 2.0** | ORM |
 | **Alembic** | Migraciones DB |
 | **SQLite** | Base de datos (desarrollo) |
-| **python-jose** | JWT |
-| **passlib + bcrypt** | Hash de contraseñas |
+| **PyJWT** | JWT (issuer, audience, expiración, revocación por `token_version`) |
+| **bcrypt** | Hash de contraseñas y PIN |
 | **pytest** | Tests |
 | **ReportLab** | Generación de PDF |
 
@@ -1288,15 +1288,15 @@ server/
 │   │   ├── archivo.py       # Archivos adjuntos
 │   │   └── marca_modelo.py  # Marcas y modelos de vehículos (catálogo global)
 │   ├── schemas/             # Pydantic (request/response)
-│   ├── api/v1/              # 9 routers REST
+│   ├── api/v1/              # 10 routers REST (incluye auditoría)
 │   ├── services/            # Lógica de negocio
-│   └── core/                # Security, WebSocket, exceptions
-├── alembic/                 # Migraciones
-├── tests/                   # pytest (32 tests)
+│   └── core/                # Security, audit, rate limit, middleware, WebSocket, exceptions
+├── alembic/                 # Migraciones (baseline versionada)
+├── tests/                   # pytest (50 tests)
 └── requirements.txt
 ```
 
-### Base de datos: 14 tablas
+### Base de datos: 15 tablas
 
 | Tabla | PK | Claves foráneas |
 |---|---|---|
@@ -1314,16 +1314,23 @@ server/
 | `archivos` | id UUID | taller_id, orden_id |
 | `marcas_vehiculo` | id UUID | — (catálogo global, no multi-taller) |
 | `modelos_vehiculo` | id UUID | id_marca → marcas_vehiculo |
+| `audit_logs` | id UUID | id_taller, id_usuario (append-only) |
 
 ### Auth
 
 - `POST /auth/registro-taller` — crea taller + admin con hash bcrypt
 - `POST /auth/login` — email + password → JWT (sub=usuario.id, taller_id)
-- `POST /auth/login-pin` — PIN de 4 dígitos → JWT
+- `POST /auth/login-pin` — PIN de 6 dígitos (4-6 para cuentas legacy) → JWT
 - `GET /auth/me` — perfil actual desde token
-- `PATCH /auth/me/pin` — asignar/cambiar PIN
+- `PATCH /auth/me/pin` — asignar/cambiar PIN (revoca tokens anteriores)
+- `POST /auth/me/password` — cambiar contraseña con la contraseña actual
+- `POST /auth/logout` — revoca todos los tokens del usuario
+- `GET /auditoria/eventos` — eventos de auditoría (solo ADMIN, por taller)
 
-JWT configurable: access token (30 min default).
+JWT configurable: access token 60 min por defecto, PIN token 480 min. El token
+incluye `iss`, `aud`, `exp`, `nbf`, `jti` y `ver` (versión de token). Al cambiar
+PIN/contraseña o hacer logout se incrementa `token_version` y los tokens previos
+quedan revocados.
 
 ### Tests
 
@@ -1331,7 +1338,7 @@ JWT configurable: access token (30 min default).
 cd server && . venv/bin/activate && pytest tests/ -v
 ```
 
-32 tests: auth (4), clientes (6), vehículos (6) y aislamiento multi-taller (16).
+50 tests: autenticación, clientes, vehículos, aislamiento multi-taller y controles de hardening (headers, rate limit, lockout, revocación, PIN, WebSocket, RBAC y auditoría).
 
 ### Ejecutar
 
@@ -1352,7 +1359,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 cd server && . venv/bin/activate && pytest tests/ -v
 ```
 
-32 tests: auth (4), clientes (6), vehículos (6) y aislamiento multi-taller (16).
+50 tests: autenticación, clientes, vehículos, aislamiento multi-taller y controles de hardening (headers, rate limit, lockout, revocación, PIN, WebSocket, RBAC y auditoría).
 
 ---
 
