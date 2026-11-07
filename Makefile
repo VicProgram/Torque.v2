@@ -1,4 +1,4 @@
-.PHONY: help install server desktop test test-server test-desktop lint lint-python clean seed seed-marcas
+.PHONY: help install server desktop test test-server test-desktop test-security lint lint-python clean seed seed-marcas
 
 help:
 	@echo "╔══════════════════════════════════════════╗"
@@ -10,6 +10,7 @@ help:
 	@echo "║ make test         ─ Ejecutar tests        ║"
 	@echo "║ make test-server  ─ Tests del servidor    ║"
 	@echo "║ make test-desktop ─ Tests del desktop     ║"
+	@echo "║ make test-security─ Bandit + pip-audit    ║"
 	@echo "║ make lint         ─ detekt + Ruff         ║"
 	@echo "║ make lint-python  ─ Ruff (server/desktop) ║"
 	@echo "║ make clean        ─ Limpiar archivos temp ║"
@@ -26,8 +27,8 @@ install:
 server:
 	@echo "==> Iniciar servidor en http://localhost:8000"
 	cd server && . venv/bin/activate && test -f .env || cp .env.example .env && \
-	python3 -c "from app.database import engine, Base; from app.models import *; Base.metadata.create_all(bind=engine)" && \
-	uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+	python3 -m alembic upgrade head && \
+	uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --no-access-log --no-server-header --proxy-headers
 
 desktop:
 	@echo "==> Iniciando app de escritorio"
@@ -40,6 +41,10 @@ test-server:
 
 test-desktop:
 	cd desktop-python && . .venv/bin/activate && python3 -m pytest tests/ -v
+
+test-security:
+	cd server && . venv/bin/activate && bandit -r app -q && pip-audit -r requirements.txt
+	cd desktop-python && . .venv/bin/activate && bandit -r app -q && pip-audit -r requirements.txt
 
 seed:
 	@echo "==> Sembrando datos demo..."

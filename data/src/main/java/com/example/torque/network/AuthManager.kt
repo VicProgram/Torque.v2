@@ -2,6 +2,7 @@ package com.example.torque.network
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
+import com.example.torque.data.BuildConfig
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +24,11 @@ class AuthManager(private val context: Context) {
         private val KEY_NOMBRE = stringPreferencesKey("nombre")
         private val KEY_ROL = stringPreferencesKey("rol")
         private val KEY_SERVER_URL = stringPreferencesKey("server_url")
-        const val DEFAULT_SERVER_URL = "http://10.0.2.2:8000"
+
+        // Debug builds keep the emulator default. Release builds require an
+        // explicitly configured HTTPS endpoint (cleartext is disabled there).
+        val DEFAULT_SERVER_URL: String =
+            if (BuildConfig.DEBUG) "http://10.0.2.2:8000" else ""
 
         @Volatile
         private var instance: AuthManager? = null

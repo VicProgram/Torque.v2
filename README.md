@@ -88,7 +88,7 @@ Torque.v2/
 | Layer | Stack |
 |---|---|
 | Android | Kotlin 2.1, Jetpack Compose (BOM 2025.05), Material 3, Room 2.6, Retrofit 2.11, KSP, DataStore |
-| Backend | Python 3.12, FastAPI, SQLAlchemy 2, Alembic, Pydantic v2, python-jose, ReportLab, Uvicorn |
+| Backend | Python 3.12, FastAPI, SQLAlchemy 2, Alembic, Pydantic v2, PyJWT, bcrypt, ReportLab, Uvicorn |
 | Desktop | Python 3.12, CustomTkinter, httpx, Pillow |
 | Quality | JUnit 4, pytest, Ruff, detekt, GitHub Actions |
 
@@ -143,7 +143,7 @@ Swagger UI is served at `http://localhost:8000/docs`. The API exposes 45 endpoin
 
 | Group | Endpoints |
 |---|---|
-| Auth | `registro-taller`, `login`, `login-pin`, `me`, `me/pin` |
+| Auth | `registro-taller`, `login`, `login-pin`, `me`, `me/pin`, `me/password`, `logout` |
 | Customers | list/create/read/update/delete |
 | Vehicles | CRUD, plate lookup |
 | Work orders | CRUD, state transitions, line items, PDF |
@@ -152,8 +152,9 @@ Swagger UI is served at `http://localhost:8000/docs`. The API exposes 45 endpoin
 | Inventory | CRUD, stock adjustment |
 | Dashboard | workshop KPIs |
 | Catalogue | brands by vehicle type, models per brand |
+| Audit | `auditoria/eventos` (ADMIN, read-only, tenant-scoped) |
 
-Auth is JWT-based. Every workshop-owned record is filtered by `id_taller`, so each workshop can only list and edit its own data. The vehicle brand/model catalogue is global and intentionally shared.
+Auth is JWT-based (issuer/audience/expiry validation, per-user token version for revocation). New PINs are six digits and stored as bcrypt hashes plus a keyed HMAC lookup; legacy four-digit PINs keep working and are upgraded after login. Every workshop-owned record is filtered by `id_taller`, so each workshop can only list and edit its own data. The vehicle brand/model catalogue is global and intentionally shared.
 
 ## Screenshots
 
@@ -168,7 +169,7 @@ Auth is JWT-based. Every workshop-owned record is filtered by `id_taller`, so ea
 ## Tests and quality
 
 ```bash
-# Backend — 32 tests
+# Backend — 50 tests
 cd server && pytest
 
 # Desktop — 4 tests
@@ -179,11 +180,28 @@ cd desktop-python && pytest
 ./gradlew detekt
 ```
 
-GitHub Actions runs all three suites on every push and pull request, builds the debug APK and uploads it as an artifact.
+GitHub Actions runs all three suites on every push and pull request, builds the debug APK and uploads it as an artifact. The server job also runs Bandit, `pip-audit` and an Alembic model/migration drift check.
+
+## Security
+
+- Password and PIN hashing, JWT claim validation and token revocation.
+- Per-workshop tenant isolation plus `ADMIN` checks for destructive and billing operations.
+- Authenticated, tenant-scoped WebSocket channel.
+- Append-only audit trail with request IDs and admin-only access.
+- Rate limiting, account lockout, security headers and a production configuration guard.
+- TLS-only Android release builds; cleartext is debug-only.
+- Bandit, `pip-audit`, Dependabot and migration-drift checks in CI.
+
+See [SECURITY.md](SECURITY.md) for the reporting process and the secure
+deployment checklist. The SOC 2 control mapping and operating procedures are in:
+
+- [SOC 2 hardening and control mapping](docs/SOC2_HARDENING.md)
+- [Incident response plan](docs/INCIDENT_RESPONSE.md)
+- [Change management](docs/CHANGE_MANAGEMENT.md)
 
 ## Documentation
 
-The in-depth documentation is written in Spanish:
+The in-depth product documentation is written in Spanish:
 
 - [Project guide](docs/README.es.md) — components, commands, structure
 - [Development guide](docs/GUIA_DEV.md) — environment setup, troubleshooting

@@ -16,7 +16,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.BuildConfig
 import com.example.torque.network.AuthManager
+
+private fun serverUrlError(url: String): String? {
+    val trimmed = url.trim()
+    return when {
+        trimmed.isBlank() -> "Introduce la URL del servidor"
+        !trimmed.startsWith("http://") && !trimmed.startsWith("https://") ->
+            "La URL debe empezar por http:// o https://"
+        !BuildConfig.DEBUG && !trimmed.startsWith("https://") ->
+            "La versión de producción requiere HTTPS"
+        else -> null
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,8 +40,10 @@ fun LoginScreen(
 ) {
     var pin by remember { mutableStateOf("") }
     var serverUrl by remember { mutableStateOf(AuthManager.DEFAULT_SERVER_URL) }
-    var showServerConfig by remember { mutableStateOf(false) }
+    var showServerConfig by remember { mutableStateOf(AuthManager.DEFAULT_SERVER_URL.isBlank()) }
     val focusManager = LocalFocusManager.current
+    val urlError = serverUrlError(serverUrl)
+    val cleartextWarning = BuildConfig.DEBUG && serverUrl.trim().startsWith("http://")
 
     Column(
         modifier = Modifier
@@ -47,7 +62,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Introduce tu código PIN",
+            text = "Introduce tu PIN (4-6 dígitos)",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -56,7 +71,7 @@ fun LoginScreen(
 
         OutlinedTextField(
             value = pin,
-            onValueChange = { if (it.length <= 6) pin = it },
+            onValueChange = { value -> pin = value.filter(Char::isDigit).take(6) },
             label = { Text("PIN") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
@@ -66,7 +81,7 @@ fun LoginScreen(
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
-                    if (pin.isNotBlank()) onLogin(pin, serverUrl)
+                    if (pin.length >= 4 && urlError == null) onLogin(pin, serverUrl)
                 },
             ),
             modifier = Modifier.fillMaxWidth(),
@@ -79,7 +94,7 @@ fun LoginScreen(
                 focusManager.clearFocus()
                 onLogin(pin, serverUrl)
             },
-            enabled = pin.isNotBlank() && !isLoading,
+            enabled = pin.length >= 4 && urlError == null && !isLoading,
             modifier = Modifier.fillMaxWidth().height(50.dp),
         ) {
             if (isLoading) {
@@ -124,6 +139,13 @@ fun LoginScreen(
                     onValueChange = { serverUrl = it },
                     label = { Text("URL del servidor") },
                     singleLine = true,
+                    isError = urlError != null && serverUrl.isNotBlank(),
+                    supportingText = {
+                        when {
+                            urlError != null && serverUrl.isNotBlank() -> Text(urlError)
+                            cleartextWarning -> Text("Aviso: conexión HTTP sin cifrar (solo desarrollo)")
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Uri,
                         imeAction = ImeAction.Done,

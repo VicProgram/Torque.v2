@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_rol
 from app.core.exceptions import NotFoundException
 from app.database import get_db
 from app.models.articulo import Articulo
@@ -94,7 +94,7 @@ def actualizar_articulo(
 @router.delete("/{articulo_id}", response_model=Mensaje)
 def eliminar_articulo(
     articulo_id: str,
-    user: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(require_rol("ADMIN")),
     db: Session = Depends(get_db),
 ):
     articulo = db.query(Articulo).filter(

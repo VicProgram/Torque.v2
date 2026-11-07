@@ -3,6 +3,8 @@
     <!-- Global -->
     <string name="app_name">Torque</string>
     <string name="btn_save">Save</string>
+    <string name="server_url_invalid">The URL must start with http:// or https://</string>
+    <string name="server_url_https_required">The production build requires HTTPS</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_close">Close</string>
     <string name="btn_delete">Delete</string>

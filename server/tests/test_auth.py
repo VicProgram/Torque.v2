@@ -8,7 +8,7 @@ def test_registro_taller(client: TestClient):
             "nombre_taller": "Nuevo Taller",
             "nombre_admin": "Admin",
             "email_admin": "admin@nuevo.com",
-            "password": "securepass",
+            "password": "Seguro1234",
         },
     )
     assert response.status_code == 200
@@ -26,13 +26,13 @@ def test_login(client: TestClient):
             "nombre_taller": "Login Taller",
             "nombre_admin": "Admin Login",
             "email_admin": "login@test.com",
-            "password": "test123",
+            "password": "Seguro1234",
         },
     )
 
     response = client.post(
         "/api/v1/auth/login",
-        json={"email": "login@test.com", "password": "test123"},
+        json={"email": "login@test.com", "password": "Seguro1234"},
     )
     assert response.status_code == 200
     data = response.json()

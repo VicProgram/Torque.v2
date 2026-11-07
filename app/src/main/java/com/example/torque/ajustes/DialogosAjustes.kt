@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.BuildConfig
 import com.example.torque.R
 import com.example.torque.ui.dashboard.ColoresTorque
 import com.example.torque.utils.AyudaIdioma
@@ -106,6 +107,15 @@ fun DialogoConfigurarServidor(
     onConfirmar: (String) -> Unit
 ) {
     var url by remember { mutableStateOf(urlActual) }
+    val trimmedUrl = url.trim()
+    val urlError = when {
+        trimmedUrl.isBlank() -> stringResource(R.string.server_url_invalid)
+        !trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://") ->
+            stringResource(R.string.server_url_invalid)
+        !BuildConfig.DEBUG && !trimmedUrl.startsWith("https://") ->
+            stringResource(R.string.server_url_https_required)
+        else -> null
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -120,6 +130,8 @@ fun DialogoConfigurarServidor(
                 onValueChange = { url = it },
                 label = { Text(stringResource(R.string.dialog_server_url_label)) },
                 singleLine = true,
+                isError = urlError != null,
+                supportingText = urlError?.let { { Text(it) } },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -134,7 +146,10 @@ fun DialogoConfigurarServidor(
             )
         },
         confirmButton = {
-            TextButton(onClick = { onConfirmar(url) }) {
+            TextButton(
+                onClick = { onConfirmar(trimmedUrl) },
+                enabled = urlError == null,
+            ) {
                 Text(stringResource(R.string.btn_save), color = ColoresTorque.Primary)
             }
         },

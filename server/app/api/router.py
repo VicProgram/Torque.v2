@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     articulos,
+    auditoria,
     auth,
     citas,
     clientes,
@@ -15,6 +16,9 @@ from app.api.v1 import (
 api_router = APIRouter()
 
 api_router.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
+api_router.include_router(
+    auditoria.router, prefix="/auditoria", tags=["Auditoría"]
+)
 api_router.include_router(clientes.router, prefix="/clientes", tags=["Clientes"])
 api_router.include_router(
     vehiculos.router, prefix="/vehiculos", tags=["Vehículos"]

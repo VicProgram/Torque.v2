@@ -1,5 +1,6 @@
 from app.models.archivo import Archivo
 from app.models.articulo import Articulo
+from app.models.audit_log import AuditLog
 from app.models.base import Base
 from app.models.cita import Cita
 from app.models.cliente import Cliente
@@ -15,6 +16,7 @@ from app.models.vehiculo import Vehiculo
 
 __all__ = [
     "Base",
+    "AuditLog",
     "Taller",
     "Usuario",
     "Cliente",

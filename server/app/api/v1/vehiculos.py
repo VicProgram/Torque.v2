@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, require_taller_record
+from app.api.deps import get_current_user, require_rol, require_taller_record
 from app.core.exceptions import NotFoundException
 from app.database import get_db
 from app.models.cliente import Cliente
@@ -129,7 +129,7 @@ def actualizar_vehiculo(
 @router.delete("/{vehiculo_id}", response_model=Mensaje)
 def eliminar_vehiculo(
     vehiculo_id: str,
-    user: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(require_rol("ADMIN")),
     db: Session = Depends(get_db),
 ):
     vehiculo = db.query(Vehiculo).filter(
